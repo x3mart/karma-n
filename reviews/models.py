@@ -1,23 +1,18 @@
 from django.db import models
 from django.db.models.aggregates import Avg
-from django.db.models.signals import post_save
-from phonenumber_field.modelfields import PhoneNumberField
-from django.db.models import Q
-from django.db.models.constraints import UniqueConstraint
+from polymorphic.models import PolymorphicModel
 from django.template.defaultfilters import truncatechars
 import django.dispatch
 
 # Create your models here.
-class ReviewComment(models.Model):
+class Likeable(PolymorphicModel):
     body = models.TextField(null=True, blank=True)
     owner = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, related_name='%(class)s')
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
-    class Meta:
-        abstract = True
 
-class Review(ReviewComment):
+class Review(Likeable):
     rating = models.DecimalField(decimal_places=1, default=5, max_digits=3, null=True, blank=True)
     reviewable = models.ForeignKey('reviewables.Reviewable', on_delete=models.CASCADE, related_name='reviews', null=True, blank=True)
     service = models.ForeignKey('services.Service', on_delete=models.PROTECT, related_name='reviews', verbose_name='Услуга', null=True, blank=True)
@@ -57,8 +52,8 @@ class AttributeTitle(models.Model):
         return self.title
 
 
-class Comment(ReviewComment):
-    review = models.ForeignKey('Review', on_delete=models.CASCADE, related_name='comments')
+class Comment(Likeable):
+    commented_review = models.ForeignKey('Review', on_delete=models.CASCADE, related_name='comments')
 
 
     class Meta:
@@ -69,23 +64,12 @@ class Comment(ReviewComment):
 
 class Like(models.Model):
     owner = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, related_name='likes')
-    review = models.ForeignKey('Review', on_delete=models.CASCADE, related_name='likes', blank=True, null=True)
-    comment = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name='likes', blank=True, null=True)
+    likeable = models.ForeignKey('Likeable', on_delete=models.CASCADE, related_name='likes', blank=True, null=True)
     dislike = models.BooleanField(default=False)
 
 
     class Meta:
-        constraints = [
-            UniqueConstraint(fields=['owner', 'review', 'comment'],
-                             name='unique_together'),
-            UniqueConstraint(fields=['owner', 'comment'],
-                             condition=Q(review=None),
-                             name='unique_without_review'),
-            UniqueConstraint(fields=['owner', 'comment'],
-                             condition=Q(review=None),
-                             name='unique_without_comment'),
-        ]
-
+        pass
 
 class ReviewTemplate(models.Model):
     body = models.TextField(verbose_name='Текст')
