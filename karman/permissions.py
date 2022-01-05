@@ -23,8 +23,8 @@ class ReviewPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if view.action in ['destroy','update', 'partial_update',]:
             return obj.owner == request.user or request.user.is_staff
-        if view.action in ['like',]:
-            return request.auth and obj.owner != request.user
+        # if view.action in ['like',]:
+        #     return request.auth and obj.owner != request.user
         return True
 
 

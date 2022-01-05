@@ -104,25 +104,28 @@ class ReviewViewSet(viewsets.ModelViewSet):
         remove = request.data.get('remove')
         dislike = request.data.get('dislike')
         like = object.likes.filter(owner=request.user).first()
+        print(like)
+        print(dislike)
         if dislike and like and not like.dislike:
             like.dislike = True
             like.save()
-            object.like_count -= 2
+            object.count_likes -= 2
         if dislike and not like:
             object.likes.create(owner=request.user, dislike=True)
-            object.like_count -= 1
+            object.count_likes -= 1
         if not dislike and like and like.dislike:
             like.dislike = False
             like.save()
-            object.like_count += 2
+            object.count_likes += 2
         if not dislike and not like:
+            print('wow')
             object.likes.create(owner=request.user)
-            object.like_count += 1
+            object.count_likes += 1
         if remove and like:
             if like.dislike:
-                object.like_count += 1
+                object.count_likes += 1
             else:
-                object.like_count -= 1
+                object.count_likes -= 1
             like.delete()
         object.save()
         qs = self.get_queryset()
@@ -167,22 +170,22 @@ class CommentViewSet(viewsets.ModelViewSet):
         if dislike and like and not like.dislike:
             like.dislike = True
             like.save()
-            comment.like_count -= 2
+            comment.count_likes -= 2
         if dislike and not like:
             comment.likes.create(owner=request.user, dislike=True)
-            comment.like_count -= 1
+            comment.count_likes -= 1
         if not dislike and like and like.dislike:
             like.dislike = False
             like.save()
-            comment.like_count += 2
+            comment.count_likes += 2
         if not dislike and not like:
             comment.likes.create(owner=request.user)
-            comment.like_count += 1
+            comment.count_likes += 1
         if remove and like:
             if like.dislike:
-                comment.like_count += 1
+                comment.count_likes += 1
             else:
-                comment.like_count -= 1
+                comment.count_likes -= 1
             like.delete()
         comment.save()
         qs = self.get_queryset()
