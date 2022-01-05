@@ -8,6 +8,7 @@ import django.dispatch
 class Likeable(PolymorphicModel):
     body = models.TextField(null=True, blank=True)
     owner = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, related_name='%(class)s')
+    count_likes = models.IntegerField(verbose_name='Количество лайков', default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
@@ -17,7 +18,6 @@ class Review(Likeable):
     reviewable = models.ForeignKey('reviewables.Reviewable', on_delete=models.CASCADE, related_name='reviews', null=True, blank=True)
     service = models.ForeignKey('services.Service', on_delete=models.PROTECT, related_name='reviews', verbose_name='Услуга', null=True, blank=True)
     about_customer = models.BooleanField(default=False, verbose_name='О заказчике')
-    count_likes = models.IntegerField(verbose_name='Количество лайков', default=0)
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -42,7 +42,7 @@ class Attribute(models.Model):
 
 class AttributeTitle(models.Model):
     title = models.CharField(max_length=60, verbose_name='Название')
-    is_customer = models.BooleanField(default=False)
+    about_customer = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Название характеристики'

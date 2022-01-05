@@ -13,9 +13,7 @@ def review_template_post_save(instance, created, **kwargs):
             instance.save()
 
 @receiver(post_save, sender=Review)
-def user_post_save(instance, **kwargs):
-    if instance.attributes:
-        avg = instance.attributes.aggregate(avg=Avg('value'))['avg']
-        if instance.rating != avg:
-            instance.rating = avg
-            instance.save()
+def review_post_save(instance, **kwargs):
+    reviewable = instance.reviewable
+    reviewable.rating = reviewable.reviews.aggregate(avg=Avg('rating'))['avg']
+    reviewable.save()

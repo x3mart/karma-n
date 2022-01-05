@@ -10,9 +10,12 @@ from django.db.models import Count
 from django.db.models import Prefetch
 from rest_framework.response import Response
 import requests
+from django.db.models.aggregates import Avg
 from django.apps import apps
 from reviews.filters import ReviewFilter
 from django.db.models import Q
+
+from services.models import Service
 from .models import Attribute, AttributeTitle, Review, Comment, Like, ReviewTemplate
 from .serializers import ReviewSerializer, CommentSerializer, LikeSerializer, ReviewTemplateSerializer
 
@@ -48,30 +51,39 @@ class ReviewViewSet(viewsets.ModelViewSet):
             data = serializer.validated_data
         else:
             return Response(serializer.errors, status=400)
-        reviewable = data.pop('reviewable')
-        type = reviewable.pop('resourcetype')
-        model = apps.get_model('reviewables', type.capitalize())
+        reviewable = request.data.get('reviewable')
+        ctype = reviewable.pop('resourcetype')
+        model = apps.get_model('reviewables', ctype.capitalize())
         reviewable, created = model.objects.get_or_create(**reviewable)
         if reviewable.owner == request.user:
                 return Response({'error':'Запрещено оставлять отзыв на свой номер телефона или аккаунт'}, status=403)
-        attributes = request.data.get('attributes')         
+        attributes = request.data.get('attributes')
+        service = request.data.get('service')         
         review = Review.objects.create(owner=request.user, reviewable=reviewable, **data)
-        if not reviewable.owner and type.capitalize() == 'Phone':
+        if not reviewable.owner and ctype.capitalize() == 'Phone':
             phone_number = reviewable.screen_name.replace(' ','').replace('(','').replace(')','').replace('-','')
             send_sms(data, phone_number)
         elif reviewable.owner:
-            Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {reviewable.polymorphic_ctype}: {reviewable.screen_name}. <a href="https://karman.ru/reviewable/{reviewable.id}/#reviwe-{review.id}">Смотреть</a></div>')
+            Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karman.ru/reviewable/{reviewable.id}/#reviwe-{review.id}">Смотреть</a></div>')
         for attribute in attributes:
             title = AttributeTitle.objects.get(pk=attribute['title'])
             value = float(attribute['value'])
             review.attributes.create(title=title, value=value)
+        if service:
+            review.service = Service.objects.get(pk=service)
+        review.rating = review.attributes.aggregate(avg=Avg('value'))['avg']
         review.save()
         return Response(ReviewSerializer(review).data, status=201)
 
     def update(self, request, *args, **kwargs):
         attributes = request.data.get('attributes')
+        service = request.data.get('service')
         for attribute in attributes:
             Attribute.objects.filter(pk=attribute['id']).update(value=attribute['value'])
+        if service:
+            instance = self.get_object()
+            instance.service = Service.objects.get(pk=service)
+            instance.save()
         return super().update(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -88,34 +100,34 @@ class ReviewViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['patch'])
     def like(self, request, pk=None):
-        review = self.get_object()
+        object = self.get_object()
         remove = request.data.get('remove')
         dislike = request.data.get('dislike')
-        like = review.likes.filter(owner=request.user).first()
+        like = object.likes.filter(owner=request.user).first()
         if dislike and like and not like.dislike:
             like.dislike = True
             like.save()
-            review.like_count -= 2
+            object.like_count -= 2
         if dislike and not like:
-            review.likes.create(owner=request.user, dislike=True)
-            review.like_count -= 1
+            object.likes.create(owner=request.user, dislike=True)
+            object.like_count -= 1
         if not dislike and like and like.dislike:
             like.dislike = False
             like.save()
-            review.like_count += 2
+            object.like_count += 2
         if not dislike and not like:
-            review.likes.create(owner=request.user)
-            review.like_count += 1
+            object.likes.create(owner=request.user)
+            object.like_count += 1
         if remove and like:
             if like.dislike:
-                review.like_count += 1
+                object.like_count += 1
             else:
-                review.like_count -= 1
+                object.like_count -= 1
             like.delete()
-        review.save()
+        object.save()
         qs = self.get_queryset()
-        review = qs.get(pk=review.id)
-        serializer = self.get_serializer(review, many=False)
+        object = qs.get(pk=object.id)
+        serializer = self.get_serializer(object, many=False)
         return Response(serializer.data, status=200)
         
 
@@ -135,6 +147,10 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors,status=400)
         comment = Comment.objects.create(owner=request.user, **data)
         return Response(CommentSerializer(comment).data, status=201)
+    
+    def update(self, request, *args, **kwargs):
+        request.data.pop('commented_review', None)
+        return super().update(request, *args, **kwargs)
     
     def get_queryset(self):
         my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))

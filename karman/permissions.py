@@ -31,8 +31,8 @@ class ReviewPermission(BasePermission):
 class CommentPermission(BasePermission):
     def has_permission(self, request, view):
         if view.action in ['create',]:
-            review = Review.objects.get(pk=request.data.get('review'))
-            return request.auth and (review.phone.owner == request.user or review.owner == request.user)
+            review = Review.objects.get(pk=request.data.get('commented_review'))
+            return request.auth and (review.reviewable.owner == request.user or review.owner == request.user)
         return True      
 
     def has_object_permission(self, request, view, obj):

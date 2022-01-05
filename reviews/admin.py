@@ -14,7 +14,7 @@ class AttributeTitleExecuterAdmin(admin.ModelAdmin):
     exclude = ('about_customer',)
     
     def get_queryset(self, request):
-        return AttributeTitle.objects.filter(is_customer=False)
+        return AttributeTitle.objects.filter(about_customer=False)
     
     def has_delete_permission(self, request, obj=None):
         if self.get_queryset(request).count() < 4:
@@ -37,7 +37,7 @@ class AttributeTitleCustomerAdmin(admin.ModelAdmin):
     exclude = ('is_customer',)
     
     def get_queryset(self, request):
-        return AttributeTitle.objects.filter(is_customer=True)
+        return AttributeTitle.objects.filter(about_customer=True)
     
     def has_delete_permission(self, request, obj=None):
         if self.get_queryset(request).count() < 4:
@@ -77,7 +77,7 @@ class AttributeReviewExecuterTemplateInline(admin.TabularInline):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "title":
-            kwargs["queryset"] = AttributeTitle.objects.filter(is_customer=False)
+            kwargs["queryset"] = AttributeTitle.objects.filter(about_customer=False)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -92,7 +92,7 @@ class AttributeReviewCustomerTemplateInline(admin.TabularInline):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "title":
-            kwargs["queryset"] = AttributeTitle.objects.filter(is_customer=True)
+            kwargs["queryset"] = AttributeTitle.objects.filter(about_customer=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -110,7 +110,7 @@ class ReviewTemplateExecuterAdmin(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        return ReviewTemplate.objects.filter(is_customer=False)
+        return ReviewTemplate.objects.filter(about_customer=False)
 
 class ReviewTemplateCustomer(ReviewTemplate):
     class Meta:
@@ -127,7 +127,7 @@ class ReviewTemplateCustomerAdmin(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        return ReviewTemplate.objects.filter(is_customer=True)
+        return ReviewTemplate.objects.filter(about_customer=True)
     
     def save_model(self, request, obj, form, change):
         if not obj.is_customer:

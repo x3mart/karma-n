@@ -8,6 +8,9 @@ class Reviewable(PolymorphicModel):
     rating = models.DecimalField(decimal_places=1, default=0, max_digits=2)
     owner = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, verbose_name='Владелец', null=True, related_name='reviewables')
 
+    class Meta:
+        unique_together = ['screen_name', 'polymorphic_ctype']
+
     def __str__(self):
         return str(self.screen_name)
 

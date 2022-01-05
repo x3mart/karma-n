@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model
 from rest_framework.routers import DefaultRouter
 from .views import AccountViewSet
 
-from djoser import views
-
 router = DefaultRouter()
 router.register("users", AccountViewSet)
 

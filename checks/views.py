@@ -136,7 +136,7 @@ def check_code(request):
         check.aproved = True
         check.save()
         model = apps.get_model('reviewables', type.capitalize())
-        reviewable, created = model.objects.get_or_create(screen_name=screen_name, polymorphic_ctype=type)
+        reviewable, created = model.objects.get_or_create(screen_name=screen_name)
         if type == 'VK':
             url = 'https://api.vk.com/method/utils.resolveScreenName'
             vk_data = {

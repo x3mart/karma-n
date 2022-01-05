@@ -31,7 +31,7 @@ class AttributeTitleSerializer(serializers.ModelSerializer):
 
 
 class AttributeSerializer(serializers.ModelSerializer):
-    title = AttributeTitleSerializer(read_only=True, many=False)
+    title = serializers.StringRelatedField(read_only=True, many=False)
     class Meta:
         model = Attribute
         exclude = ("review", "review_template")
@@ -46,8 +46,9 @@ class CommentSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only=True, many=False)
     class Meta:
         model = Comment
-        fields = ['id', 'body', 'is_my_like', 'is_my_dislike', 'owner', 'review', 'count_likes',]
+        fields = ['id', 'body', 'is_my_like', 'is_my_dislike', 'owner', 'commented_review', 'count_likes',]
         depth = 0
+        extra_kwargs = {'commented_review': {'write_only': True}, }
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -58,13 +59,12 @@ class ReviewSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only=True, many=False)
     attributes = AttributeSerializer(many=True, read_only=True)
     rating = serializers.DecimalField(read_only=True, max_digits=2, decimal_places=1)
-    phone = PhoneNumberField(source='phone.phone_number', read_only=True)
-    service = ServiceSerializer(many=False, read_only=True)
-    reviewable = ReviewablePolymorphicSerializer(many=False,)
+    service = ServiceSerializer(many=False, read_only=True,)
+    reviewable = ReviewablePolymorphicSerializer(many=False, read_only=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'phone', 'service', 'created_at', 'is_my_like', 'is_my_dislike', 'count_comments', 'count_likes', 'rating', 'attributes','owner', 'body', 'rating', 'comments', 'about_customer', 'reviewable']
+        fields = ['id', 'service', 'created_at', 'is_my_like', 'is_my_dislike', 'count_comments', 'count_likes', 'rating', 'attributes','owner', 'body', 'rating', 'comments', 'about_customer', 'reviewable']
 
 
 class ReviewTemplateSerializer(serializers.ModelSerializer):
