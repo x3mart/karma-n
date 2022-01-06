@@ -1,16 +1,17 @@
 from django.db.models.aggregates import Avg
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from .models import ReviewTemplate, Review
+from .models import Attribute, ReviewTemplate, Review
 
 
-@receiver(post_save, sender=ReviewTemplate)
-def review_template_post_save(instance, created, **kwargs):
-    if instance.attributes:
-        avg = instance.attributes.aggregate(avg=Avg('value'))['avg']
-        if instance.rating != avg:
-            instance.rating = avg
-            instance.save()
+@receiver(post_save, sender=Attribute)
+def atribute_post_save(instance, created, **kwargs):
+    if instance.review_template:
+        template = instance.review_template
+        avg = template.attributes.aggregate(avg=Avg('value'))['avg']
+        template.rating = avg
+        template.save()
+        print(avg)
 
 @receiver(post_save, sender=Review)
 def review_post_save(instance, **kwargs):

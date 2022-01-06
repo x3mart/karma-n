@@ -40,7 +40,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [ReviewPermission]
     swagger_schema = None
     filter_backend = [django_filters.rest_framework.DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    filterset_fields = ['owner', 'about_customer']
+    filterset_fields = ['owner', 'about_customer', 'reviewable', 'reviewable__owner']
     # search_fields = ['owner', 'phone__phone_number', 'phone__owner', 'is_customer']
     ordering_fields = '__all__'
     ordering = ('count_likes',)
@@ -89,13 +89,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))
         my_dislike = Count('likes', filter=(Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))
-        comments = Comment.objects.annotate(is_my_like=my_like, is_my_dislike=my_dislike).prefetch_related('owner')
+        likes = Like.objects.prefetch_related('owner')
+        prefetch_likes = Prefetch('likes', queryset=likes)
+        comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
         prefetch_comments = Prefetch('comments', queryset=comments)
         reviewable = Reviewable.objects.prefetch_related('owner')
         prefetch_reviewable = Prefetch('reviewable', queryset=reviewable)
         attributes = Attribute.objects.prefetch_related('title').order_by('title')
         prefetch_attributes = Prefetch('attributes', queryset=attributes)
-        reviews = Review.objects.prefetch_related('owner', prefetch_comments, prefetch_attributes, 'service', prefetch_reviewable).annotate(is_my_like=my_like, is_my_dislike=my_dislike, count_comments=Count('comments'))
+        reviews = Review.objects.prefetch_related('owner', prefetch_comments, prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike, count_comments=Count('comments'))
         return reviews
     
     @action(detail=True, methods=['patch'])
@@ -104,8 +106,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         remove = request.data.get('remove')
         dislike = request.data.get('dislike')
         like = object.likes.filter(owner=request.user).first()
-        print(like)
-        print(dislike)
         if dislike and like and not like.dislike:
             like.dislike = True
             like.save()

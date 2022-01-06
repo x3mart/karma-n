@@ -34,7 +34,7 @@ class AttributeTitleCustomer(AttributeTitle):
 
 
 class AttributeTitleCustomerAdmin(admin.ModelAdmin):
-    exclude = ('is_customer',)
+    exclude = ('about_customer',)
     
     def get_queryset(self, request):
         return AttributeTitle.objects.filter(about_customer=True)
@@ -104,7 +104,7 @@ class ReviewTemplateExecuter(ReviewTemplate):
 
 
 class ReviewTemplateExecuterAdmin(admin.ModelAdmin):
-    exclude = ('is_customer',)
+    exclude = ('about_customer',)
     inlines = [
         AttributeReviewExecuterTemplateInline,
     ]
@@ -121,7 +121,7 @@ class ReviewTemplateCustomer(ReviewTemplate):
 
 
 class ReviewTemplateCustomerAdmin(admin.ModelAdmin):
-    exclude = ('is_customer',)
+    exclude = ('about_customer',)
     inlines = [
         AttributeReviewCustomerTemplateInline,
     ]
@@ -130,8 +130,8 @@ class ReviewTemplateCustomerAdmin(admin.ModelAdmin):
         return ReviewTemplate.objects.filter(about_customer=True)
     
     def save_model(self, request, obj, form, change):
-        if not obj.is_customer:
-            obj.is_customer=True
+        if not obj.about_customer:
+            obj.about_customer=True
         return super().save_model(request, obj, form, change)
 
 class ReviewAdmin(admin.ModelAdmin):

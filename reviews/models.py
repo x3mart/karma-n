@@ -74,7 +74,7 @@ class Like(models.Model):
 class ReviewTemplate(models.Model):
     body = models.TextField(verbose_name='Текст')
     rating = models.DecimalField(decimal_places=1, default=5, max_digits=2)
-    is_customer = models.BooleanField(default=False)
+    about_customer = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Шаблон отзыва'
