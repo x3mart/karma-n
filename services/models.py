@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class ServiceCategory(models.Model):
     title = models.CharField(verbose_name='Название', max_length=255)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -14,7 +14,7 @@ class ServiceCategory(models.Model):
 
 class Service(models.Model):
     title = models.CharField(verbose_name='Название', max_length=255)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     category = models.ForeignKey('ServiceCategory', on_delete=models.PROTECT, verbose_name='Категория', related_name='services')
 
     class Meta:
