@@ -64,7 +64,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     )
     city = models.CharField(max_length=255, null=True, blank=True, default='Москва', verbose_name='Город')
     rating = models.DecimalField(decimal_places=1, default=0, max_digits=2, null=True, blank=True)
-    about =models.TextField(null=True, blank=True,)
+    my_reviews_count =models.PositiveIntegerField(verbose_name='Мои отзывы', default=0)
+    reviews_about_me_count =models.PositiveIntegerField(verbose_name='Отзывы обо мне', default=0)
+    about = models.TextField(null=True, blank=True,)
     services = models.ManyToManyField('services.Service', verbose_name='Услуги', related_name='accounts')
 
     objects = AccountManager()
