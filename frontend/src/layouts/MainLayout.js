@@ -32,7 +32,7 @@ const MainLayout = ({
         {children}
       </main>
       <FooterOne
-        backgroundColorClass='bg-gray'
+        backgroundColorClass='bg-dark-gray'
         spaceTopClass='pt-100'
         spaceBottomClass='pb-70'
       />

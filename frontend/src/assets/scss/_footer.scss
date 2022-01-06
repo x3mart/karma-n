@@ -2,7 +2,7 @@
 
 .copyright {
   .footer-logo {
-    margin-top: 41px;
+    // margin-top: 41px;
     margin-bottom: 12px;
     @media #{$xs-layout} {
       margin-top: 0;
@@ -47,7 +47,7 @@
 
       margin: 0 0 16px;
 
-      color: #313131;
+      color: #C4C4C4;
     }
   }
   .footer-list {
@@ -60,7 +60,7 @@
         a {
           letter-spacing: 0.3px;
 
-          color: #5d5d5d;
+          color: #ffffff;
           &:hover {
             color: $theme-color;
           }

@@ -22,7 +22,7 @@ const MyProfile = ({ location }) => {
         Главная
       </BreadcrumbsItem>
       <BreadcrumbsItem to={process.env.PUBLIC_URL + pathname}>
-        Поиск
+        Моя страница
       </BreadcrumbsItem>
       <MainLayout headerTop='visible'>
         <Breadcrumb />

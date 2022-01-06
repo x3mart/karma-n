@@ -1,13 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import InputMask from 'react-input-mask'
 import { useForm, Controller } from 'react-hook-form'
 import { searchRequestSuccess } from '../../redux/actions/searchActions'
 import { connect } from 'react-redux'
 import { getReviewsAboutMe } from '../../redux/actions/reviewActions'
+import phone from '../../assets/img/phone.svg'
+import insta from '../../assets/img/insta.svg'
+import vk from '../../assets/img/vk.svg'
 
 const MainSection = ({ getReviewsAboutMe, searchRequestSuccess }) => {
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  })
+
+  const myRef = useRef()
+
+  const handleClickOutside = e => {
+    if (!myRef.current.contains(e.target)) {
+      setActive('')
+    }
+  }
+
   const [number, setNumber] = useState({})
+
+  const [active, setActive] = useState('')
 
   const { handleSubmit, control } = useForm()
 
@@ -20,129 +39,98 @@ const MainSection = ({ getReviewsAboutMe, searchRequestSuccess }) => {
   }
 
   return (
-    <div className='slider-area pb-100'>
-      <div className='slider-active nav-style-1'>
-        <div
-          className='d-none single-slider-2 slider-height-2 d-lg-flex align-items-center bg-img'
-          style={{
-            backgroundImage: `url(${
-              process.env.PUBLIC_URL + '/assets/img/slider/karman.jpg'
-            })`,
-          }}
-        >
-          <div className='container'>
-            <div className='row'>
-              <div className='col-xl-6 col-lg-7 col-md-8 col-12 mr-auto'>
-                <div className='slider-content-3 slider-animated-1 text-center'>
-                  {/*<h3 className="animated d-none d-lg-inline-block">{data.title}</h3>*/}
-                  <h3 className='animated d-inline-block d-lg-none'>
-                    <img
-                      src='/assets/img/logo/logo-karman.png'
-                      alt=''
-                      width='80px'
-                    />
-                  </h3>
-                  <h1 className='animated d-inline-block d-lg-none'>карман</h1>
-                  <h2 className='animated d-none d-lg-inline-block'>
-                    Поиск отзывов о человеке, или компании по номеру телефона
-                    <br />
-                    Введите номер и начните поиск прямо сейчас:
-                  </h2>
-                  <p className='animated d-inline-block d-lg-none'>
-                    Поиск отзывов о человеке, или компании по номеру телефона
-                    <br />
-                    Введите номер и начните поиск прямо сейчас:
-                  </p>
-
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    <Controller
-                      control={control}
-                      name='number'
-                      defaultValue={number}
-                      render={({ field }) => (
-                        <InputMask
-                          type='tel'
-                          autoFocus
-                          className='phone-input phone-input-big'
-                          mask='+7 (999) 999-99-99'
-                          placeholder='+7 (999) 999-99-99'
-                          onChange={e =>
-                            field.onChange(setNumber(e.target.value))
-                          }
-                          // onChange={(e) => field.onChange(setNumber(e.target.value.replace(/\D/g,'')))}
-                          // value={transform.input(field.value)}
-                        />
-                      )}
-                    />
-                    <div className='slider-btn btn-hover'>
-                      <button className='phone-input-button' type='submit'>
-                        ПОИСК
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
+    <div className='main-section'>
+      <div className='container'>
+        <div className='row'>
+          <div className='col-lg-6'>
+            <div className='animated main-section-main-text'>
+              Поиск отзвывов о физических и юридических лицах по номеру телефона
             </div>
-          </div>
-        </div>
-        <div
-          className={`d-flex d-lg-none align-items-center bg-img py-5`}
-          style={{ backgroundColor: '#d7f7f6' }}
-        >
-          <div className='container'>
-            <div className='row'>
-              <div className='col-xl-6 col-lg-7 col-md-8 col-12 mr-auto'>
-                <div className='text-center'>
-                  <h3 className='animated d-none d-lg-inline-block'>карман</h3>
-                  <h3 className='animated d-inline-block d-lg-none'>
-                    <img
-                      src='/assets/img/logo/logo-karman.png'
-                      alt=''
-                      width='80px'
-                    />
-                  </h3>
-                  <h1 className='animated'>карман</h1>
-                  <h4 className='animated'>
-                    Поиск отзывов о человеке, или компании по номеру телефона
-                    <br />
-                    Введите номер и начните поиск прямо сейчас:
-                  </h4>
-
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    <Controller
-                      control={control}
-                      name='number'
-                      defaultValue={number}
-                      render={({ field }) => (
-                        <InputMask
-                          type='tel'
-                          autoFocus
-                          className='phone-input'
-                          mask='+7 (999) 999-99-99'
-                          placeholder='+7 (999) 999-99-99'
-                          onChange={e =>
-                            field.onChange(setNumber(e.target.value))
-                          }
-                          // value={transform.input(field.value)}
-                        />
-                      )}
-                    />
-                    <div className='slider-btn btn-hover'>
-                      <button className='phone-input-button' type='submit'>
-                        ПОИСК
-                      </button>
-                    </div>
-                  </form>
-                </div>
+            <div className='animated main-section-sub-text'>
+              Начните поиск прямо сейчас:
+            </div>
+            <div className='main-section-search-block' ref={myRef}>
+              <div
+                className={`search-block phone d-${
+                  active === 'phone' ? 'none' : 'flex'
+                }`}
+                onClick={() => setActive('phone')}
+              >
+                <img src={phone} alt='phone' />
               </div>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className={`d-${active === 'phone' ? 'block' : 'none'}`}
+              >
+                <Controller
+                  control={control}
+                  name='number'
+                  defaultValue={number}
+                  render={({ field }) => (
+                    <InputMask
+                      type='tel'
+                      autoFocus
+                      className='search-block-input phone'
+                      mask='+7 (999) 999-99-99'
+                      placeholder='+7 (___) ___-__-__'
+                      onChange={e => field.onChange(setNumber(e.target.value))}
+                      
+                    />
+                  )}
+                />
+              </form>
+              <div
+                className={`search-block insta d-${
+                  active === 'insta' ? 'none' : 'flex'
+                }`}
+                onClick={() => setActive('insta')}
+              >
+                <img src={insta} alt='insta' />
+              </div>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className={`d-${active === 'insta' ? 'block' : 'none'}`}
+              >
+                <input
+                  type='text'
+                  autoFocus
+                  className='search-block-input insta'
+                  placeholder='instagram id:'
+                  onChange={e => setNumber(e.target.value)}
+                />
+              </form>
+              <div
+                className={`search-block vk d-${
+                  active === 'vk' ? 'none' : 'flex'
+                }`}
+                onClick={() => setActive('vk')}
+              >
+                <img src={vk} alt='vk' />
+              </div>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className={`d-${active === 'vk' ? 'block' : 'none'}`}
+              >
+                <input
+                  type='text'
+                  autoFocus
+                  className='search-block-input vk'
+                  placeholder='vk id:'
+                  onChange={e => setNumber(e.target.value)}
+                />
+              </form>
+              <button className='search-block-button' type='submit'>
+                найти отзывы
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
   )
-}
 
+  
+}
 
 export default connect(null, { getReviewsAboutMe, searchRequestSuccess })(
   MainSection
