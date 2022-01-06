@@ -63,7 +63,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         verbose_name='Пол'
     )
     city = models.CharField(max_length=255, null=True, blank=True, default='Москва', verbose_name='Город')
-    rating = rating = models.DecimalField(decimal_places=1, default=0, max_digits=2, null=True, blank=True)
+    rating = models.DecimalField(decimal_places=1, default=0, max_digits=2, null=True, blank=True)
     about =models.TextField(null=True, blank=True,)
     services = models.ManyToManyField('services.Service', verbose_name='Услуги', related_name='accounts')
 
