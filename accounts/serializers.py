@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from notifications.serializers import MessageSerializer
 from reviews.serializers import ReviewSerializer
+from services.serializers import ServiceSerializer
 from accounts.models import Account
 from django.db.models import fields
 from djoser.serializers import UserSerializer
@@ -32,6 +33,7 @@ class CurentAcountSerializer(AccountSerializer):
     # reviews = ReviewSerializer(many=True, read_only=True)
     # phones = PhoneSerializer(many=True, read_only=True)
     # reviews_about_me = serializers.SerializerMethodField(method_name='get_reviews_about_me')
+    services = ServiceSerializer(many=True)
     class Meta:
         model = Account
         exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions']
