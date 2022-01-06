@@ -11,7 +11,6 @@ def atribute_post_save(instance, created, **kwargs):
         avg = template.attributes.aggregate(avg=Avg('value'))['avg']
         template.rating = avg
         template.save()
-        print(avg)
 
 @receiver(post_save, sender=Review)
 def review_post_save(instance, **kwargs):
