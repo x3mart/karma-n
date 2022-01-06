@@ -8,6 +8,7 @@ from services.serializers import ServiceCategorySerializer, ServiceSerializer
 class ServiсeCategoryViewSet(viewsets.ModelViewSet):
     queryset = ServiceCategory.objects.filter(is_active=True)
     serializer_class = ServiceCategorySerializer
+    pagination_class=None
 
     def get_queryset(self):
         services = Service.objects.filter(is_active=True)
