@@ -30,9 +30,6 @@ class AccountSerializer(UserSerializer):
 
 
 class CurentAcountSerializer(AccountSerializer):
-    # reviews = ReviewSerializer(many=True, read_only=True)
-    # phones = PhoneSerializer(many=True, read_only=True)
-    # reviews_about_me = serializers.SerializerMethodField(method_name='get_reviews_about_me')
     services = ServiceSerializer(many=True)
     class Meta:
         model = Account

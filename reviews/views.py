@@ -40,10 +40,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [ReviewPermission]
     swagger_schema = None
     filter_backend = [django_filters.rest_framework.DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    filterset_fields = ['owner', 'about_customer', 'reviewable', 'reviewable__owner']
+    filterset_fields = ['owner', 'about_customer', 'reviewable', 'reviewable__owner', 'is_active']
     # search_fields = ['owner', 'phone__phone_number', 'phone__owner', 'is_customer']
     ordering_fields = '__all__'
-    ordering = ('count_likes',)
+    ordering = ('-created_at', '-count_likes')
 
     def create(self, request):
         serializer = ReviewSerializer(data=request.data)

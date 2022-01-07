@@ -5,7 +5,10 @@ from .models import VK, Instagram, Phone, Reviewable
 
 
 def update_account(account):
-    account.rating = account.reviewables.aggregate(avg=Avg('rating'))['avg']
+    account.customer_rating = account.reviewables.aggregate(avg=Avg('customer_rating'))['avg']
+    account.executor_rating = account.reviewables.aggregate(avg=Avg('executor_rating'))['avg']
+    print(account.customer_rating)
+    print(account.executor_rating)
     account.save()
 
 @receiver(post_save, sender=Reviewable)

@@ -5,7 +5,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
 class Reviewable(PolymorphicModel):
     screen_name = models.CharField(max_length=150, null=True, blank=True)
-    rating = models.DecimalField(decimal_places=1, default=0, max_digits=2)
+    executor_rating = models.DecimalField(decimal_places=1, default=0, max_digits=2, null=True, blank=True)
+    customer_rating = models.DecimalField(decimal_places=1, default=0, max_digits=2, null=True, blank=True)
     owner = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, verbose_name='Владелец', null=True, related_name='reviewables')
 
     class Meta:
