@@ -158,7 +158,9 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))
         my_dislike = Count('likes', filter=(Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))
-        comments = Comment.objects.annotate(is_my_like=my_like, is_my_dislike=my_dislike).prefetch_related('owner')
+        likes = Like.objects.prefetch_related('owner')
+        prefetch_likes = Prefetch('likes', queryset=likes)
+        comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
         return comments.order_by('-created_at')
     
     @action(detail=True, methods=['patch'])
