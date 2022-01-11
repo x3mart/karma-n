@@ -1,6 +1,7 @@
 # from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from notifications.serializers import MessageSerializer
+from reviewables.serializers import ReviewablePolymorphicSerializer
 from reviews.serializers import ReviewSerializer
 from services.serializers import ServiceSerializer
 from accounts.models import Account
@@ -31,6 +32,7 @@ class AccountSerializer(UserSerializer):
 
 class CurentAcountSerializer(AccountSerializer):
     services = ServiceSerializer(many=True)
+    reviewables = ReviewablePolymorphicSerializer(many=True)
     class Meta:
         model = Account
         exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions']
