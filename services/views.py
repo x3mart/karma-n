@@ -1,5 +1,5 @@
 from django.db.models.query import Prefetch
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 import django_filters.rest_framework
 from rest_framework.response import Response
 from services.models import Service, ServiceCategory
@@ -29,6 +29,7 @@ class ServiсeCategoryViewSet(viewsets.ModelViewSet):
         category = ServiceCategory.objects.create(**data)
         if service:
             service = Service.objects.create(title=service, category=category)
+            self.request.user.services.add(service)
         return Response(ServiceCategorySerializer(category).data, status=201)
     
     def perform_update(self, serializer):
@@ -36,6 +37,7 @@ class ServiсeCategoryViewSet(viewsets.ModelViewSet):
         instance = serializer.save()
         if service:
             service, created = Service.objects.get_or_create(title=service, category=instance)
+            self.request.user.services.add(service)
         
     
 
@@ -47,3 +49,8 @@ class ServiсeViewSet(viewsets.ModelViewSet):
         categories = ServiceCategory.objects.all()
         prefetch_categories = Prefetch('category', categories)
         return Service.objects.filter(is_active=True).filter(category__is_active=True).prefetch_related(prefetch_categories)
+    
+    def destroy(self, request, *args, **kwargs):
+        service = self.get_object()
+        request.user.services.remove(service)
+        return Response(status=status.HTTP_204_NO_CONTENT)
