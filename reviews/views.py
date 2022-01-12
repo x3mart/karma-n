@@ -18,7 +18,7 @@ from django.db.models import Q
 from services.models import Service
 from utils.reviewables import clean_phone
 from .models import Attribute, AttributeTitle, Review, Comment, Like, ReviewTemplate
-from .serializers import ReviewSerializer, CommentSerializer, LikeSerializer, ReviewTemplateSerializer
+from .serializers import ReviewSerializer, CommentSerializer, LikeSerializer, ReviewTemplateSerializer, AttributeTitleSerializer
 
 # Create your views here.
 def set_like(object, request, pk):
@@ -217,3 +217,12 @@ class ReviewTemplateList(ListAPIView):
         attributes = Attribute.objects.prefetch_related('title').order_by('title')
         prefetch_attributes = Prefetch('attributes', queryset=attributes)
         return (ReviewTemplate.objects.prefetch_related(prefetch_attributes)).order_by('-rating')
+
+
+class AttributeTitleList(ListAPIView):
+    pagination_class = None
+    serializer_class = AttributeTitleSerializer
+    queryset = AttributeTitle.objects.all()
+    filter_backend = [django_filters.rest_framework.DjangoFilterBackend, filters.OrderingFilter,]
+    filterset_fields = ['about_customer']
+    ordering = ('-id',)

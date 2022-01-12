@@ -1,11 +1,12 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from .views import ReviewViewSet, CommentViewSet, LikeViewSet, ReviewTemplateList
+from .views import ReviewViewSet, CommentViewSet, LikeViewSet, ReviewTemplateList, AttributeTitleList
 
 
 
 urlpatterns = [
-    path('reviewtemplates/', ReviewTemplateList.as_view(), name='review_template'),
+    path('reviewtemplates/', ReviewTemplateList.as_view(), name='reviewtemplate'),
+    path('attributetitles/', AttributeTitleList.as_view(), name='attributetitle'),
 ]
 
 router = DefaultRouter()

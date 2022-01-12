@@ -5,25 +5,25 @@ from .models import Phone, VK, Instagram, Reviewable
 class ReviewableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviewable
-        fields = ('screen_name', 'customer_rating', 'executor_rating', 'owner' )
+        fields = ('id', 'screen_name', 'customer_rating', 'executor_rating', 'owner' )
 
 
 class PhoneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Phone
-        fields = ('screen_name', 'customer_rating', 'executor_rating', 'owner' )
+        fields = ('id', 'screen_name', 'customer_rating', 'executor_rating', 'owner' )
 
 
 class VKSerializer(serializers.ModelSerializer):
     class Meta:
         model = VK
-        fields = ('screen_name', 'customer_rating', 'executor_rating', 'owner', 'user_id', 'user_type' )
+        fields = ('id', 'screen_name', 'customer_rating', 'executor_rating', 'owner', 'user_id', 'user_type' )
 
 
 class InstagramSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instagram
-        fields = ('screen_name', 'customer_rating', 'executor_rating', 'owner', 'user_id',)
+        fields = ('id', 'screen_name', 'customer_rating', 'executor_rating', 'owner', 'user_id',)
 
 class ReviewablePolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {
