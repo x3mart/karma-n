@@ -94,6 +94,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = AttributeTitle.objects.get(pk=attribute['title'])
         value = float(attribute['value'])
         review.attributes.create(title=title, value=value)
+    
+    def get_rating(self, review):
+        return review.attributes.aggregate(avg=Avg('value'))['avg']
 
     def create(self, request):
         serializer = ReviewSerializer(data=request.data)
@@ -121,20 +124,26 @@ class ReviewViewSet(viewsets.ModelViewSet):
             self.greate_attribute(review, attribute)
         if service:
             review.service = Service.objects.get(pk=service)
-        review.rating = review.attributes.aggregate(avg=Avg('value'))['avg']
+        review.rating = self.get_rating(review)
         review.save()
         return Response(ReviewSerializer(review).data, status=201)
 
     def update(self, request, *args, **kwargs):
         attributes = request.data.get('attributes')
         service = request.data.get('service')
+        review = self.get_object()
         for attribute in attributes:
             Attribute.objects.filter(pk=attribute['id']).update(value=attribute['value'])
+        review.rating = self.get_rating(review)
         if service:
-            instance = self.get_object()
-            instance.service = Service.objects.get(pk=service)
-            instance.save()
-        return super().update(request, *args, **kwargs)
+            review.service = Service.objects.get(pk=service)
+        partial = kwargs.pop('partial', False)
+        serializer = self.get_serializer(review, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        if getattr(review, '_prefetched_objects_cache', None):
+            review._prefetched_objects_cache = {}
+        return Response(serializer.data)
 
     def get_queryset(self):
         my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))

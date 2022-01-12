@@ -1,7 +1,11 @@
 from django.urls import path
-from .views import MessageList
+from .views import MessageViewSet
+from rest_framework.routers import DefaultRouter
 
-urlpatterns = [
-    # path('phones/<phone_number>/', PhoneDetail.as_view(), name='phone'),
-    path('messages/', MessageList.as_view(), name='notifications'),
-]
+urlpatterns = []
+
+router = DefaultRouter()
+
+router.register(r'messages', MessageViewSet, basename='message')
+
+urlpatterns += router.urls
