@@ -4,6 +4,7 @@ import django_filters.rest_framework
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from karman.permissions import ServicePermission
 from services.filters import CategoryFilter
 from services.models import Service, ServiceCategory
 from services.serializers import ServiceCategorySerializer, ServiceSerializer
@@ -52,7 +53,7 @@ class ServiсeCategoryViewSet(viewsets.ModelViewSet):
 class ServiсeViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.filter(is_active=True).filter(category__is_active=True)
     serializer_class = ServiceSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [ServicePermission]
 
     def get_queryset(self):
         categories = ServiceCategory.objects.all()

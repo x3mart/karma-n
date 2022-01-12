@@ -70,3 +70,10 @@ class MessagePermission(BasePermission):
         def has_object_permission(self, request, view, obj):
             return obj.owner == request.user or request.user.is_staff
 
+class ServicePermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True 
+        if request.method in ['DELETE']:
+            return request.auth
+        return False 
