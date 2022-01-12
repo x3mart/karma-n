@@ -16,6 +16,7 @@ from reviews.filters import ReviewFilter
 from django.db.models import Q
 
 from services.models import Service
+from utils.reviewables import clean_phone
 from .models import Attribute, AttributeTitle, Review, Comment, Like, ReviewTemplate
 from .serializers import ReviewSerializer, CommentSerializer, LikeSerializer, ReviewTemplateSerializer
 
@@ -46,18 +47,6 @@ def set_like(object, request, pk):
         like.delete()
     return object
 
-def send_sms(data, phone_number):
-    url = 'https://sms.ru/sms/send/'
-    sms_data = {
-        'api_id': SMS_SECRET,
-        'to':phone_number,
-        'msg':f'На Ваш номер телефона {phone_number} был оставлен отзыв на сайте KarmaN. https://karma-n.ru/phones/{phone_number}/',
-        'json':1
-        }
-    sms_reponse = requests.get(url, params=sms_data)
-    sms = sms_reponse.json()
-    return sms
-
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
@@ -70,10 +59,33 @@ class ReviewViewSet(viewsets.ModelViewSet):
     ordering_fields = '__all__'
     ordering = ('-created_at', '-count_likes')
 
+    def send_sms(self, reviewable):
+        phone_number = clean_phone(reviewable.screen_name)
+        url = 'https://sms.ru/sms/send/'
+        sms_data = {
+            'api_id': SMS_SECRET,
+            'to':phone_number,
+            'msg':f'На Ваш номер телефона {reviewable.screen_name} был оставлен отзыв на сайте KarmaN. https://karma-n.ru/',
+            'json':1
+            }
+        sms_reponse = requests.get(url, params=sms_data)
+        sms = sms_reponse.json()
+        return sms
 
     def get_template_attributes(self, template):
         attributes = Attribute.objects.filter(review_template=template).values('title', 'value')
         return attributes
+    
+    def get_template_body(self, template):
+        template = ReviewTemplate.objects.get(pk=template)
+        return template.body
+    
+    def get_reviewable(self, request):
+        reviewable = request.data.get('reviewable')
+        ctype = reviewable.pop('resourcetype')
+        model = apps.get_model('reviewables', ctype.capitalize())
+        reviewable, created = model.objects.get_or_create(**reviewable)
+        return (reviewable, ctype)
 
     def create(self, request):
         serializer = ReviewSerializer(data=request.data)
@@ -81,21 +93,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
             data = serializer.validated_data
         else:
             return Response(serializer.errors, status=400)
-        reviewable = request.data.get('reviewable')
-        ctype = reviewable.pop('resourcetype')
-        model = apps.get_model('reviewables', ctype.capitalize())
-        reviewable, created = model.objects.get_or_create(**reviewable)
+        reviewable, ctype = self.get_reviewable(request)
         if reviewable.owner == request.user:
                 return Response({'error':'Запрещено оставлять отзыв на свой номер телефона или аккаунт'}, status=403)
         attributes = request.data.get('attributes')
         template = request.data.get('template')
-        service = request.data.get('service')         
+        service = request.data.get('service')    
+        if template:
+            attributes = self.get_template_attributes(template)
+            data['body'] = self.get_template_body(template)     
         review = Review.objects.create(owner=request.user, reviewable=reviewable, **data)
         if not reviewable.owner and ctype.capitalize() == 'Phone':
-            phone_number = reviewable.screen_name.replace(' ','').replace('(','').replace(')','').replace('-','')
-            send_sms(data, phone_number)
+            self.send_sms(reviewable)
         elif reviewable.owner:
-            Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karman.ru/reviewable/{reviewable.id}/#reviwe-{review.id}">Смотреть</a></div>')
+            Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karma-n.ru/">Смотреть</a></div>')
         if template:
             attributes = self.get_template_attributes(template)
         for attribute in attributes:
