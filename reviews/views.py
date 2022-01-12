@@ -71,6 +71,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
         sms_reponse = requests.get(url, params=sms_data)
         sms = sms_reponse.json()
         return sms
+    
+    def create_message(self, reviewable):
+        Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karma-n.ru/">Смотреть</a></div>')
 
     def get_template_attributes(self, template):
         attributes = Attribute.objects.filter(review_template=template).values('title', 'value')
@@ -111,7 +114,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if not reviewable.owner and ctype.capitalize() == 'Phone':
             self.send_sms(reviewable)
         elif reviewable.owner:
-            Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karma-n.ru/">Смотреть</a></div>')
+            self.create_message(reviewable)
         if template:
             attributes = self.get_template_attributes(template)
         for attribute in attributes:
@@ -157,8 +160,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(review, many=False)
         return Response(serializer.data, status=200)
         
-
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
