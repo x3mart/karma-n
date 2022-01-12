@@ -42,7 +42,11 @@ class ServiсeCategoryViewSet(viewsets.ModelViewSet):
         if service:
             service, created = Service.objects.get_or_create(title=service, category=instance)
             self.request.user.services.add(service)
-        
+
+    def destroy(self, request, *args, **kwargs):
+        services = self.get_object().services.filter(accounts=request.user)
+        request.user.services.remove(*services)
+        return Response(status=status.HTTP_204_NO_CONTENT)        
     
 
 class ServiсeViewSet(viewsets.ModelViewSet):
