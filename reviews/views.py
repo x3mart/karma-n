@@ -20,6 +20,31 @@ from .models import Attribute, AttributeTitle, Review, Comment, Like, ReviewTemp
 from .serializers import ReviewSerializer, CommentSerializer, LikeSerializer, ReviewTemplateSerializer
 
 # Create your views here.
+def set_like(object, request, pk):
+    remove = request.data.get('remove')
+    dislike = request.data.get('dislike')
+    like = object.likes.filter(owner=request.user).first()
+    if dislike and like and not like.dislike:
+        like.dislike = True
+        like.save()
+        object.count_likes -= 2
+    if dislike and not like:
+        object.likes.create(owner=request.user, dislike=True)
+        object.count_likes -= 1
+    if not dislike and like and like.dislike:
+        like.dislike = False
+        like.save()
+        object.count_likes += 2
+    if not dislike and not like:
+        object.likes.create(owner=request.user)
+        object.count_likes += 1
+    if remove and like:
+        if like.dislike:
+            object.count_likes += 1
+        else:
+            object.count_likes -= 1
+        like.delete()
+    return object
 
 def send_sms(data, phone_number):
     url = 'https://sms.ru/sms/send/'
@@ -102,35 +127,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['patch'])
     def like(self, request, pk=None):
-        object = self.get_object()
-        remove = request.data.get('remove')
-        dislike = request.data.get('dislike')
-        like = object.likes.filter(owner=request.user).first()
-        if dislike and like and not like.dislike:
-            like.dislike = True
-            like.save()
-            object.count_likes -= 2
-        if dislike and not like:
-            object.likes.create(owner=request.user, dislike=True)
-            object.count_likes -= 1
-        if not dislike and like and like.dislike:
-            like.dislike = False
-            like.save()
-            object.count_likes += 2
-        if not dislike and not like:
-            print('wow')
-            object.likes.create(owner=request.user)
-            object.count_likes += 1
-        if remove and like:
-            if like.dislike:
-                object.count_likes += 1
-            else:
-                object.count_likes -= 1
-            like.delete()
-        object.save()
+        review = self.get_object()
+        review = set_like(review, request, pk)
+        review.save()
         qs = self.get_queryset()
-        object = qs.get(pk=object.id)
-        serializer = self.get_serializer(object, many=False)
+        review = qs.get(pk=review.id)
+        serializer = self.get_serializer(review, many=False)
         return Response(serializer.data, status=200)
         
 
@@ -166,29 +168,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'])
     def like(self, request, pk=None):
         comment = self.get_object()
-        remove = request.data.get('remove')
-        dislike = request.data.get('dislike')
-        like = comment.likes.filter(owner=request.user).first()
-        if dislike and like and not like.dislike:
-            like.dislike = True
-            like.save()
-            comment.count_likes -= 2
-        if dislike and not like:
-            comment.likes.create(owner=request.user, dislike=True)
-            comment.count_likes -= 1
-        if not dislike and like and like.dislike:
-            like.dislike = False
-            like.save()
-            comment.count_likes += 2
-        if not dislike and not like:
-            comment.likes.create(owner=request.user)
-            comment.count_likes += 1
-        if remove and like:
-            if like.dislike:
-                comment.count_likes += 1
-            else:
-                comment.count_likes -= 1
-            like.delete()
+        comment = set_like(comment, request, pk)
         comment.save()
         qs = self.get_queryset()
         comment = qs.get(pk=comment.id)

@@ -23,8 +23,8 @@ class ReviewPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if view.action in ['destroy','update', 'partial_update',]:
             return obj.owner == request.user or request.user.is_staff
-        # if view.action in ['like',]:
-        #     return request.auth and obj.owner != request.user
+        if view.action in ['like',]:
+            return request.auth and obj.owner != request.user
         return True
 
 
@@ -36,7 +36,7 @@ class CommentPermission(BasePermission):
         return True      
 
     def has_object_permission(self, request, view, obj):
-        if view.action in ['destroy','update', 'partial_update',]:
+        if view.action in ['destroy', 'update', 'partial_update',]:
             return obj.owner == request.user or request.user.is_staff
         if view.action in ['like',]:
             return request.auth and obj.owner != request.user
@@ -48,7 +48,7 @@ class AccountPermission(BasePermission):
         return view.action != 'me' or request.auth
 
     def has_object_permission(self, request, view, obj):
-        if view.action in ['destroy','update', 'partial_update', 'phone_attach']:
+        if view.action in ['destroy',' update', 'partial_update', 'phone_attach']:
             return obj == request.user or request.user.is_staff
         return True
 
@@ -59,7 +59,7 @@ class ComplaintPermission(BasePermission):
         return True      
 
     def has_object_permission(self, request, view, obj):
-        if view.action in ['destroy','update', 'partial_update',]:
+        if view.action in ['destroy', 'update', 'partial_update',]:
             return obj.owner == request.user or request.user.is_staff
         return True
 

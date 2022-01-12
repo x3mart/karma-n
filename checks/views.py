@@ -21,7 +21,6 @@ def set_code():
 
 def get_random_id():
     random_id = random.randint(-2147483648, 2147483647)
-    print(random_id)
     return np.int32(random_id)  
 
 def send_code_possibility(check, created):
