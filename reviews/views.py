@@ -86,6 +86,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
         model = apps.get_model('reviewables', ctype.capitalize())
         reviewable, created = model.objects.get_or_create(**reviewable)
         return (reviewable, ctype)
+    
+    def greate_attribute(self, review, attribute):
+        title = AttributeTitle.objects.get(pk=attribute['title'])
+        value = float(attribute['value'])
+        review.attributes.create(title=title, value=value)
 
     def create(self, request):
         serializer = ReviewSerializer(data=request.data)
@@ -110,9 +115,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if template:
             attributes = self.get_template_attributes(template)
         for attribute in attributes:
-            title = AttributeTitle.objects.get(pk=attribute['title'])
-            value = float(attribute['value'])
-            review.attributes.create(title=title, value=value)
+            self.greate_attribute(review, attribute)
         if service:
             review.service = Service.objects.get(pk=service)
         review.rating = review.attributes.aggregate(avg=Avg('value'))['avg']
