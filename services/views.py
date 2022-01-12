@@ -1,7 +1,10 @@
 from django.db.models.query import Prefetch
 from rest_framework import viewsets, status
 import django_filters.rest_framework
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from services.filters import CategoryFilter
 from services.models import Service, ServiceCategory
 from services.serializers import ServiceCategorySerializer, ServiceSerializer
 
@@ -9,8 +12,9 @@ from services.serializers import ServiceCategorySerializer, ServiceSerializer
 class ServiсeCategoryViewSet(viewsets.ModelViewSet):
     queryset = ServiceCategory.objects.filter(is_active=True)
     filter_backend = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['services__accounts',]
+    filterset_class = CategoryFilter
     serializer_class = ServiceCategorySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class=None
 
     def get_queryset(self):
@@ -44,6 +48,7 @@ class ServiсeCategoryViewSet(viewsets.ModelViewSet):
 class ServiсeViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.filter(is_active=True).filter(category__is_active=True)
     serializer_class = ServiceSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         categories = ServiceCategory.objects.all()
