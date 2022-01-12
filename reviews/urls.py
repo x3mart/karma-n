@@ -13,4 +13,5 @@ router = DefaultRouter()
 router.register(r'reviews', ReviewViewSet, basename='review')
 router.register(r'comments', CommentViewSet, basename='comment')
 router.register(r'likes', LikeViewSet, basename='likes')
+
 urlpatterns += router.urls

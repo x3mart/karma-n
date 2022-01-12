@@ -70,6 +70,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     ordering_fields = '__all__'
     ordering = ('-created_at', '-count_likes')
 
+
+    def get_template_attributes(self, template):
+        attributes = Attribute.objects.filter(review_template=template).values('title', 'value')
+        return attributes
+
     def create(self, request):
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid():
@@ -83,6 +88,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if reviewable.owner == request.user:
                 return Response({'error':'Запрещено оставлять отзыв на свой номер телефона или аккаунт'}, status=403)
         attributes = request.data.get('attributes')
+        template = request.data.get('template')
         service = request.data.get('service')         
         review = Review.objects.create(owner=request.user, reviewable=reviewable, **data)
         if not reviewable.owner and ctype.capitalize() == 'Phone':
@@ -90,6 +96,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
             send_sms(data, phone_number)
         elif reviewable.owner:
             Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karman.ru/reviewable/{reviewable.id}/#reviwe-{review.id}">Смотреть</a></div>')
+        if template:
+            attributes = self.get_template_attributes(template)
         for attribute in attributes:
             title = AttributeTitle.objects.get(pk=attribute['title'])
             value = float(attribute['value'])
@@ -187,7 +195,7 @@ class ReviewTemplateList(ListAPIView):
     serializer_class = ReviewTemplateSerializer
     queryset = ReviewTemplate.objects.prefetch_related('attributes')
     filter_backend = [django_filters.rest_framework.DjangoFilterBackend, filters.OrderingFilter,]
-    filterset_fields = ['is_customer']
+    filterset_fields = ['about_customer']
     ordering = ('-rating',)
 
     def get_queryset(self):
