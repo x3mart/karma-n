@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class ServiceCategory(models.Model):
-    title = models.CharField(verbose_name='Название', max_length=255)
+    title = models.CharField(verbose_name='Название', max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -20,6 +20,7 @@ class Service(models.Model):
     class Meta:
         verbose_name = 'Услуга'
         verbose_name_plural = 'Услуги'
+        unique_together = ['title', 'category']
     
     def __str__(self):
         return self.title
