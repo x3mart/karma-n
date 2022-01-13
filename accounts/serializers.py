@@ -18,11 +18,14 @@ from phonenumber_field.serializerfields import PhoneNumberField
 #         token['is_teacher'] = user.is_teacher
 #         return token
 
+class AccountListSerializer(UserSerializer):
+    class Meta:
+        model = Account
+        fields = ['id', 'name', 'full_name', 'avatar', 'executor_rating', 'customer_rating', 'my_reviews_about_customers_count', 'my_reviews_about_executors_count', 'reviews_executors_about_me_count', 'reviews_customers_about_me_count']
+
 
 class AccountSerializer(UserSerializer):
-    # reviews = ReviewSerializer(many=True, read_only=True)
-    # phones = PhoneSerializer(many=True, read_only=True)
-    # phone_number = PhoneNumberField(required=False)
+    reviewables = ReviewablePolymorphicSerializer(many=True)
     class Meta:
         model = Account
         exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions']
