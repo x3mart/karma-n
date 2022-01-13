@@ -26,11 +26,10 @@ class AccountListSerializer(UserSerializer):
 
 class AccountSerializer(UserSerializer):
     reviewables = ReviewablePolymorphicSerializer(many=True)
+    services = ServiceSerializer(many=True)
     class Meta:
         model = Account
-        exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions', 'is_active', 'is_private']
-        extra_kwargs = {'password': {'write_only': True} }
-    
+        exclude = ['password', 'is_superuser', 'is_staff', 'groups', 'user_permissions', 'is_active', 'is_private'] 
 
 
 class CurentAcountSerializer(AccountSerializer):
