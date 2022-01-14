@@ -13,5 +13,4 @@ def tg_update_handler(request):
     tgdata = request.data
     data = {"chat_id":"1045490278", "text": f'{tgdata}'}
     response = requests.post(TG_URL + 'sendMessage', data)
-    print(response.json())
     return Response({},status=200)
