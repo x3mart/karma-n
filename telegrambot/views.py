@@ -11,6 +11,12 @@ import requests
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     tgdata = request.data
-    data = {"chat_id":"1045490278", "text": f'{tgdata}'}
+    keyboard = ['Найти отзыв', 'Оставить отзыв']
+    data = {"chat_id":"1045490278", "text": f'{tgdata}', 'replyKeyboardMarkup':{
+    'keyboard': keyboard, 
+    'resize_keyboard':True, 
+    'one_time_keyboard':True
+    }
+}
     response = requests.post(TG_URL + 'sendMessage', data)
     return Response({},status=200)
