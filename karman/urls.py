@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/', include('notifications.urls')),
     path('api/', include('complaints.urls')),
     path('api/', include('services.urls')),
+    path('api/', include('telegrambot.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
