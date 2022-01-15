@@ -7,16 +7,24 @@ from karman.settings import TG_URL
 import requests
 
 
-@api_view(['POST', 'GET'])
+@api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     tgdata = request.data
-    keyboard = ['Найти отзыв', 'Оставить отзыв']
-    data = {"chat_id":"1045490278", "text": f'{tgdata}', 'replyKeyboardMarkup':{
-    'keyboard': keyboard, 
-    'resize_keyboard':True, 
-    'one_time_keyboard':True
+    keyboard = ["Найти отзыв", "Оставить отзыв"]
+    reply_markup = {"replyKeyboardMarkup":{
+    "keyboard": keyboard, 
+    "resize_keyboard":True, 
+    "one_time_keyboard":True
+    }
+    }
+    data = {"chat_id":"1045490278", "text": f"{tgdata}", "reply_markup":{
+    "keyboard": [{"text":"Найти отзыв"}] 
+    # "resize_keyboard":True, 
+    # "one_time_keyboard":True
     }
 }
-    response = requests.post(TG_URL + 'sendMessage', data)
+
+    response = requests.post(TG_URL + "sendMessage", data)
+    print(response.json())
     return Response({},status=200)

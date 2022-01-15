@@ -54,7 +54,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [ReviewPermission]
     swagger_schema = None
     filter_backend = [django_filters.rest_framework.DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    filterset_fields = ['owner', 'about_customer', 'reviewable', 'reviewable__owner', 'is_active']
+    filterset_fields = ['owner', 'about_customer', 'reviewable', 'reviewable__owner', 'reviewable__screen_name', 'reviewable__polymorphic_ctype__model', 'is_active', ]
     # search_fields = ['owner', 'phone__phone_number', 'phone__owner', 'is_customer']
     ordering_fields = '__all__'
     ordering = ('-created_at', '-count_likes')
