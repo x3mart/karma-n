@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from .serializers import GetCodeSerializer, CheckCodeSerializer
 from karman.settings import SMS_SECRET, VK_SECRET, VK_TOKEN
 import numpy as np
-from reviewables.models import VK, Phone, Instagram, Reviewable
+from reviewables.models import Vk, Phone, Instagram, Reviewable
 
 # Create your views here.
 def set_code():
@@ -51,7 +51,7 @@ def get_code(request):
     screen_name = data.get('screen_name', None)
     type = data.get('resourcetype', None)
     code = set_code()
-    if screen_name and type == 'Phone':
+    if screen_name and type == 'phone':
         check, created = Check.objects.get_or_create(**data)
         error_message = send_code_possibility(check, created)
         if error_message:
@@ -71,7 +71,7 @@ def get_code(request):
             return Response({'error':'Ошибка связи. Отправьте запрос еще раз'}, status=400)
         if sms['status_code'] != 100:
             return Response({'error':sms['status']}, sms['status_code'])
-    elif screen_name and type == 'VK':
+    elif screen_name and type == 'vk':
         url = 'https://api.vk.com/method/utils.resolveScreenName'
         vk_data = {
             'v':'5.131',
@@ -136,7 +136,7 @@ def check_code(request):
         check.save()
         model = apps.get_model('reviewables', type.capitalize())
         reviewable, created = model.objects.get_or_create(screen_name=screen_name)
-        if type == 'VK':
+        if type == 'vk':
             url = 'https://api.vk.com/method/utils.resolveScreenName'
             vk_data = {
                 'v':'5.131',

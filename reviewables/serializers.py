@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
-from .models import Phone, VK, Instagram, Reviewable
+from .models import Phone, Vk, Instagram, Reviewable
 
 class ReviewableSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,7 +16,7 @@ class PhoneSerializer(serializers.ModelSerializer):
 
 class VKSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VK
+        model = Vk
         fields = ('id', 'screen_name', 'customer_rating', 'executor_rating', 'owner', 'user_id', 'user_type' )
 
 
@@ -28,7 +28,7 @@ class InstagramSerializer(serializers.ModelSerializer):
 class ReviewablePolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {
         Phone: PhoneSerializer,
-        VK: VKSerializer,
+        Vk: VKSerializer,
         Instagram: InstagramSerializer,
         Reviewable: ReviewableSerializer
     }

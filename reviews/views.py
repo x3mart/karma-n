@@ -1,7 +1,7 @@
 from karman.settings import SMS_SECRET
 from notifications.models import Message
 from karman.permissions import KarmanPermission, ReviewPermission, CommentPermission
-from reviewables.models import VK, Instagram, Phone, Reviewable
+from reviewables.models import Vk, Instagram, Phone, Reviewable
 import django_filters.rest_framework
 from rest_framework import viewsets, filters
 from rest_framework.generics import ListAPIView

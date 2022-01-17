@@ -22,7 +22,7 @@ class Phone(Reviewable):
         verbose_name_plural = 'Телефоны'
 
 
-class VK(Reviewable):
+class Vk(Reviewable):
     user_id = models.PositiveIntegerField(null=True, blank=True)
     user_type = models.CharField(max_length=50, null=True, blank=True)
 
