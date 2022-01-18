@@ -16,10 +16,10 @@ class AttributeTitleExecutorAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return AttributeTitle.objects.filter(about_customer=False)
     
-    # def has_delete_permission(self, request, obj=None):
-    #     if self.get_queryset(request).count() < 4:
-    #         return True      
-    #     return False
+    def has_delete_permission(self, request, obj=None):
+        if self.get_queryset(request).count() < 4:
+            return True      
+        return False
     
     def has_add_permission(self, request, obj=None):
         if self.get_queryset(request).count() < 4:
@@ -50,7 +50,7 @@ class AttributeTitleCustomerAdmin(admin.ModelAdmin):
         return False
     
     def save_model(self, request, obj, form, change):
-        obj.is_customer = True
+        obj.about_customer = True
         super().save_model(request, obj, form, change)
 
 
@@ -139,11 +139,11 @@ class ReviewAdmin(admin.ModelAdmin):
         AttributeReviewInline,
     ]
 
-class AttributeTitleAdmin(admin.ModelAdmin):
-    def has_delete_permission(self, request, obj=None):
-        return AttributeTitle.objects.count() < 4
-    def has_add_permission(self, request, obj=None):
-        return AttributeTitle.objects.count() < 4
+# class AttributeTitleAdmin(admin.ModelAdmin):
+#     def has_delete_permission(self, request, obj=None):
+#         return AttributeTitle.objects.count() < 4
+#     def has_add_permission(self, request, obj=None):
+#         return AttributeTitle.objects.count() < 4
 
 
 admin.site.register(Review, ReviewAdmin)
