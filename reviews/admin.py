@@ -16,10 +16,10 @@ class AttributeTitleExecutorAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return AttributeTitle.objects.filter(about_customer=False)
     
-    def has_delete_permission(self, request, obj=None):
-        if self.get_queryset(request).count() < 4:
-            return True      
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     if self.get_queryset(request).count() < 4:
+    #         return True      
+    #     return False
     
     def has_add_permission(self, request, obj=None):
         if self.get_queryset(request).count() < 4:
