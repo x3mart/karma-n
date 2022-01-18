@@ -3,14 +3,14 @@ from reviews.models import Attribute, Comment, AttributeTitle, Review, ReviewTem
 from django.contrib import admin
 
 # Register your models here.
-class AttributeTitleExecuter(AttributeTitle):
+class AttributeTitleExecutor(AttributeTitle):
     class Meta:
         proxy = True
         verbose_name = 'Название характеристики отзывов на Исполнителя'
         verbose_name_plural = 'Названия характеристик отзывов на Исполнителя'
 
 
-class AttributeTitleExecuterAdmin(admin.ModelAdmin):
+class AttributeTitleExecutorAdmin(admin.ModelAdmin):
     exclude = ('about_customer',)
     
     def get_queryset(self, request):
@@ -66,7 +66,7 @@ class AttributeReviewInline(admin.TabularInline):
     
 
 
-class AttributeReviewExecuterTemplateInline(admin.TabularInline):
+class AttributeReviewExecutorTemplateInline(admin.TabularInline):
     model = Attribute
     exclude = ('review',)
     max_num = 4
@@ -96,17 +96,17 @@ class AttributeReviewCustomerTemplateInline(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-class ReviewTemplateExecuter(ReviewTemplate):
+class ReviewTemplateExecutor(ReviewTemplate):
     class Meta:
         proxy = True
         verbose_name = 'Шаблон отзывов на Исполнителя'
         verbose_name_plural = 'Шаблоны отзывов на Исполнителя'
 
 
-class ReviewTemplateExecuterAdmin(admin.ModelAdmin):
+class ReviewTemplateExecutorAdmin(admin.ModelAdmin):
     exclude = ('about_customer',)
     inlines = [
-        AttributeReviewExecuterTemplateInline,
+        AttributeReviewExecutorTemplateInline,
     ]
 
     def get_queryset(self, request):
@@ -147,9 +147,9 @@ class AttributeTitleAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Review, ReviewAdmin)
-admin.site.register(ReviewTemplateExecuter, ReviewTemplateExecuterAdmin)
+admin.site.register(ReviewTemplateExecutor, ReviewTemplateExecutorAdmin)
 admin.site.register(ReviewTemplateCustomer, ReviewTemplateCustomerAdmin)
 admin.site.register(Comment)
 # admin.site.register(Attribute)
-admin.site.register(AttributeTitleExecuter, AttributeTitleExecuterAdmin)
+admin.site.register(AttributeTitleExecutor, AttributeTitleExecutorAdmin)
 admin.site.register(AttributeTitleCustomer, AttributeTitleCustomerAdmin)

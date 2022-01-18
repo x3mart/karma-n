@@ -1,3 +1,4 @@
+from weakref import proxy
 from django.db import models
 from django.db.models.aggregates import Avg
 from polymorphic.models import PolymorphicModel
@@ -83,4 +84,26 @@ class ReviewTemplate(models.Model):
     def __str__(self):
         return self.body
 
+class AttributeAvgValue(models.Model):
+    value = models.DecimalField(decimal_places=1, max_digits=2, default=0)
+    title = models.ForeignKey('AttributeTitle', null=True, on_delete=models.PROTECT)
 
+    class Meta:
+        abstract = True
+        ordering = ['title']
+
+
+class UserCustomerAttributeAvgValue(AttributeAvgValue):
+    account = models.ForeignKey('accounts.Account', on_delete=models.PROTECT, related_name='users_customer_attributes_avg')
+
+
+class UserExecutorAttributeAvgValue(AttributeAvgValue):
+    account = models.ForeignKey('accounts.Account', on_delete=models.PROTECT, related_name='users_executor_attributes_avg')
+
+
+class ReviewableCustomerAttributeAvgValue(AttributeAvgValue):
+    reviewable = models.ForeignKey('reviewables.Reviewable', on_delete=models.PROTECT, related_name='reviewables_customer_attributes_avg')
+
+
+class ReviewableExecutorAttributeAvgValue(AttributeAvgValue):
+    reviewable = models.ForeignKey('reviewables.Reviewable', on_delete=models.PROTECT, related_name='reviewables_executor_attributes_avg')

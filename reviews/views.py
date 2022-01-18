@@ -17,7 +17,7 @@ from django.db.models import Q
 
 from services.models import Service
 from utils.reviewables import clean_phone
-from .models import Attribute, AttributeTitle, Review, Comment, Like, ReviewTemplate
+from .models import Attribute, AttributeTitle, Review, Comment, Like, ReviewTemplate, ReviewableCustomerAttributeAvgValue, ReviewableExecutorAttributeAvgValue
 from .serializers import ReviewSerializer, CommentSerializer, LikeSerializer, ReviewTemplateSerializer, AttributeTitleSerializer
 
 # Create your views here.
@@ -79,9 +79,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
         attributes = Attribute.objects.filter(review_template=template).values('title', 'value')
         return attributes
     
-    def get_template_body(self, template):
+    def get_template(self, template):
         template = ReviewTemplate.objects.get(pk=template)
-        return template.body
+        return template
     
     def get_reviewable(self, request):
         reviewable = request.data.get('reviewable')
@@ -90,10 +90,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
         reviewable, created = model.objects.get_or_create(**reviewable)
         return (reviewable, ctype)
     
-    def greate_attribute(self, review, attribute):
-        title = AttributeTitle.objects.get(pk=attribute['title'])
-        value = float(attribute['value'])
-        review.attributes.create(title=title, value=value)
+    def create_attributes(self, review, attributes):
+        objs = []
+        for attribute in attributes:
+            objs.append(Attribute(review=review, title_id=attribute['title'], value=float(attribute['value'])))
+        Attribute.objects.bulk_create(objs)
+
     
     def get_rating(self, review):
         return review.attributes.aggregate(avg=Avg('value'))['avg']
@@ -105,14 +107,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=400)
         reviewable, ctype = self.get_reviewable(request)
-        if reviewable.owner == request.user:
-                return Response({'error':'Запрещено оставлять отзыв на свой номер телефона или аккаунт'}, status=403)
+        # if reviewable.owner == request.user:
+        #         return Response({'error':'Запрещено оставлять отзыв на свой номер телефона или аккаунт'}, status=403)
         attributes = request.data.get('attributes')
         template = request.data.get('template')
         service = request.data.get('service')    
         if template:
-            attributes = self.get_template_attributes(template)
-            data['body'] = self.get_template_body(template)     
+            template = self.get_template(template)
+            data['body'] = template.body
+            data['about_customer'] = template.about_customer     
         review = Review.objects.create(owner=request.user, reviewable=reviewable, **data)
         if not reviewable.owner and ctype.capitalize() == 'Phone':
             self.send_sms(reviewable)
@@ -120,8 +123,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
             self.create_message(reviewable)
         if template:
             attributes = self.get_template_attributes(template)
-        for attribute in attributes:
-            self.greate_attribute(review, attribute)
+        self.create_attributes(review, attributes)
         if service:
             review.service = Service.objects.get(pk=service)
         review.rating = self.get_rating(review)
@@ -152,9 +154,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
         prefetch_likes = Prefetch('likes', queryset=likes)
         comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
         prefetch_comments = Prefetch('comments', queryset=comments)
-        reviewable = Reviewable.objects.prefetch_related('owner')
+        reviewables_customer_attributes_avg = ReviewableCustomerAttributeAvgValue.objects.prefetch_related('title')
+        prefetch_reviewables_customer_attributes_avg = Prefetch('reviewables_customer_attributes_avg', reviewables_customer_attributes_avg)
+        reviewables_executor_attributes_avg = ReviewableExecutorAttributeAvgValue.objects.prefetch_related('title')
+        prefetch_reviewables_executor_attributes_avg = Prefetch('reviewables_executor_attributes_avg', reviewables_executor_attributes_avg)
+        
+        reviewable = Reviewable.objects.prefetch_related('owner', prefetch_reviewables_customer_attributes_avg, prefetch_reviewables_executor_attributes_avg)
         prefetch_reviewable = Prefetch('reviewable', queryset=reviewable)
-        attributes = Attribute.objects.prefetch_related('title').order_by('title')
+        attributes = Attribute.objects.prefetch_related('title')
         prefetch_attributes = Prefetch('attributes', queryset=attributes)
         reviews = Review.objects.prefetch_related('owner', prefetch_comments, prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike, count_comments=Count('comments'))
         return reviews

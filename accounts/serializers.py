@@ -8,6 +8,7 @@ from accounts.models import Account
 from django.db.models import fields
 from djoser.serializers import UserSerializer
 from phonenumber_field.serializerfields import PhoneNumberField
+from reviews.models import UserCustomerAttributeAvgValue, UserExecutorAttributeAvgValue
 
 # class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #     @classmethod
@@ -17,6 +18,17 @@ from phonenumber_field.serializerfields import PhoneNumberField
 #         token['is_student'] = user.is_student
 #         token['is_teacher'] = user.is_teacher
 #         return token
+class UserCustomerAttributeAvgSerializer(serializers.ModelSerializer):
+    title = serializers.StringRelatedField(read_only=True, many=False)
+    class Meta:
+        model = UserCustomerAttributeAvgValue
+        fields = ('id', 'value', 'title')
+
+class UserExecutorAttributeAvgSerializer(serializers.ModelSerializer):
+    title = serializers.StringRelatedField(read_only=True, many=False)
+    class Meta:
+        model = UserExecutorAttributeAvgValue
+        fields = ('id', 'value', 'title')
 
 class AccountListSerializer(UserSerializer):
     class Meta:
@@ -27,6 +39,8 @@ class AccountListSerializer(UserSerializer):
 class AccountSerializer(UserSerializer):
     reviewables = ReviewablePolymorphicSerializer(many=True)
     services = ServiceSerializer(many=True)
+    users_customer_attributes_avg = UserCustomerAttributeAvgSerializer(many=True, read_only=True)
+    users_executor_attributes_avg = UserExecutorAttributeAvgSerializer(many=True, read_only=True)
     class Meta:
         model = Account
         exclude = ['password', 'is_superuser', 'is_staff', 'groups', 'user_permissions', 'is_active', 'is_private'] 
@@ -35,6 +49,8 @@ class AccountSerializer(UserSerializer):
 class CurentAcountSerializer(AccountSerializer):
     services = ServiceSerializer(many=True)
     reviewables = ReviewablePolymorphicSerializer(many=True)
+    users_customer_attributes_avg = UserCustomerAttributeAvgSerializer(many=True, read_only=True)
+    users_executor_attributes_avg = UserExecutorAttributeAvgSerializer(many=True, read_only=True)
     class Meta:
         model = Account
         exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions']
