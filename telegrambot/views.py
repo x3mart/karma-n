@@ -27,7 +27,7 @@ def tg_update_handler(request):
     reply_markup['inline_keyboard'] = [[button1, button2], [button2]]
     reply_markup = ReplyMarkup(reply_markup).data
     reply_markup = JSONRenderer().render(reply_markup)
-    data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут кручое сообщение!!! \n Coll message!!!", "parse_mode":"HTML","reply_markup":reply_markup}
+    data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup}
 
     response = requests.post(TG_URL + "sendMessage", data)
     print(response.json())
