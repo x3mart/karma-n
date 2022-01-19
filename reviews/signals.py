@@ -16,9 +16,9 @@ def atribute_post_save(instance, created, **kwargs):
 @receiver(post_save, sender=Review)
 def review_post_save(instance, created, **kwargs):
     if not created and instance.about_customer:
-        attributes = instance.attributes
+        attributes = instance.attributes.all()
         reviewable = instance.reviewable
-        for attribute in attributes.all():
+        for attribute in attributes:
             reviewable_attribute, created = ReviewableCustomerAttributeAvgValue.objects.get_or_create(reviewable=reviewable, title=attribute.title)
             reviewable_attribute.value = reviewable.reviews.filter(is_active=True).aggregate(avg=Avg('attributes__value', filter=Q(attributes__title=attribute.title)))['avg']
             reviewable_attribute.save()
@@ -30,7 +30,7 @@ def review_post_save(instance, created, **kwargs):
     elif not created and not instance.about_customer:
         attributes = instance.attributes
         reviewable = instance.reviewable
-        for attribute in attributes.all():
+        for attribute in attributes:
             reviewable_attribute, created = ReviewableExecutorAttributeAvgValue.objects.get_or_create(reviewable=reviewable, title=attribute.title)
             reviewable_attribute.value = reviewable.reviews.filter(is_active=True).aggregate(avg=Avg('attributes__value', filter=Q(attributes__title=attribute.title)))['avg']
             reviewable_attribute.save()

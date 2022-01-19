@@ -18,13 +18,9 @@ def tg_update_handler(request):
     "one_time_keyboard":True
     }
     }
-    data = {"chat_id":"1045490278", "text": f"{tgdata}", "reply_markup":{
-    "keyboard": [{"text":"Найти отзыв"}] 
-    # "resize_keyboard":True, 
-    # "one_time_keyboard":True
-    }
+    data = {"chat_id":"1045490278", "text": f"{tgdata}", "reply_markup":"{\"keyboard\":[[{\"text\":\"на сайт\", \"url\":\"https://novosti247.ru/\"},{\"text\":\"mario\"}]]}"
 }
 
     response = requests.post(TG_URL + "sendMessage", data)
-    print(response.json())
+    # print(response.json())
     return Response({},status=200)

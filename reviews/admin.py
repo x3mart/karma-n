@@ -55,7 +55,6 @@ class AttributeReviewInline(admin.TabularInline):
 
     def has_delete_permission(self, request, obj=None):
         return False
-    
 
 
 class AttributeReviewExecutorTemplateInline(admin.TabularInline):
