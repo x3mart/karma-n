@@ -39,7 +39,7 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # print(request.META)
-    tgdata = request.headers
+    tgdata = request.data
     button1 = InlineButton(text='Привет', url='https://novosti247.ru/api/reviews/')
     button2 = InlineButton(text='Пока', url='https://novosti247.ru/api/reviews/')
     keyboard = [[button1, button2], [button2]]
