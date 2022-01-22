@@ -24,5 +24,5 @@ class ReplyMarkupSerializer(serializers.Serializer):
 class AnswerCallbackQuerySerializer(serializers.Serializer):
     text = serializers.CharField(required=False)
     url = serializers.URLField(required=False)
-    callback_query_id = serializers.IntegerField()
+    callback_query_id = serializers.CharField()
     show_alert = serializers.BooleanField(required=False)
