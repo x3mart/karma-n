@@ -57,6 +57,7 @@ def tg_update_handler(request):
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
         # print(callback_aswer_data)
         data = JSONRenderer().render(callback_aswer_data)
+        data = {"callback_query_id":callback_aswer_data['callback_query_id']}
         # print(callback_aswer_data)
         response = requests.post(TG_URL + method, data)
         # print(response.json())
