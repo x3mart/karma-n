@@ -40,7 +40,7 @@ class Update():
 def tg_update_handler(request):
     # print(request.META)
     tgdata = request.data
-    button1 = InlineButton(text='Привет', url='https://novosti247.ru/api/reviews/')
+    button1 = InlineButton(text='Привет', callback_data='show_user_review 2')
     button2 = InlineButton(text='Пока', url='https://novosti247.ru/api/reviews/')
     keyboard = [[button1, button2], [button2]]
     reply_markup = ReplyMarkup()
