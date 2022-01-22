@@ -52,12 +52,13 @@ def tg_update_handler(request):
     tgdata = request.data
     if callback_query:
         method = "answerCallbackQuery"
-        callback_aswer = AnswerCallbackQuery(callback_query_id = callback_query['id'], text = callback_query['id'], show_alert=True)
+        callback_aswer = AnswerCallbackQuery(callback_query_id = callback_query['id'], text = callback_query['id'], show_alert=False)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
-        print(callback_aswer_data)
+        # print(callback_aswer_data)
         data = JSONRenderer().render(callback_aswer_data)
+        # print(callback_aswer_data)
         response = requests.post(TG_URL + method, data)
-        print(response.json())
+        # print(response.json())
     method = "sendMessage"
     button1 = InlineButton(text='Привет', callback_data='show_user_review 2')
     button2 = InlineButton(text='Пока', callback_data='show_user_review 2')
@@ -67,9 +68,9 @@ def tg_update_handler(request):
     reply_markup_data = ReplyMarkupSerializer(reply_markup).data
     reply_markup_json = JSONRenderer().render(reply_markup_data)
     # data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
-    data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
-    response = requests.post(TG_URL + method, data)
-    print(response.json())
+    data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
+    # response = requests.post(TG_URL + method, data)
+    # print(response.json())
     return Response({},status=200)
 
 
