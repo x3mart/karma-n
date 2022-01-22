@@ -20,3 +20,9 @@ class ReplyMarkupSerializer(serializers.Serializer):
         for row in obj.inline_keyboard:
             keyboards.append(InlineKeyboardButtonSerializer(row, many=True).data)
         return keyboards
+
+class AnswerCallbackQuerySerializer(serializers.Serializer):
+    text = serializers.CharField(required=False)
+    url = serializers.URLField(required=False)
+    callback_query_id = serializers.IntegerField()
+    show_alert = serializers.BooleanField(required=False)
