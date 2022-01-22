@@ -72,8 +72,5 @@ def tg_update_handler(request):
     # data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     response = requests.post(TG_URL + method, data)
-    print(response.json())
+    # print(response.json())
     return Response({},status=200)
-
-
-{'update_id': 351822288, 'callback_query': {'id': '4490346553341109267', 'message': {'message_id': 108, 'from': {'id': 5038109651, 'is_bot': True, 'first_name': 'karma-n', 'username': 'x3mart_test_bot'}, 'chat': {'id': 1045490278, 'first_name': 'Vyatcheslav', 'last_name': 'Morozov', 'username': 'x3mart', 'type': 'private'}, 'date': 1642885444, 'text': "{'update_id': 351822287, 'message': {'message_id': 107, 'from': {'id': 1045490278, 'is_bot': False, 'first_name': 'Vyatcheslav', 'last_name': 'Morozov', 'username': 'x3mart', 'language_code': 'ru'}, 'chat': {'id': 1045490278, 'first_name': 'Vyatcheslav', 'last_name': 'Morozov', 'username': 'x3mart', 'type': 'private'}, 'date': 1642885444, 'text': 'xczvzcvz'}} \n Вот тут крутое сообщение!!! \n \n  Coll message!!!", 'entities': [{'offset': 0, 'length': 361, 'type': 'pre', 'language': 'python'}, {'offset': 396, 'length': 16, 'type': 'text_link', 'url': 'https://novosti247.ru/api/reviews/'}], 'chat_instance': '3809238572327023370', 'data': 'show_user_review 2'}}}
