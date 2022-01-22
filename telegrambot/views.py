@@ -9,10 +9,11 @@ from rest_framework.renderers import JSONRenderer
 from .serializers import *
 
 class AnswerCallbackQuery():
-    def __init__(self, text, url=None, callback_query_id=None, show_alert=False):
+    def __init__(self, text, url=None, callback_query_id=None, show_alert=False, cache_time=20):
         self.text = text
         self.show_alert = show_alert
         self.callback_query_id = callback_query_id
+        self.cache_time = cache_time
         if url:
             self.url = url
 
@@ -70,7 +71,7 @@ def tg_update_handler(request):
     # data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     response = requests.post(TG_URL + method, data)
-    # print(response.json())
+    print(response.json())
     return Response({},status=200)
 
 
