@@ -1,22 +1,22 @@
 from rest_framework import serializers
 
 
-class AnswerCallbackQuery(serializers.Serializer):
+class AnswerCallbackQuerySerializer(serializers.Serializer):
     callback_query_id = serializers.CharField()
     text = serializers.CharField()
 
 
-class InlineKeyboardButton(serializers.Serializer):
+class InlineKeyboardButtonSerializer(serializers.Serializer):
     text = serializers.CharField(required=False)
     url = serializers.URLField(required=False)
     callback_data = serializers.CharField(required=False)
 
 
-class ReplyMarkup(serializers.Serializer):
+class ReplyMarkupSerializer(serializers.Serializer):
     inline_keyboard = serializers.SerializerMethodField()
 
     def get_inline_keyboard(self, obj):
         keyboards = []
-        for row in obj['inline_keyboard']:
-            keyboards.append(InlineKeyboardButton(row, many=True).data)
+        for row in obj.inline_keyboard:
+            keyboards.append(InlineKeyboardButtonSerializer(row, many=True).data)
         return keyboards
