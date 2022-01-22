@@ -9,7 +9,7 @@ from rest_framework.renderers import JSONRenderer
 from .serializers import *
 
 class InlineButton:
-    def __init__(self, text, url='', callback_data=None, login_url=None, switch_inline_query=None):
+    def __init__(self, text, url='', callback_data='', login_url=None, switch_inline_query=None):
         self.text = text
         self.url = url
         self.callback_data = callback_data
@@ -40,8 +40,8 @@ class Update():
 def tg_update_handler(request):
     # print(request.META)
     tgdata = request.data
-    button1 = InlineButton(text='Привет', callback_data='show_user_review 2')
-    button2 = InlineButton(text='Пока', callback_data='show_user_review 2')
+    button1 = InlineButton(text='Привет', url='show_user_review 2')
+    button2 = InlineButton(text='Пока', url='show_user_review 2')
     keyboard = [[button1, button2], [button2]]
     reply_markup = ReplyMarkup()
     reply_markup.inline_keyboard = keyboard
