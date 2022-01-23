@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 from karman.settings import TG_URL
 import requests
+import json
 from rest_framework.renderers import JSONRenderer
 from .serializers import *
 
@@ -56,8 +57,8 @@ def tg_update_handler(request):
         callback_aswer = AnswerCallbackQuery(callback_query_id = callback_query['id'], text = callback_query['data'], show_alert=False)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
         # print(callback_aswer_data)
-        data = JSONRenderer().render(callback_aswer_data)
-        data = {"callback_query_id":callback_aswer_data['callback_query_id'], "text":callback_aswer_data['text'], "show_alert":1}
+        data = json.dumps(callback_aswer_data)
+        # data = {"callback_query_id":callback_aswer_data['callback_query_id'], "text":callback_aswer_data['text'], "show_alert":1}
         # print(data)
         response = requests.post(TG_URL + method, data)
         # print(response.json())
@@ -68,9 +69,9 @@ def tg_update_handler(request):
     reply_markup = ReplyMarkup()
     reply_markup.inline_keyboard = keyboard
     reply_markup_data = ReplyMarkupSerializer(reply_markup).data
-    reply_markup_json = JSONRenderer().render(reply_markup_data)
+    reply_markup_json = json.dumps(reply_markup_data)
     data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     # data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     response = requests.post(TG_URL + method, data)
-    # print(response.json())
-    return Response({},status=200)
+    # print(reply_markup_json)
+    return Response({}, status=200)
