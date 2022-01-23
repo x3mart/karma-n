@@ -60,7 +60,7 @@ def tg_update_handler(request):
         callback_aswer_json = json.dumps(callback_aswer_data, sort_keys=True)
         # callback_aswer_json = {"callback_query_id":callback_aswer_data['callback_query_id'], "text":callback_aswer_data['text'], "show_alert":1}
         # print(data)
-        response = requests.post(TG_URL + method, callback_aswer_json)
+        response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())
     method = "sendMessage"
     button1 = InlineButton(text='Привет', callback_data='show_user_review 2')
@@ -73,7 +73,7 @@ def tg_update_handler(request):
     
     data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     if callback_query:
-        data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_json}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
+        data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     response = requests.post(TG_URL + method, data)
     # print(reply_markup_json)
     return Response({}, status=200)
