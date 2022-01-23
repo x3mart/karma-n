@@ -58,7 +58,7 @@ def tg_update_handler(request):
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
         # print(callback_aswer_data)
         callback_aswer_json = json.dumps(callback_aswer_data, sort_keys=True)
-        callback_aswer_json = {"callback_query_id":callback_aswer_data['callback_query_id'], "text":callback_aswer_data['text'], "show_alert":1}
+        # callback_aswer_json = {"callback_query_id":callback_aswer_data['callback_query_id'], "text":callback_aswer_data['text'], "show_alert":1}
         # print(data)
         response = requests.post(TG_URL + method, callback_aswer_json)
         # print(response.json())
@@ -69,7 +69,7 @@ def tg_update_handler(request):
     reply_markup = ReplyMarkup()
     reply_markup.inline_keyboard = keyboard
     reply_markup_data = ReplyMarkupSerializer(reply_markup).data
-    reply_markup_json = json.dumps(reply_markup_data)
+    reply_markup_json = json.dumps(reply_markup_data, sort_keys=True)
     
     data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
     if callback_query:
