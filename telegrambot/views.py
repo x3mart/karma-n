@@ -57,7 +57,7 @@ def tg_update_handler(request):
         callback_aswer = AnswerCallbackQuery(callback_query_id = callback_query['id'], text = callback_query['data'], show_alert=False)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
         # print(callback_aswer_data)
-        callback_aswer_json = json.dumps(callback_aswer_data)
+        callback_aswer_json = json.dumps(callback_aswer_data, sort_keys=True)
         callback_aswer_json = {"callback_query_id":callback_aswer_data['callback_query_id'], "text":callback_aswer_data['text'], "show_alert":1}
         # print(data)
         response = requests.post(TG_URL + method, callback_aswer_json)
