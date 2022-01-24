@@ -41,13 +41,26 @@ class ReplyMarkup():
         pass
 
 
-# class 
+class TgUser():
+    def __init__(self, user) -> None:
+        self.id = user.get('id')
+        self.is_bot = user.get('is_bot')
+        self.first_name = user.get('first_name')
+        self.last_name = user.get('last_name')
+        self.username = user.get('username')
 
+
+class Message():
+    def __init__(self, message):
+        self.message_id = message.get('message_id')
+        self.sender = TgUser(user=message.get('from'))
+        self.text = message.get('text')
+        self.entities = message.get('entities')
 
 class Update():
     def __init__(self, data) -> None:
         self.update_id = data.get('update_id')
-        self.message = data.get('message')
+        self.message = Message(message=data.get('message'))
         self.edited_message = data.get('edited_message')
         self.channel_post = data.get('channel_post')
         self.edited_channel_post = data.get('edited_channel_post')
@@ -82,7 +95,7 @@ def tg_update_handler(request):
         response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())
     method = "sendMessage"
-    button1 = InlineButton(text='Привет', callback_data='show_user_review 2')
+    button1 = InlineButton(text='Привет', callback_data=f'Привет {update.message.sender.username}')
     button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
     keyboard = [[button1, button2], [button2]]
     reply_markup = ReplyMarkup()
