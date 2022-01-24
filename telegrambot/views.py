@@ -58,7 +58,11 @@ class SendMessage():
 def tg_update_handler(request):
     # print(request.META)
     callback_query = request.data.get('callback_query')
-    chat_id=1045490278
+    chat = request.data.get('chat')
+    if chat:
+        chat_id = chat['id']
+    else:
+        chat_id=1045490278
     tgdata = request.data
     if callback_query:
         method = "answerCallbackQuery"
