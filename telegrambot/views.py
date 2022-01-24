@@ -10,7 +10,7 @@ from rest_framework.renderers import JSONRenderer
 from .serializers import *
 
 class AnswerCallbackQuery():
-    def __init__(self, text, url=None, callback_query_id=None, show_alert=False, cache_time=20):
+    def __init__(self, text, url=None, callback_query_id=None, show_alert=False, cache_time=0):
         self.text = text
         self.show_alert = show_alert
         self.callback_query_id = callback_query_id
@@ -45,21 +45,25 @@ class Update():
     def __init__(self) -> None:
         pass
 
+class SendMessage():
+    def __init__(self, chat_id, text, parse_mode='HTML', reply_markup=None) -> None:
+        self.chat_id = chat_id
+        self.text = text
+        self.parse_mode = parse_mode
+        self.reply_markup = reply_markup
+
 
 @api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # print(request.META)
     callback_query = request.data.get('callback_query')
+    chat_id=1045490278
     tgdata = request.data
     if callback_query:
         method = "answerCallbackQuery"
         callback_aswer = AnswerCallbackQuery(callback_query_id = callback_query['id'], text = callback_query['data'], show_alert=True)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
-        # print(callback_aswer_data)
-        callback_aswer_json = json.dumps(callback_aswer_data, sort_keys=True)
-        # callback_aswer_json = {"callback_query_id":callback_aswer_data['callback_query_id'], "text":callback_aswer_data['text'], "show_alert":1}
-        # print(data)
         response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())
     method = "sendMessage"
@@ -69,11 +73,13 @@ def tg_update_handler(request):
     reply_markup = ReplyMarkup()
     reply_markup.inline_keyboard = keyboard
     reply_markup_data = ReplyMarkupSerializer(reply_markup).data
-    reply_markup_json = json.dumps(reply_markup_data, sort_keys=True)
-    
-    data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
+    reply_markup_json = JSONRenderer().render(reply_markup_data)
+    text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>" 
     if callback_query:
-        data = {"chat_id":1045490278, "text": f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>", "parse_mode":"HTML","reply_markup":reply_markup_json}
+        text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>"
+    send_message = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup_json)
+    data = SendMessageSerializer(send_message).data
+    # print(data)
     response = requests.post(TG_URL + method, data)
-    # print(reply_markup_json)
+    # print(response.json())
     return Response({}, status=200)

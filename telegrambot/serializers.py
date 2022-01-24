@@ -1,3 +1,4 @@
+from rest_framework.renderers import JSONRenderer
 from rest_framework import serializers
 
 
@@ -26,3 +27,9 @@ class AnswerCallbackQuerySerializer(serializers.Serializer):
     url = serializers.URLField(required=False)
     callback_query_id = serializers.CharField()
     show_alert = serializers.BooleanField(required=False)
+
+class SendMessageSerializer(serializers.Serializer):
+    chat_id = serializers.IntegerField()
+    text = serializers.CharField()
+    parse_mode = serializers.CharField()
+    reply_markup = serializers.JSONField(required=False)
