@@ -103,10 +103,10 @@ def tg_update_handler(request):
         method = "answerCallbackQuery"
         callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query['id'], text = update.callback_query['id'], show_alert=True)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
+        button1 = InlineButton(text='Привет', callback_data=f'Привет')
         response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())
     method = "sendMessage"
-    button1 = InlineButton(text='Привет', callback_data=f'Привет')
     button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
     keyboard = [[button1, button2], [button2]]
     reply_markup = ReplyMarkup()
