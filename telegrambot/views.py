@@ -41,7 +41,7 @@ class ReplyMarkup():
         pass
 
 
-class 
+# class 
 
 
 class Update():
@@ -90,7 +90,7 @@ def tg_update_handler(request):
     reply_markup_data = ReplyMarkupSerializer(reply_markup).data
     reply_markup_json = JSONRenderer().render(reply_markup_data)
     text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>" 
-    if callback_query:
+    if update.callback_query:
         text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>"
     send_message = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup_json)
     data = SendMessageSerializer(send_message).data
