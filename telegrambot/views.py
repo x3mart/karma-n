@@ -51,22 +51,32 @@ class TgUser():
 
 
 class Message():
-    def __init__(self, message):
-        self.message_id = message.get('message_id')
-        self.sender = TgUser(user=message.get('from'))
-        self.text = message.get('text')
-        self.entities = message.get('entities')
+    def __init__(self, data):
+        for key, value in data.items():
+            if key == 'message':
+                self.__setattr__(key, Message(value))
+            else:
+                self.__setattr__(key, value)
 
 class Update():
     def __init__(self, data) -> None:
-        self.update_id = data.get('update_id')
-        self.message = Message(message=data.get('message'))
-        self.edited_message = data.get('edited_message')
-        self.channel_post = data.get('channel_post')
-        self.edited_channel_post = data.get('edited_channel_post')
-        self.chosen_inline_result = data.get('chosen_inline_result')
-        self.callback_query = data.get('callback_query')
-        self.chat = data.get('chat')
+        for key, value in data.items():
+            print(key)
+            if key == 'message':
+                self.__setattr__(key, Message(value))
+            else:
+                self.__setattr__(key, value)
+
+            
+        # self.update_id = data.get('update_id')
+
+        # self.message = Message(message=data.get('message'))
+        # self.edited_message = data.get('edited_message')
+        # self.channel_post = data.get('channel_post')
+        # self.edited_channel_post = data.get('edited_channel_post')
+        # self.chosen_inline_result = data.get('chosen_inline_result')
+        # self.callback_query = data.get('callback_query')
+        # self.chat = data.get('chat')
 
 
 
@@ -82,20 +92,20 @@ class SendMessage():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # print(request.META)
-    update = Update(data=request.data)
-    if update.chat:
-        chat_id = update.chat['id']
+    update = Update(request.data)
+    if hasattr(update,'message'):
+        chat_id = update.message.chat['id']
     else:
         chat_id=1045490278
     tgdata = request.data
-    if update.callback_query:
+    if hasattr(update,'callback_query'):
         method = "answerCallbackQuery"
         callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query['id'], text = update.callback_query['data'], show_alert=True)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
         response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())
     method = "sendMessage"
-    button1 = InlineButton(text='Привет', callback_data=f'Привет {update.message.sender.username}')
+    button1 = InlineButton(text='Привет', callback_data=f'Привет {update.message.chat["username"]}')
     button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
     keyboard = [[button1, button2], [button2]]
     reply_markup = ReplyMarkup()
@@ -103,7 +113,7 @@ def tg_update_handler(request):
     reply_markup_data = ReplyMarkupSerializer(reply_markup).data
     reply_markup_json = JSONRenderer().render(reply_markup_data)
     text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>" 
-    if update.callback_query:
+    if hasattr(update,'callback_query'):
         text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>"
     send_message = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup_json)
     data = SendMessageSerializer(send_message).data
@@ -111,3 +121,5 @@ def tg_update_handler(request):
     response = requests.post(TG_URL + method, data)
     # print(response.json())
     return Response({}, status=200)
+
+    
