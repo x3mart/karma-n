@@ -95,6 +95,7 @@ def tg_update_handler(request):
     update = Update(request.data)
     if hasattr(update,'message'):
         chat_id = update.message.chat['id']
+        button1 = InlineButton(text=f'Привет  {update.message.chat["username"]}', callback_data=f'Привет {update.message.chat["username"]}')
     else:
         chat_id=1045490278
     tgdata = request.data
@@ -105,7 +106,7 @@ def tg_update_handler(request):
         response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())
     method = "sendMessage"
-    button1 = InlineButton(text='Привет', callback_data=f'Привет {update.message.chat["username"]}')
+    button1 = InlineButton(text='Привет', callback_data=f'Привет')
     button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
     keyboard = [[button1, button2], [button2]]
     reply_markup = ReplyMarkup()
