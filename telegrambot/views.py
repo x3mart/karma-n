@@ -41,9 +41,21 @@ class ReplyMarkup():
         pass
 
 
+class 
+
+
 class Update():
-    def __init__(self) -> None:
-        pass
+    def __init__(self, data) -> None:
+        self.update_id = data.get('update_id')
+        self.message = data.get('message')
+        self.edited_message = data.get('edited_message')
+        self.channel_post = data.get('channel_post')
+        self.edited_channel_post = data.get('edited_channel_post')
+        self.chosen_inline_result = data.get('chosen_inline_result')
+        self.callback_query = data.get('callback_query')
+        self.chat = data.get('chat')
+
+
 
 class SendMessage():
     def __init__(self, chat_id, text, parse_mode='HTML', reply_markup=None) -> None:
@@ -57,16 +69,15 @@ class SendMessage():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # print(request.META)
-    callback_query = request.data.get('callback_query')
-    chat = request.data.get('chat')
-    if chat:
-        chat_id = chat['id']
+    update = Update(data=request.data)
+    if update.chat:
+        chat_id = update.chat['id']
     else:
         chat_id=1045490278
     tgdata = request.data
-    if callback_query:
+    if update.callback_query:
         method = "answerCallbackQuery"
-        callback_aswer = AnswerCallbackQuery(callback_query_id = callback_query['id'], text = callback_query['data'], show_alert=True)
+        callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query['id'], text = update.callback_query['data'], show_alert=True)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
         response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())
