@@ -42,21 +42,29 @@ class ReplyMarkup():
 
 
 class TgUser():
-    def __init__(self, user) -> None:
-        self.id = user.get('id')
-        self.is_bot = user.get('is_bot')
-        self.first_name = user.get('first_name')
-        self.last_name = user.get('last_name')
-        self.username = user.get('username')
+    def __init__(self, data) -> None:
+        for key, value in data.items():
+            self.__setattr__(key, value)
+
+
+class Chat():
+    def __init__(self, data) -> None:
+        for key, value in data.items():
+            self.__setattr__(key, value)
 
 
 class Message():
     def __init__(self, data):
         for key, value in data.items():
-            if key == 'message':
+            if key == 'reply_to_message':
                 self.__setattr__(key, Message(value))
+            elif key == 'from':
+                self.__setattr__(key, TgUser(value))
+            elif key == 'chat':
+                self.__setattr__(key, Chat(value))
             else:
                 self.__setattr__(key, value)
+
 
 class Update():
     def __init__(self, data) -> None:
@@ -66,18 +74,6 @@ class Update():
                 self.__setattr__(key, Message(value))
             else:
                 self.__setattr__(key, value)
-
-            
-        # self.update_id = data.get('update_id')
-
-        # self.message = Message(message=data.get('message'))
-        # self.edited_message = data.get('edited_message')
-        # self.channel_post = data.get('channel_post')
-        # self.edited_channel_post = data.get('edited_channel_post')
-        # self.chosen_inline_result = data.get('chosen_inline_result')
-        # self.callback_query = data.get('callback_query')
-        # self.chat = data.get('chat')
-
 
 
 class SendMessage():
@@ -91,11 +87,10 @@ class SendMessage():
 @api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
-    # print(request.META)
     update = Update(request.data)
     if hasattr(update,'message'):
         chat_id = update.message.chat['id']
-        button1 = InlineButton(text=f'Привет  {update.message.chat["username"]}', callback_data=f'Привет {update.message.chat["username"]}')
+        button1 = InlineButton(text=f'Привет  {update.message.chat.username}', callback_data=f'Привет {update.message.chat.username}')
     else:
         chat_id=1045490278
     tgdata = request.data
