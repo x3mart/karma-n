@@ -101,7 +101,7 @@ def tg_update_handler(request):
     tgdata = request.data
     if hasattr(update,'callback_query'):
         method = "answerCallbackQuery"
-        callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query['id'], text = update.callback_query['id'], show_alert=True)
+        callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query['id'], text = update.callback_query['data'], show_alert=True)
         callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
         button1 = InlineButton(text='Привет', callback_data=f'Привет')
         response = requests.post(TG_URL + method, callback_aswer_data)
