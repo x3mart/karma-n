@@ -89,7 +89,7 @@ class SendMessage():
 def tg_update_handler(request):
     update = Update(request.data)
     if hasattr(update,'message'):
-        chat_id = update.message.chat['id']
+        chat_id = update.message.chat.id
         button1 = InlineButton(text=f'Привет  {update.message.chat.username}', callback_data=f'Привет {update.message.chat.username}')
     else:
         chat_id=1045490278
