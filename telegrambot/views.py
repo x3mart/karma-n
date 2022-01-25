@@ -14,7 +14,7 @@ from .serializers import *
 from .models import *
 
 
-COMMAND_LIST = ('review', 'user_info')
+COMMANDS_LIST = ('review', 'user_info')
 
 class SendMessage():
     def __init__(self, chat_id, text, parse_mode='HTML', reply_markup=None) -> None:
@@ -43,7 +43,7 @@ class Update():
         if message.text.startswith('/'):
             command_message = message.text.split(' ')
             command = command_message.pop(0).replace('/', '')
-        if command in COMMAND_LIST:
+        if command in COMMANDS_LIST:
             return (command, command_message)
         else:
             return (None, None)
@@ -51,7 +51,8 @@ class Update():
     def message_dispatcher(self):
         command, args = self.command_handler(self.message)
         if command == 'user_info':
-            text = render_to_string('user_info.html', {'user': Account.objects.get(pk=2)})
+            # text = render_to_string('user_info.html', {'user': Account.objects.get(pk=2)})
+            text= 'command'
         else:
             text = 'No commands'
         response = SendMessage(chat_id=self.message.chat.id, text=text).send()
@@ -91,7 +92,7 @@ def tg_update_handler(request):
     # data = SendMessageSerializer(send_message).data
     # # print(data)
     # response = requests.post(TG_URL + method, data)
-    print(result.json())
+    # print(result.json())
     return Response({}, status=200)
 
     
