@@ -52,7 +52,7 @@ class Update():
         command, args = self.command_handler(self.message)
         if command == 'user_info':
             # text = render_to_string('user_info.html', {'user': Account.objects.get(pk=2)})
-            text= 'command'
+            text = 'command'
         else:
             text = 'No commands'
         response = SendMessage(chat_id=self.message.chat.id, text=text).send()
@@ -65,9 +65,9 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     update = Update(request.data)
-    if hasattr(update,'message'):
-        result = update.message_dispatcher()
-        SendMessage(chat_id=1045490278, text=result.json).send()
+    # if hasattr(update,'message'):
+        # result = update.message_dispatcher()
+        # SendMessage(chat_id=1045490278, text=result.json).send()
     # elif hasattr(update,'callback_query'):
     #     pass
         # method = "answerCallbackQuery"
