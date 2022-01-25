@@ -1,0 +1,17 @@
+<u>Персональная информация</u> 
+<b>Ник</b>: {{ user.name }}
+<b>Полное Имя</b>: {% firstof  user.full_name "неизвестно"  %}
+<b>День рождения</b>: {% firstof user.birthday "неизвестно" %}
+<b>Пол</b>: {% firstof user.sex "неизвестно" %}
+<b>Город</b>: {% firstof user.city "неизвестно" %}
+<b>О себе</b>: {% firstof user.about "неизвестно" %}
+<b>Услуги</b>: {% for service in user.services.all %}{{ service.title }} {% endfor %}
+<b>Аккаунты и телефоны</b>: {% for reviewable in user.reviewables.all %} {% if reviewable.polymorphic_ctype.model == "phone" %}телефон{% else %}{{ reviewable.polymorphic_ctype.model }}{% endif %}-{{ reviewable.screen_name }} {% endfor %}
+<b>Рейтинг потребителя</b>: {{ user.customer_rating }} ({{ user.reviews_executors_about_me_count }} отзывов)
+    {% for attribute in user.reviewables_customer_attributes_avg.all %}
+    {{ attribute.title }}-{{ attribute.value }}
+    {% endfor %}
+<b>Рейтинг исполнителя</b>: {{ user.executor_rating }} ({{ user.reviews_customers_about_me_count }} отзывов)
+    {% for attribute in user.reviewables_executor_attributes_avg.all %}
+    {{ attribute.title }}-{{ attribute.value }}
+    {% endfor %}
