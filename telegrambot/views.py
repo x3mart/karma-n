@@ -64,7 +64,8 @@ class Update():
 @api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
-    send_message = SendMessage(chat_id=1045490278, text="update")
+    tgdata = request.data 
+    send_message = SendMessage(chat_id=1045490278, text=f"{tgdata}")
     data = SendMessageSerializer(send_message).data
     response = requests.post(TG_URL + "sendMessage", data)
     update = Update(request.data)
@@ -80,7 +81,6 @@ def tg_update_handler(request):
         # response = requests.post(TG_URL + method, callback_aswer_data)
         # print(response.json())else:
     #     chat_id=1045490278
-    tgdata = request.data 
     method = "sendMessage"
     # button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
     # keyboard = [[button1, button2], [button2]]
