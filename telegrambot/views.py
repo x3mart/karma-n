@@ -51,8 +51,8 @@ class Update():
     def message_dispatcher(self):
         command, args = self.command_handler(self.message)
         if command == 'user_info':
-            # text = render_to_string('user_info.html', {'user': Account.objects.get(pk=2)})
-            text = 'command'
+            text = render_to_string('user_info.html', {'user': Account.objects.get(pk=2)})
+            # text = 'command'
         else:
             text = 'No commands'
         response = SendMessage(chat_id=self.message.chat.id, text=text).send()
