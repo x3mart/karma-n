@@ -20,6 +20,7 @@ def tg_update_handler(request):
         button1 = InlineButton(text=f'Привет  {update.message.chat.username}', callback_data=f'Привет {update.message.chat.username}')
     else:
         chat_id=1045490278
+        button1 = InlineButton(text=f'Привет Nemo', callback_data=f'Привет Немо')
     tgdata = request.data
     if hasattr(update,'callback_query'):
         method = "answerCallbackQuery"
