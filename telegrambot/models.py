@@ -1,14 +1,6 @@
 from django.db import models
 
 # Create your models here.
-class SendMessage():
-    def __init__(self, chat_id, text, parse_mode='HTML', reply_markup=None) -> None:
-        self.chat_id = chat_id
-        self.text = text
-        self.parse_mode = parse_mode
-        self.reply_markup = reply_markup
-
-
 class AnswerCallbackQuery():
     def __init__(self, text, url=None, callback_query_id=None, show_alert=False, cache_time=0):
         self.text = text
@@ -73,16 +65,5 @@ class CallbackQuery():
                 self.__setattr__(key, Message(value))
             elif key == 'from':
                 self.__setattr__(key, TgUser(value))
-            else:
-                self.__setattr__(key, value)
-
-
-class Update():
-    def __init__(self, data) -> None:
-        for key, value in data.items():
-            if key == 'message':
-                self.__setattr__(key, Message(value))
-            elif key == 'callback_query':
-                self.__setattr__(key, CallbackQuery(value))
             else:
                 self.__setattr__(key, value)
