@@ -80,10 +80,9 @@ class CallbackQuery():
 class Update():
     def __init__(self, data) -> None:
         for key, value in data.items():
-            print(key)
             if key == 'message':
                 self.__setattr__(key, Message(value))
-            if key == 'callback_query':
+            elif key == 'callback_query':
                 self.__setattr__(key, CallbackQuery(value))
             else:
                 self.__setattr__(key, value)
