@@ -91,7 +91,7 @@ def tg_update_handler(request):
     send_message = SendMessage(chat_id=1045490278, text=f'{tgdata}')
     data = SendMessageSerializer(send_message).data
     # # print(data)
-    response = requests.post(TG_URL + method, f'{tgdata}')
+    response = requests.post(TG_URL + method, data)
     # print(result.json())
     return Response({}, status=200)
 
