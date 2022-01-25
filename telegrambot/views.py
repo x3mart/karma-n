@@ -64,6 +64,9 @@ class Update():
 @api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
+    send_message = SendMessage(chat_id=1045490278, text="update")
+    data = SendMessageSerializer(send_message).data
+    response = requests.post(TG_URL + "sendMessage", data)
     update = Update(request.data)
     if hasattr(update,'message'):
         result = update.message_dispatcher()
