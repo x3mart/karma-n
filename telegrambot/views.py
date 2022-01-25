@@ -15,7 +15,7 @@ from .models import *
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     update = Update(request.data)
-    if hasattr(update,'message'):
+    if hasattr(update,'message') and hasattr(update.message, 'chat'):
         chat_id = update.message.chat.id
         button1 = InlineButton(text=f'Привет  {update.message.chat.username}', callback_data=f'Привет {update.message.chat.username}')
     else:
@@ -42,7 +42,7 @@ def tg_update_handler(request):
     data = SendMessageSerializer(send_message).data
     # print(data)
     response = requests.post(TG_URL + method, data)
-    # print(response.json())
+    print(response.json())
     return Response({}, status=200)
 
     
