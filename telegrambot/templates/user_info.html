@@ -8,5 +8,4 @@
 <b>Услуги</b>: {% for service in user.services.all %}{{ service.title }} {% endfor %}
 <b>Аккаунты и телефоны</b>: {% for reviewable in user.reviewables.all %} {% if reviewable.polymorphic_ctype.model == "phone" %}телефон{% else %}{{ reviewable.polymorphic_ctype.model }}{% endif %}-{{ reviewable.screen_name }} {% endfor %}
 <b>Рейтинг потребителя</b>: {{ user.customer_rating }} ({{ user.reviews_executors_about_me_count }} отзывов)
-<b>Рейтинг исполнителя</b>: {{ user.executor_rating }} ({{ user.reviews_customers_about_me_count }} отзывов){% for attribute in user.users_executor_attributes_avg.all %}
-    {{ attribute.title }}-{{ attribute.value }}{% endfor %}
+<b>Рейтинг исполнителя</b>: {{ user.executor_rating }} ({{ user.reviews_customers_about_me_count }} отзывов)
