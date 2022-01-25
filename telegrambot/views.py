@@ -64,38 +64,38 @@ class Update():
 @api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
-    tgdata = request.data 
-    send_message = SendMessage(chat_id=1045490278, text=f"{tgdata}")
-    data = SendMessageSerializer(send_message).data
-    response = requests.post(TG_URL + "sendMessage", data)
-    update = Update(request.data)
-    if hasattr(update,'message'):
-        result = update.message_dispatcher()
-        SendMessage(chat_id=1045490278, text=result.json).send()
-    # elif hasattr(update,'callback_query'):
-    #     pass
-        # method = "answerCallbackQuery"
-        # callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query.id, text = update.callback_query.data, show_alert=True)
-        # callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
-        # button1 = InlineButton(text='Привет', callback_data=f'Привет')
-        # response = requests.post(TG_URL + method, callback_aswer_data)
-        # print(response.json())else:
-    #     chat_id=1045490278
-    method = "sendMessage"
-    # button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
-    # keyboard = [[button1, button2], [button2]]
-    # reply_markup = ReplyMarkup()
-    # reply_markup.inline_keyboard = keyboard
-    # reply_markup_data = ReplyMarkupSerializer(reply_markup).data
-    # reply_markup_json = JSONRenderer().render(reply_markup_data)
-    # text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>" 
-    # if hasattr(update,'callback_query'):
-    #     text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>"
-    send_message = SendMessage(chat_id=1045490278, text=f'{tgdata}')
-    data = SendMessageSerializer(send_message).data
-    # # print(data)
-    response = requests.post(TG_URL + method, data)
-    # print(result.json())
+    # tgdata = request.data 
+    # send_message = SendMessage(chat_id=1045490278, text=f"{tgdata}")
+    # data = SendMessageSerializer(send_message).data
+    # response = requests.post(TG_URL + "sendMessage", data)
+    # update = Update(request.data)
+    # if hasattr(update,'message'):
+    #     result = update.message_dispatcher()
+    #     SendMessage(chat_id=1045490278, text=result.json).send()
+    # # elif hasattr(update,'callback_query'):
+    # #     pass
+    #     # method = "answerCallbackQuery"
+    #     # callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query.id, text = update.callback_query.data, show_alert=True)
+    #     # callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
+    #     # button1 = InlineButton(text='Привет', callback_data=f'Привет')
+    #     # response = requests.post(TG_URL + method, callback_aswer_data)
+    #     # print(response.json())else:
+    # #     chat_id=1045490278
+    # method = "sendMessage"
+    # # button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
+    # # keyboard = [[button1, button2], [button2]]
+    # # reply_markup = ReplyMarkup()
+    # # reply_markup.inline_keyboard = keyboard
+    # # reply_markup_data = ReplyMarkupSerializer(reply_markup).data
+    # # reply_markup_json = JSONRenderer().render(reply_markup_data)
+    # # text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>" 
+    # # if hasattr(update,'callback_query'):
+    # #     text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>"
+    # send_message = SendMessage(chat_id=1045490278, text=f'{tgdata}')
+    # data = SendMessageSerializer(send_message).data
+    # # # print(data)
+    # response = requests.post(TG_URL + method, data)
+    # # print(result.json())
     return Response({}, status=200)
 
     
