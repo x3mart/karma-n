@@ -66,6 +66,7 @@ def tg_update_handler(request):
     update = Update(request.data)
     if hasattr(update,'message'):
         result = update.message_dispatcher()
+        SendMessage(chat_id=1045490278, text=result.json).send()
     elif hasattr(update,'callback_query'):
         pass
         # method = "answerCallbackQuery"
