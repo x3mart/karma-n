@@ -46,7 +46,7 @@ class Update():
         if command in COMMAND_LIST:
             return (command, command_message)
         else:
-            return None
+            return (None, None)
     
     def message_dispatcher(self):
         command, args = self.command_handler(self.message)
