@@ -68,10 +68,10 @@ def tg_update_handler(request):
     # send_message = SendMessage(chat_id=1045490278, text=f"{tgdata}")
     # data = SendMessageSerializer(send_message).data
     # response = requests.post(TG_URL + "sendMessage", data)
-    # update = Update(request.data)
-    # if hasattr(update,'message'):
-    #     result = update.message_dispatcher()
-    #     SendMessage(chat_id=1045490278, text=result.json).send()
+    update = Update(request.data)
+    if hasattr(update,'message'):
+        result = update.message_dispatcher()
+        SendMessage(chat_id=1045490278, text=result.json).send()
     # # elif hasattr(update,'callback_query'):
     # #     pass
     #     # method = "answerCallbackQuery"
