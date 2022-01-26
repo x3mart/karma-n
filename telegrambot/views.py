@@ -43,10 +43,10 @@ class Update():
         if message.text.startswith('/'):
             command_message = message.text.split(' ')
             command = command_message.pop(0).replace('/', '')
-        if command in COMMANDS_LIST:
-            return (command, command_message)
+            if command in COMMANDS_LIST:
+                return (command, command_message)
         else:
-            return (None, None)
+            return (None, [])
     
     def message_dispatcher(self):
         command, args = self.command_handler(self.message)
