@@ -93,7 +93,7 @@ class Update():
         else:
             text = "No commands"
         response = self.callback_query.answer()
-        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
+        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text, reply_markup=None).send()
         return response
 
 
