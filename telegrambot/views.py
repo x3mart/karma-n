@@ -92,7 +92,7 @@ class Update():
             text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
         else:
             text = "No commands"
-        response = self.callback_query.answer()
+        response = self.callback_query.answer(show_alert=True, text="Ща все будет!")
         response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
         return response
 
@@ -102,10 +102,9 @@ class Update():
 def tg_update_handler(request):
     update = Update(request.data)
     if hasattr(update,'message'):
-        result = update.message_dispatcher()
-        # SendMessage(chat_id=1045490278, text=result.json).send()
+        update.message_dispatcher()
     elif hasattr(update,'callback_query'):
-        result = update.callback_dispatcher()
+        update.callback_dispatcher()
     #     # method = "answerCallbackQuery"
     #     # callback_aswer = AnswerCallbackQuery(callback_query_id = update.callback_query.id, text = update.callback_query.data, show_alert=True)
     #     # callback_aswer_data = AnswerCallbackQuerySerializer(callback_aswer).data
