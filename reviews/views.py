@@ -107,8 +107,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=400)
         reviewable, ctype = self.get_reviewable(request)
-        if reviewable.owner == request.user:
-                return Response({'error':'Запрещено оставлять отзыв на свой номер телефона или аккаунт'}, status=403)
+        # if reviewable.owner == request.user:
+        #         return Response({'error':'Запрещено оставлять отзыв на свой номер телефона или аккаунт'}, status=403)
         attributes = request.data.get('attributes')
         template = request.data.get('template')
         service = request.data.get('service')    
