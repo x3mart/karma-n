@@ -19,6 +19,22 @@ from reviews.models import Review
 
 COMMANDS_LIST = ('reviews', 'user_info', 'start')
 
+class CallbackQuery():
+    def __init__(self, data) -> None:
+        for key, value in data.items():
+            if key == 'message':
+                self.__setattr__(key, Message(value))
+            elif key == 'from':
+                self.__setattr__(key, TgUser(value))
+            else:
+                self.__setattr__(key, value)
+    
+    def answer(self, text=None, show_alert=None):
+        answer = AnswerCallbackQuery(callback_query_id=self.id, text=text, show_alert=show_alert)
+        data = AnswerCallbackQuerySerializer(answer).data
+        response = requests.post(TG_URL + 'answerCallbackQuery', data)
+        return response
+
 class SendMessage():
     def __init__(self, chat_id, text, parse_mode='HTML', reply_markup=None) -> None:
         self.chat_id = chat_id
@@ -76,7 +92,8 @@ class Update():
             text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
         else:
             text = "No commands"
-        response = SendMessage(chat_id=self.message.chat.id, text=text).send()
+        response = self.callback_query.answer()
+        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
         return response
 
 

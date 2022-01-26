@@ -57,13 +57,3 @@ class Message():
             else:
                 self.__setattr__(key, value)
 
-
-class CallbackQuery():
-    def __init__(self, data) -> None:
-        for key, value in data.items():
-            if key == 'message':
-                self.__setattr__(key, Message(value))
-            elif key == 'from':
-                self.__setattr__(key, TgUser(value))
-            else:
-                self.__setattr__(key, value)
