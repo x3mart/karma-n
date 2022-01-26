@@ -63,8 +63,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
         verbose_name='Пол'
     )
     city = models.CharField(max_length=255, null=True, blank=True, default='Москва', verbose_name='Город')
-    executor_rating = models.DecimalField(decimal_places=1, default=0, max_digits=2, null=True, blank=True)
-    customer_rating = models.DecimalField(decimal_places=1, default=0, max_digits=2, null=True, blank=True)
+    executor_rating = models.DecimalField(decimal_places=1, max_digits=2, null=True, blank=True)
+    customer_rating = models.DecimalField(decimal_places=1, max_digits=2, null=True, blank=True)
     my_reviews_about_customers_count = models.PositiveIntegerField(verbose_name='Мои отзывы о заказчиках', default=0)
     my_reviews_about_executors_count = models.PositiveIntegerField(verbose_name='Мои отзывы об исполнителях', default=0)
     reviews_executors_about_me_count = models.PositiveIntegerField(verbose_name='Отзывы исполнителей обо мне', default=0)
