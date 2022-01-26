@@ -92,7 +92,7 @@ class Update():
             text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
         else:
             text = "No commands"
-        response = self.callback_query.answer(show_alert=True, text="Ща все будет!")
+        response = self.callback_query.answer()
         response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
         return response
 
