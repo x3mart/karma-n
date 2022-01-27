@@ -116,6 +116,7 @@ class Update():
             reply_markup = ReplyMarkup().get_markup(command, tg_user=self.tg_account)
             response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
         elif command == 'login':
+            response = SendMessage(chat_id=self.message.chat.id, text=source).send()
             if source == 'callback_query':
                 response = self.callback_query.answer()
                 response = SendMessage(chat_id=self.message.chat.id, text=response.json()).send()
