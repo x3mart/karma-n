@@ -1,6 +1,25 @@
 from django.db import models
 
 # Create your models here.
+class TelegramAccount(models.Model):
+    tg_id = models.BigIntegerField(unique=True)
+    is_bot = models.BooleanField(default=False)
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
+    username = models.CharField(max_length=255, null=True, blank=True)
+    language_code = models.CharField(max_length=255, null=True, blank=True)
+    is_auth = models.BooleanField(default=False)
+    account = models.ForeignKey('accounts.Account', on_delete=models.PROTECT, related_name='telegram_accounts', null=True, blank=True)
+    notofication = models.BooleanField(default=False)
+    await_reply = models.BooleanField(default=False)
+    reply_type = models.CharField(max_length=255, null=True, blank=True)
+    reply_1 = models.TextField(null=True, blank=True)
+    reply_2 = models.TextField(null=True, blank=True)
+    reply_3 = models.TextField(null=True, blank=True)
+
+    # def __str__(self) -> str:
+    #     return self.username
+
 class AnswerCallbackQuery():
     def __init__(self, text, url=None, callback_query_id=None, show_alert=False, cache_time=0):
         self.text = text
@@ -47,7 +66,7 @@ class Message():
             if key == 'reply_to_message':
                 self.__setattr__(key, Message(value))
             elif key == 'from':
-                self.__setattr__(key, TgUser(value))
+                self.__setattr__('user', value)
             elif key == 'chat':
                 self.__setattr__(key, Chat(value))
             else:

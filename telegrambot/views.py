@@ -17,16 +17,32 @@ from .models import *
 from reviews.models import Review
 
 
-COMMANDS_LIST = ('reviews', 'user_info', 'start')
+COMMANDS_LIST = ('reviews', 'user_info', 'start', 'login', 'me')
+
+def get_tg_account(user):
+    tg_account, created = TelegramAccount.objects.get_or_create(tg_id=user['id'])
+    if created:
+        user.pop('id')
+        tg_account = TelegramAccount.objects.filter(pk=tg_account.id)
+        tg_account.update(**user)
+        tg_account = tg_account.first()
+    return tg_account
 
 class ReplyMarkup():
     def __init__(self):
         pass
 
-    def get_markup(self, name):
-        button1 = InlineButton(text='Инфа о себе', callback_data=f'/user_info 2')
-        button2 = InlineButton(text='Отзывы о Вас', callback_data=f'/reviews 2')
-        keyboard = [[button1], [button2]]
+    def get_markup(self, name, tg_user=None):
+        if tg_user and tg_user.account:
+            button1 = InlineButton(text='Инфа о себе', callback_data=f'/me')
+            keyboard = [[button1]]
+            for reviewable in tg_user.account.reviewables:
+                button = [InlineButton(text=f'Отзывы о {reviewable.screen_name}', callback_data=f'/reviews {reviewable.screen_name}')]
+                keyboard.append(button)
+        else:
+            button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
+            button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
+            keyboard = [[button1], [button2]]
         self.inline_keyboard = keyboard
         reply_markup_data = ReplyMarkupSerializer(self).data
         return JSONRenderer().render(reply_markup_data)
@@ -37,7 +53,7 @@ class CallbackQuery():
             if key == 'message':
                 self.__setattr__(key, Message(value))
             elif key == 'from':
-                self.__setattr__(key, TgUser(value))
+                self.__setattr__('user', value)
             else:
                 self.__setattr__(key, value)
     
@@ -79,12 +95,32 @@ class Update():
         else:
             return (None, [])
     
+    def command_dispatcher(self, source, command, tg_account=None, args=[]):
+        if command == 'start':
+            if tg_account.account:
+                text = render_to_string('start_for_auth.html', {'user': tg_account.account})
+            text = render_to_string('start.html', {'reviews_count': Review.objects.count(), 'reviewable_count': Reviewable.objects.count()})
+            reply_markup = ReplyMarkup().get_markup(command, tg_account)
+            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
+        elif command == 'user_info':
+            if source == 'callback_query':
+                callback_response = self.callback_query.answer()
+            text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
+            reply_markup = ReplyMarkup().get_markup(command, tg_user=tg_account)
+            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
+        elif command == 'me':
+            if source == 'callback_query':
+                callback_response = self.callback_query.answer()
+            text = render_to_string('user_info.html', {'user': tg_account.account})
+            reply_markup = ReplyMarkup().get_markup(command, tg_user=tg_account)
+            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
+        return response
+    
     def message_dispatcher(self):
         command, args = self.command_handler(self.message.text)
-        if command == 'start':
-            text = render_to_string('start.html', {'reviews_count': Review.objects.count(), 'reviewable_count': Reviewable.objects.count()})
-            reply_markup = ReplyMarkup().get_markup(command)
-            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
+        tg_account = get_tg_account(self.message.user)
+        if command:
+            response = self.command_dispatcher('message', command, tg_account, args)
         else:
             text = "No commands"
             response = SendMessage(chat_id=self.message.chat.id, text=text).send()
@@ -92,12 +128,12 @@ class Update():
     
     def callback_dispatcher(self):
         command, args = self.command_handler(self.callback_query.data)
-        if command == 'user_info':
-            text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
+        tg_account = get_tg_account(self.message.user)
+        if command:
+            response = self.command_dispatcher('callback_query', command, tg_account, args)
         else:
             text = "No commands"
-        response = self.callback_query.answer()
-        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text, reply_markup=None).send()
+        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
         return response
 
 
