@@ -149,6 +149,7 @@ class Update():
             self.tg_account.save()
             if user is not None:
                 response = SendMessage(chat_id=self.message.chat.id, text='Чет вышло').send()
+                response = requests.post(TG_URL + 'deleteMessage', data={'chat_id':self.message.chat.id, 'message_id': self.message.message_id})
             else:
                 response = SendMessage(chat_id=self.message.chat.id, text='Фигня').send()
         return response
@@ -167,7 +168,6 @@ class Update():
     def callback_dispatcher(self):
         command, args = self.command_handler(self.callback_query.data)
         self.tg_account = get_tg_account(self.callback_query.user)
-        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=self.tg_account.username).send()
         if command:
             response = self.command_dispatcher('callback_query', command, args)
         else:
@@ -191,7 +191,7 @@ def tg_update_handler(request):
     #     # response = requests.post(TG_URL + method, callback_aswer_data)
     #     # print(response.json())else:
     # #     chat_id=1045490278
-    method = "sendMessage"
+    # method = "sendMessage"
     # # button2 = InlineButton(text='Пока', callback_data='show_user_review 3')
     # # keyboard = [[button1, button2], [button2]]
     # # reply_markup = ReplyMarkup()
@@ -201,10 +201,10 @@ def tg_update_handler(request):
     # # text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>" 
     # # if hasattr(update,'callback_query'):
     # #     text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>"
-    send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
-    data = SendMessageSerializer(send_message).data
+    # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
+    # data = SendMessageSerializer(send_message).data
     # # # print(data)
-    requests.post(TG_URL + method, data)
+    # requests.post(TG_URL + method, data)
     # # print(result.json())
     return Response({}, status=200)
 
