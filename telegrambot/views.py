@@ -118,6 +118,7 @@ class Update():
         elif command == 'login':
             if source == 'callback_query':
                 response = self.callback_query.answer()
+                response = SendMessage(chat_id=self.message.chat.id, text=response.json()).send()
             self.tg_account.await_reply = True
             self.tg_account.reply_type = 'email'
             self.tg_account.save()
