@@ -149,7 +149,7 @@ class Update():
             self.tg_account.save()
             if user is not None:
                 response = SendMessage(chat_id=self.message.chat.id, text='Чет вышло').send()
-                response = requests.post(TG_URL + 'editMessageText', data={'chat_id':self.message.chat.id, 'message_id': self.message.message_id, 'text': '**********'})
+                response = requests.post(TG_URL + 'deleteMessage', data={'chat_id':self.message.chat.id, 'message_id': self.message.message_id})
             else:
                 response = SendMessage(chat_id=self.message.chat.id, text='Фигня').send()
         return response
