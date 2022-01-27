@@ -158,7 +158,7 @@ class Update():
         self.tg_account = get_tg_account(self.message.user)
         if self.tg_account.await_reply:
             response = self.await_despatcher(self.message.text)
-        if command:
+        elif command:
             response = self.command_dispatcher('message', command, args)
         else:
             text = "No commands in message"
