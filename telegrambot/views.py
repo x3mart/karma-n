@@ -176,6 +176,7 @@ def tg_update_handler(request):
     if hasattr(update,'message'):
         update.message_dispatcher()
     elif hasattr(update,'callback_query'):
+        update.callback_query.answer()
         response = SendMessage(chat_id=update.message.chat.id, text='callback_query').send()
         update.callback_dispatcher()
     #     # method = "answerCallbackQuery"
