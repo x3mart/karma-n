@@ -158,6 +158,7 @@ class Update():
         return response
     
     def callback_dispatcher(self):
+        response = SendMessage(chat_id=self.message.chat.id, text='callback').send()
         command, args = self.command_handler(self.callback_query.data)
         self.tg_account = get_tg_account(self.message.user)
         if command:
