@@ -19,6 +19,18 @@ from reviews.models import Review
 
 COMMANDS_LIST = ('reviews', 'user_info', 'start')
 
+class ReplyMarkup():
+    def __init__(self):
+        pass
+
+    def get_markup(self, name):
+        button1 = InlineButton(text='Инфа о себе', callback_data=f'/user_info 2')
+        button2 = InlineButton(text='Отзывы о Вас', callback_data=f'/reviews 2')
+        keyboard = [[button1], [button2]]
+        self.inline_keyboard = keyboard
+        reply_markup_data = ReplyMarkupSerializer(self).data
+        return JSONRenderer().render(reply_markup_data)
+
 class CallbackQuery():
     def __init__(self, data) -> None:
         for key, value in data.items():
@@ -71,20 +83,12 @@ class Update():
         command, args = self.command_handler(self.message.text)
         if command == 'start':
             text = render_to_string('start.html', {'reviews_count': Review.objects.count(), 'reviewable_count': Reviewable.objects.count()})
-            button1 = InlineButton(text='Инфа о себе', callback_data=f'/user_info 2')
-            button2 = InlineButton(text='Отзывы о Вас', callback_data=f'/reviews 2')
-            keyboard = [[button1], [button2]]
-            reply_markup = ReplyMarkup()
-            reply_markup.inline_keyboard = keyboard
-            reply_markup_data = ReplyMarkupSerializer(reply_markup).data
-            reply_markup_json = JSONRenderer().render(reply_markup_data)
-            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup_json).send()
+            reply_markup = ReplyMarkup().get_markup(command)
+            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
         else:
             text = "No commands"
             response = SendMessage(chat_id=self.message.chat.id, text=text).send()
         return response
-        # chat_id = self.message.chat.id
-        # button1 = InlineButton(text=f'Привет  {self.message.chat.username}', callback_data=f'Привет {self.message.chat.username}')
     
     def callback_dispatcher(self):
         command, args = self.command_handler(self.callback_query.data)

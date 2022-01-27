@@ -26,11 +26,7 @@ class KeyboardButton():
         self.request_contact = request_contact
         self.request_location = request_location
         self.request_poll = request_poll
-    
 
-class ReplyMarkup():
-    def __init__(self):
-        pass
 
 
 class TgUser():
