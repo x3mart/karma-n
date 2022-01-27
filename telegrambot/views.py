@@ -130,13 +130,14 @@ class Update():
             self.tg_account.reply_type = 'password'
             self.tg_account.reply_1 = text.strip()
             self.tg_account.save()
-            SendMessage(chat_id=self.message.chat.id, text='Введите пароль').send()
+            response = SendMessage(chat_id=self.message.chat.id, text='Введите пароль').send()
         elif self.tg_account.reply_type =='password':
             self.tg_account.await_reply = False
             self.tg_account.reply_type = None
             self.tg_account.reply_1 = None
             self.tg_account.save()
-    
+            response = SendMessage(chat_id=self.message.chat.id, text='Чет вышло').send()
+        return response
     def message_dispatcher(self):
         command, args = self.command_handler(self.message.text)
         self.tg_account = get_tg_account(self.message.user)
