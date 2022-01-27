@@ -106,24 +106,31 @@ class Update():
         elif command == 'user_info':
             if source == 'callback_query':
                 response = self.callback_query.answer()
+                chat_id=self.callback_query.message.chat.id
+            else:
+                chat_id=self.message.chat.id
             text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
             reply_markup = ReplyMarkup().get_markup(command, tg_user=self.tg_account)
-            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
+            response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
         elif command == 'me':
             if source == 'callback_query':
                 response = self.callback_query.answer()
+                chat_id=self.callback_query.message.chat.id
+            else:
+                chat_id=self.message.chat.id
             text = render_to_string('user_info.html', {'user': self.tg_account.account})
             reply_markup = ReplyMarkup().get_markup(command, tg_user=self.tg_account)
-            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
+            response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
         elif command == 'login':
-            response = SendMessage(chat_id=self.message.chat.id, text=source).send()
             if source == 'callback_query':
                 response = self.callback_query.answer()
-                response = SendMessage(chat_id=self.message.chat.id, text=response.json()).send()
+                chat_id=self.callback_query.message.chat.id
+            else:
+                chat_id=self.message.chat.id
             self.tg_account.await_reply = True
             self.tg_account.reply_type = 'email'
             self.tg_account.save()
-            response = SendMessage(chat_id=self.message.chat.id, text='Введите email').send()
+            response = SendMessage(chat_id=chat_id, text='Введите email').send()
         else:
             response = None
         return response
@@ -158,14 +165,13 @@ class Update():
         return response
     
     def callback_dispatcher(self):
-        response = SendMessage(chat_id=self.message.chat.id, text='callback').send()
         command, args = self.command_handler(self.callback_query.data)
         self.tg_account = get_tg_account(self.message.user)
         if command:
             response = self.command_dispatcher('callback_query', command, args)
         else:
             text = "No commands"
-        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
+            response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
         return response
 
 
