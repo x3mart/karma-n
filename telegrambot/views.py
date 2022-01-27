@@ -166,7 +166,7 @@ class Update():
     
     def callback_dispatcher(self):
         command, args = self.command_handler(self.callback_query.data)
-        self.tg_account = get_tg_account(self.callback_query.message.user)
+        self.tg_account = get_tg_account(self.callback_query.user)
         response = SendMessage(chat_id=self.callback_query.message.chat.id, text=self.tg_account.username).send()
         if command:
             response = self.command_dispatcher('callback_query', command, args)
