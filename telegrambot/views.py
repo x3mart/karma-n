@@ -160,7 +160,7 @@ class Update():
         if command:
             response = self.command_dispatcher('message', command, args)
         else:
-            text = "No commands"
+            text = "No commands in message"
             response = SendMessage(chat_id=self.message.chat.id, text=text).send()
         return response
     
@@ -170,8 +170,8 @@ class Update():
         if command:
             response = self.command_dispatcher('callback_query', command, args)
         else:
-            text = "No commands"
-        response = SendMessage(chat_id=self.callback_query.message.chat.id, text=command).send()
+            text = "No commands in callback_query"
+            response = SendMessage(chat_id=self.callback_query.message.chat.id, text=text).send()
         return response
 
 
