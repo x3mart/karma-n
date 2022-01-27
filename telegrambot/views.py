@@ -10,6 +10,7 @@ import requests
 from django.template.loader import render_to_string
 import json
 from rest_framework.renderers import JSONRenderer
+from django.contrib.auth import authenticate
 
 from reviewables.models import Reviewable
 from .serializers import *
@@ -132,11 +133,15 @@ class Update():
             self.tg_account.save()
             response = SendMessage(chat_id=self.message.chat.id, text='Введите пароль').send()
         elif self.tg_account.reply_type =='password':
+            user = authenticate(email=self.tg_account.reply_1, password=text.strip())
             self.tg_account.await_reply = False
             self.tg_account.reply_type = None
             self.tg_account.reply_1 = None
             self.tg_account.save()
-            response = SendMessage(chat_id=self.message.chat.id, text='Чет вышло').send()
+            if user is not None:
+                response = SendMessage(chat_id=self.message.chat.id, text='Чет вышло').send()
+            else:
+                response = SendMessage(chat_id=self.message.chat.id, text='Фигня').send()
         return response
     def message_dispatcher(self):
         command, args = self.command_handler(self.message.text)
