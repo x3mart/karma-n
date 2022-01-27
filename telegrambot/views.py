@@ -195,10 +195,10 @@ def tg_update_handler(request):
     # # text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>" 
     # # if hasattr(update,'callback_query'):
     # #     text = f"<pre><code class='language-python'>{tgdata}</code></pre> \n \n <pre><code class='language-python'>{callback_aswer_data}</code></pre> \n \n<pre><code class='language-python'>{response.json()}</code></pre> \n Вот тут крутое сообщение!!! \n \n <a href='https://novosti247.ru/api/reviews/'> Coll message!!! </a>"
-    send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
+    send_message = SendMessage(chat_id=1045490278, text=f'{"request.data"}')
     data = SendMessageSerializer(send_message).data
     # # # print(data)
-    response = requests.post(TG_URL + method, data)
+    requests.post(TG_URL + method, data)
     # # print(result.json())
     return Response({}, status=200)
 
