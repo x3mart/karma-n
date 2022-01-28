@@ -107,7 +107,7 @@ class Update():
     def command_dispatcher(self, source, command, args=[]):
         if command == 'start':
             if self.tg_account.account:
-                text = render_to_string('start_for_auth.html', {'user': self.tg_account.account})
+                text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
             text = render_to_string('start.html', {'reviews_count': Review.objects.count(), 'reviewable_count': Reviewable.objects.count()})
             reply_markup = ReplyMarkup().get_markup(command, self.tg_account)
             response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
