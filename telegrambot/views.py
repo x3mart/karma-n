@@ -163,7 +163,9 @@ class Update():
                 kwargs = {}
                 reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')
                 reviews_count = reviews.count()
-                reviews = reviews[int(args[1]):int(args[2])]
+                offset_start = int(args[1])
+                offset_end = int(args[2])
+                reviews = reviews[offset_start:offset_end]
                 count = len(reviews)
                 if not reviews.exists():
                     response = SendMessage(chat_id=chat_id, text="Отзывов нет").send()
@@ -172,8 +174,8 @@ class Update():
                     kwargs['more'] = False if count > 0 else True
                     kwargs['review']= review
                     kwargs['screen_name']= args[0]
-                    kwargs['offset_start'] = args[2]
-                    kwargs['offset_end'] = args[2] + 5 if args[2] + 5 < reviews_count else reviews_count
+                    kwargs['offset_start'] = offset_end
+                    kwargs['offset_end'] = offset_end + 5 if offset_end + 5 < reviews_count else reviews_count
                     text =  render_to_string('review.html', {'review': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
