@@ -43,7 +43,7 @@ class ReplyMarkup():
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
             keyboard = [[button1]]
             for reviewable in tg_account.account.reviewables.all():
-                button = InlineButton(text=f'Отзывы о {reviewable.screen_name}', callback_data=f'/reviews {reviewable.screen_name}')
+                button = InlineButton(text=f'Отзывы о {reviewable.screen_name} Рейтинг {reviewable.executor_rating}/{reviewable.customer_rating}', callback_data=f'/reviews {reviewable.screen_name}')
                 keyboard.append([button])
             keyboard.append([button2])
         else:
@@ -143,6 +143,17 @@ class Update():
             self.tg_account.reply_type = 'email'
             self.tg_account.save()
             response = SendMessage(chat_id=chat_id, text='Введите email').send()
+        elif command == 'reviews':
+            if source == 'callback_query':
+                response = self.callback_query.answer()
+                chat_id=self.callback_query.message.chat.id
+            else:
+                chat_id=self.message.chat.id
+            if len(args):
+                reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')[6:10]
+                for review in reviews:
+                    text =  render_to_string('review.html', {'review': review})
+                    response = SendMessage(chat_id=chat_id, text=text).send()
         else:
             response = None
         return response
