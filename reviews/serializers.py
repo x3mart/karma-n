@@ -53,7 +53,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(read_only=True, many=True,)
-    count_comments = serializers.IntegerField(read_only=True,)
     is_my_like = serializers.IntegerField(read_only=True,)
     is_my_dislike = serializers.IntegerField(read_only=True,)
     owner = OwnerSerializer(read_only=True, many=False)
