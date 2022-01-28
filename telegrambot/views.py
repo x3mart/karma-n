@@ -150,7 +150,7 @@ class Update():
             else:
                 chat_id=self.message.chat.id
             if len(args):
-                reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')[6:10]
+                reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')[:5]
                 for review in reviews:
                     text =  render_to_string('review.html', {'review': review})
                     response = SendMessage(chat_id=chat_id, text=text).send()
