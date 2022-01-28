@@ -49,8 +49,8 @@ class ReplyMarkup():
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
-            button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
-            keyboard = [[button1], [button2]]
+            button3 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
+            keyboard = [[button1], [button2], [button3]]
         self.inline_keyboard = keyboard
         reply_markup_data = ReplyMarkupSerializer(self).data
         return JSONRenderer().render(reply_markup_data)
@@ -153,16 +153,18 @@ class Update():
             self.tg_account.save()
             response = SendMessage(chat_id=self.message.chat.id, text='Введите пароль').send()
         elif self.tg_account.reply_type =='password':
-            user = authenticate(email=self.tg_account.reply_1, password=text.strip())
-            self.tg_account.await_reply = False
-            self.tg_account.reply_type = None
-            self.tg_account.reply_1 = None
-            self.tg_account.save()
-            if user is not None:
+            account = authenticate(email=self.tg_account.reply_1, password=text.strip())
+            if account is not None:
+                self.tg_account.account = account
+                text = render_to_string('start_for_auth.html', {'user': account})
                 response = SendMessage(chat_id=self.message.chat.id, text='Чет вышло').send()
                 response = requests.post(TG_URL + 'deleteMessage', data={'chat_id':self.message.chat.id, 'message_id': self.message.message_id})
             else:
                 response = SendMessage(chat_id=self.message.chat.id, text='Фигня').send()
+            self.tg_account.await_reply = False
+            self.tg_account.reply_type = None
+            self.tg_account.reply_1 = None
+            self.tg_account.save()
         return response
     
     def message_dispatcher(self):
