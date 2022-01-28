@@ -3,6 +3,7 @@
 От: <i>{% firstof review.owner.full_name review.owner.name %}</i>
 Общая оценка: <i>{{ review.rating }}</i>
 {% if review.about_customer %}Отзыв о потребителе{% else %}Отзыв об исполнителе{% endif %}
+Лайки {{ review.count_likes }} Дизлайки
 
 {{ review.body }}
 
