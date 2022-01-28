@@ -171,7 +171,7 @@ class Update():
                     response = SendMessage(chat_id=chat_id, text="Отзывов нет").send()
                 for review in reviews:
                     count -= 1
-                    kwargs['more'] = False if count > 0 else True
+                    kwargs['more'] = False if count > 0 or offset_end + 5 >= reviews_count else True
                     kwargs['review']= review
                     kwargs['screen_name']= args[0]
                     kwargs['offset_start'] = offset_end
