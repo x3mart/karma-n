@@ -54,7 +54,7 @@ class ReplyMarkup():
             button2 = InlineButton(text='Dislike', callback_data=f'/dislike review {review.id}')
             keyboard = [[button1, button2]]
             if kwargs['more']:
-                button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} 0 5')
+                button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
                 keyboard.append([button])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
@@ -162,7 +162,7 @@ class Update():
             if len(args):
                 kwargs = {}
                 reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')
-                kwargs['reviews_count'] = reviews.count()
+                reviews_count = reviews.count()
                 reviews = reviews[int(args[1]):int(args[2])]
                 count = len(reviews)
                 if not reviews.exists():
@@ -172,6 +172,8 @@ class Update():
                     kwargs['more'] = False if count > 0 else True
                     kwargs['review']= review
                     kwargs['screen_name']= args[0]
+                    kwargs['offset_start'] = args[2]
+                    kwargs['offset_end'] = args[2] + 5 if args[2] + 5 < reviews_count else reviews_count
                     text =  render_to_string('review.html', {'review': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
