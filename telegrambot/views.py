@@ -33,15 +33,22 @@ class ReplyMarkup():
     def __init__(self):
         pass
 
-    def get_markup(self, name, tg_user=None):
-        if tg_user and tg_user.account:
+    def get_markup(self, name, tg_account=None):
+        if name == 'start' and tg_account and tg_account.account:
             button1 = InlineButton(text='Инфа о себе', callback_data=f'/me')
+            button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
+            keyboard = [[button1], [button2]]
+        elif name == 'me' and tg_account and tg_account.account:
+            button1 = InlineButton(text='Редактировать', url='https://novosti247.ru')
+            button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
             keyboard = [[button1]]
-            for reviewable in tg_user.account.reviewables:
+            for reviewable in tg_account.account.reviewables:
                 button = [InlineButton(text=f'Отзывы о {reviewable.screen_name}', callback_data=f'/reviews {reviewable.screen_name}')]
                 keyboard.append(button)
+            keyboard.append(button2)
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
+            button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
             keyboard = [[button1], [button2]]
         self.inline_keyboard = keyboard
@@ -88,10 +95,11 @@ class Update():
                 self.__setattr__(key, value)
     
     def command_handler(self, text):
+        command = ''
         if text.startswith('/'):
             command_message = text.split(' ')
             command = command_message.pop(0).replace('/', '')
-            if command in COMMANDS_LIST:
+        if command in COMMANDS_LIST:
                 return (command, command_message)
         else:
             return (None, [])
@@ -110,7 +118,7 @@ class Update():
             else:
                 chat_id=self.message.chat.id
             text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
-            reply_markup = ReplyMarkup().get_markup(command, tg_user=self.tg_account)
+            reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account)
             response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
         elif command == 'me':
             if source == 'callback_query':
@@ -118,8 +126,11 @@ class Update():
                 chat_id=self.callback_query.message.chat.id
             else:
                 chat_id=self.message.chat.id
-            text = render_to_string('user_info.html', {'user': self.tg_account.account})
-            reply_markup = ReplyMarkup().get_markup(command, tg_user=self.tg_account)
+            if self.tg_account and self.tg_account.account:
+                text = render_to_string('user_info.html', {'user': self.tg_account.account})
+            else:
+                text = "Что бы посмотреть информацию О себе, надо авторизоваться"
+            reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account)
             response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
         elif command == 'login':
             if source == 'callback_query':
@@ -153,6 +164,7 @@ class Update():
             else:
                 response = SendMessage(chat_id=self.message.chat.id, text='Фигня').send()
         return response
+    
     def message_dispatcher(self):
         command, args = self.command_handler(self.message.text)
         self.tg_account = get_tg_account(self.message.user)
