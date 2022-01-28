@@ -43,7 +43,9 @@ class ReplyMarkup():
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
             keyboard = [[button1]]
             for reviewable in tg_account.account.reviewables.all():
-                button = InlineButton(text=f'Отзывы о {reviewable.screen_name} Рейтинг {reviewable.executor_rating}/{reviewable.customer_rating}', callback_data=f'/reviews {reviewable.screen_name}')
+                executor_rating = reviewable.executor_rating if reviewable.executor_rating else 0
+                customer_rating = reviewable.customer_rating if reviewable.customer_rating else 0
+                button = InlineButton(text=f'Отзывы о {reviewable.screen_name} Рейтинг {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.screen_name}')
                 keyboard.append([button])
             keyboard.append([button2])
         else:
