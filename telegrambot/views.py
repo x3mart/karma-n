@@ -33,7 +33,7 @@ class ReplyMarkup():
     def __init__(self):
         pass
 
-    def get_markup(self, name, tg_account=None):
+    def get_markup(self, name, tg_account=None, **kwargs):
         if name == 'start' and tg_account and tg_account.account:
             button1 = InlineButton(text='Инфа о себе', callback_data=f'/me')
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
@@ -48,6 +48,13 @@ class ReplyMarkup():
                 button = InlineButton(text=f'Отзывы о {reviewable.screen_name} Рейтинг {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.screen_name}')
                 keyboard.append([button])
             keyboard.append([button2])
+        elif name == 'reviews':
+            button1 = InlineButton(text='Like', callback_data=f'/like')
+            button2 = InlineButton(text='Dislike', callback_data=f'/dislike')
+            keyboard = [[button1, button2]]
+            if kwargs['more']:
+                button = InlineButton(text='Показать еще', callback_data=f'/reviews x3mart 0 5')
+                keyboard.append([button])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -152,10 +159,21 @@ class Update():
             else:
                 chat_id=self.message.chat.id
             if len(args):
-                reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')[0:5]
+                kwargs = {}
+                reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')
+                kwargs['reviews_count'] = reviews.count()
+                reviews = reviews[int(args[1]):int(args[2])]
+                count = len(reviews)
+                if not reviews.exists():
+                    response = SendMessage(chat_id=chat_id, text="Отзывов нет").send()
                 for review in reviews:
+                    count -= 1
+                    print(count)
+                    kwargs['more'] = False if count > 0 else True
+                    kwargs['review']= review
                     text =  render_to_string('review.html', {'review': review})
-                    response = SendMessage(chat_id=chat_id, text=text).send()
+                    reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
+                    response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
         else:
             response = None
         return response
