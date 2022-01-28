@@ -1,7 +1,7 @@
 from django.db.models import Avg, Count, Q
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from .models import Attribute, Review, ReviewableCustomerAttributeAvgValue, ReviewableExecutorAttributeAvgValue
+from .models import Attribute, Review, ReviewableCustomerAttributeAvgValue, ReviewableExecutorAttributeAvgValue, Comment
 from accounts.models import Account
 
 
@@ -40,6 +40,12 @@ def review_post_save(instance, created, **kwargs):
         owner.my_reviews_about_executors_count = owner.likeable.filter(is_active=True).aggregate(count=Count('review', filter=~Q(review__about_customer=True)))['count']
         owner.save()
 
+@receiver(post_save, sender=Comment)
+def review_post_save(instance, created, **kwargs):
+    if created:
+        review = instance.review
+        review.count_comments = review.comments.count()
+        review.save()
 
     
 

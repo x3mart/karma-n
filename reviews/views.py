@@ -158,7 +158,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         prefetch_reviewables_customer_attributes_avg = Prefetch('reviewables_customer_attributes_avg', reviewables_customer_attributes_avg)
         reviewables_executor_attributes_avg = ReviewableExecutorAttributeAvgValue.objects.prefetch_related('title')
         prefetch_reviewables_executor_attributes_avg = Prefetch('reviewables_executor_attributes_avg', reviewables_executor_attributes_avg)
-        
         reviewable = Reviewable.objects.prefetch_related('owner', prefetch_reviewables_customer_attributes_avg, prefetch_reviewables_executor_attributes_avg)
         prefetch_reviewable = Prefetch('reviewable', queryset=reviewable)
         attributes = Attribute.objects.prefetch_related('title')

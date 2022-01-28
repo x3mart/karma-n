@@ -16,6 +16,7 @@ class Likeable(PolymorphicModel):
 
 class Review(Likeable):
     rating = models.DecimalField(decimal_places=1, default=5, max_digits=3, null=True, blank=True)
+    count_comments  = models.IntegerField(verbose_name='Количество коментариев', default=0)
     reviewable = models.ForeignKey('reviewables.Reviewable', on_delete=models.CASCADE, related_name='reviews', null=True, blank=True)
     service = models.ForeignKey('services.Service', on_delete=models.PROTECT, related_name='reviews', verbose_name='Услуга', null=True, blank=True)
     about_customer = models.BooleanField(default=False, verbose_name='О заказчике')
