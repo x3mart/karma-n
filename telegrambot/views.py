@@ -42,10 +42,10 @@ class ReplyMarkup():
             button1 = InlineButton(text='Редактировать', url='https://novosti247.ru')
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
             keyboard = [[button1]]
-            for reviewable in tg_account.account.reviewables:
-                button = [InlineButton(text=f'Отзывы о {reviewable.screen_name}', callback_data=f'/reviews {reviewable.screen_name}')]
-                keyboard.append(button)
-            keyboard.append(button2)
+            for reviewable in tg_account.account.reviewables.all():
+                button = InlineButton(text=f'Отзывы о {reviewable.screen_name}', callback_data=f'/reviews {reviewable.screen_name}')
+                keyboard.append([button])
+            keyboard.append([button2])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
