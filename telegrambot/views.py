@@ -49,11 +49,12 @@ class ReplyMarkup():
                 keyboard.append([button])
             keyboard.append([button2])
         elif name == 'reviews':
-            button1 = InlineButton(text='Like', callback_data=f'/like')
-            button2 = InlineButton(text='Dislike', callback_data=f'/dislike')
+            review = kwargs.get('review')
+            button1 = InlineButton(text='Like', callback_data=f'/like review {review.id}')
+            button2 = InlineButton(text='Dislike', callback_data=f'/dislike review {review.id}')
             keyboard = [[button1, button2]]
             if kwargs['more']:
-                button = InlineButton(text='Показать еще', callback_data=f'/reviews x3mart 0 5')
+                button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} 0 5')
                 keyboard.append([button])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
@@ -168,9 +169,9 @@ class Update():
                     response = SendMessage(chat_id=chat_id, text="Отзывов нет").send()
                 for review in reviews:
                     count -= 1
-                    print(count)
                     kwargs['more'] = False if count > 0 else True
                     kwargs['review']= review
+                    kwargs['screen_name']= args[0]
                     text =  render_to_string('review.html', {'review': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
