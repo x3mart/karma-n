@@ -4,7 +4,7 @@
 Общая оценка: <i>{{ review.rating }}</i>
 {% if review.about_customer %}Отзыв о потребителе{% else %}Отзыв об исполнителе{% endif %}
 Лайки {{ review.count_likes }} Дизлайки
-Коментарии: 
+Коментарии: {{ review.count_comments }}
 
 {{ review.body }}
 
