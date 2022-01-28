@@ -162,7 +162,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         prefetch_reviewable = Prefetch('reviewable', queryset=reviewable)
         attributes = Attribute.objects.prefetch_related('title')
         prefetch_attributes = Prefetch('attributes', queryset=attributes)
-        reviews = Review.objects.prefetch_related('owner', prefetch_comments, prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike, count_comments=Count('comments'))
+        reviews = Review.objects.prefetch_related('owner', prefetch_comments, prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
         return reviews
     
     @action(detail=True, methods=['patch'])
