@@ -28,7 +28,7 @@ def review_post_save(instance, created, **kwargs):
         owner.my_reviews_about_customers_count = owner.likeable.filter(is_active=True).aggregate(count=Count('review', filter=Q(review__about_customer=True )))['count']
         owner.save()
     elif not created and not instance.about_customer:
-        attributes = instance.attributes
+        attributes = instance.attributes.all()
         reviewable = instance.reviewable
         for attribute in attributes:
             reviewable_attribute, created = ReviewableExecutorAttributeAvgValue.objects.get_or_create(reviewable=reviewable, title=attribute.title)
@@ -41,10 +41,10 @@ def review_post_save(instance, created, **kwargs):
         owner.save()
 
 @receiver(post_save, sender=Comment)
-def review_post_save(instance, created, **kwargs):
+def comment_post_save(instance, created, **kwargs):
     if created:
-        review = instance.review
-        review.count_comments = review.comments.count()
+        review = instance.commented_review
+        review.count_comments = Comment.objects.filter(commented_review_id=review.id).count()
         review.save()
 
     

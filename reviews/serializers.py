@@ -52,7 +52,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(read_only=True, many=True,)
     is_my_like = serializers.IntegerField(read_only=True,)
     is_my_dislike = serializers.IntegerField(read_only=True,)
     owner = OwnerSerializer(read_only=True, many=False)
@@ -63,7 +62,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['id', 'service', 'created_at', 'is_my_like', 'is_my_dislike', 'count_comments', 'count_likes', 'rating', 'attributes','owner', 'body', 'rating', 'comments', 'about_customer', 'reviewable']
+        fields = ['id', 'service', 'created_at', 'is_my_like', 'is_my_dislike', 'count_comments', 'count_likes', 'rating', 'attributes','owner', 'body', 'rating', 'about_customer', 'reviewable']
 
 
 class ReviewTemplateSerializer(serializers.ModelSerializer):
