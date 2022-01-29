@@ -192,12 +192,14 @@ class Update():
                 self.tg_account.reply_type = 'screen_name'
                 self.tg_account.save()
         elif command == 'like':
-            if not self.tg_account.account or len(args) < 3:
+            if not self.tg_account.account or len(args) < 2:
+                print(len(args))
                 return None
             model = apps.get_model('reviews', args[0].capitalize())
             object = model.objects.get(pk=int(args[1]))
-            object = set_like(object)
+            object = set_like(object, self.tg_account.account)
             object.save()
+            print(object)
             text =  render_to_string('review.html', {'review': object})
             response = SendMessage(chat_id, text).send()
         elif command == 'dislike':
