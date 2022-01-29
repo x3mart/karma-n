@@ -266,16 +266,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    update = Update(request.data)
-    if hasattr(update,'message'):
-        # response = SendMessage(chat_id=1045490278, text='message').send()
-        update.message_dispatcher()
-    elif hasattr(update,'callback_query'):
-        update.callback_dispatcher()
-    # method = "sendMessage"
-    # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
-    # data = SendMessageSerializer(send_message).data
-    # requests.post(TG_URL + method, data)
+    try:
+        update = Update(request.data)
+        if hasattr(update,'message'):
+            # response = SendMessage(chat_id=1045490278, text='message').send()
+            update.message_dispatcher()
+        elif hasattr(update,'callback_query'):
+            update.callback_dispatcher()
+        # method = "sendMessage"
+        # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
+        # data = SendMessageSerializer(send_message).data
+        # requests.post(TG_URL + method, data)
+    except:
+        pass
     return Response({}, status=200)
 
     
