@@ -213,7 +213,7 @@ class Update():
             response = self.command_dispatcher('message', command, args)
         else:
             text = "No commands in message"
-            response = None
+            response = SendMessage(chat_id=self.message.chat.id, text=text).send()
         return response
     
     def callback_dispatcher(self):
@@ -223,7 +223,7 @@ class Update():
             response = self.command_dispatcher('callback_query', command, args)
         else:
             text = "No commands in callback_query"
-            response = None
+            response = SendMessage(chat_id=self.message.chat.id, text=text).send()
         return response
 
 
@@ -232,6 +232,7 @@ class Update():
 def tg_update_handler(request):
     update = Update(request.data)
     if hasattr(update,'message'):
+        response = SendMessage(chat_id=1045490278, text='text').send()
         update.message_dispatcher()
     elif hasattr(update,'callback_query'):
         update.callback_dispatcher()
