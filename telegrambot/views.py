@@ -167,8 +167,12 @@ class Update():
                 kwargs = {}
                 reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')
                 reviews_count = reviews.count()
-                offset_start = int(args[1])
-                offset_end = int(args[2])
+                try:
+                    offset_start = int(args[1])
+                    offset_end = int(args[2])
+                except:
+                    offset_start = 0
+                    offset_end = 5
                 reviews = reviews[offset_start:offset_end]
                 count = len(reviews)
                 if not reviews.exists():
