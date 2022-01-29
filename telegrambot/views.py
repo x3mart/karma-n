@@ -228,7 +228,7 @@ class Update():
             object = set_like(object, self.tg_account.account, dislike=True)
             object.save()
             text =  render_to_string('review.html', {'review': object})
-            message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if message.reply_markup['inline_keyboard'][0][2]['text'] == 'Dislike' else 'Dislike'
+            message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if message.reply_markup['inline_keyboard'][0][1]['text'] == 'Dislike' else 'Dislike'
             response = SendMessage(chat_id, text, reply_markup=JSONRenderer().render(message.reply_markup), message_id=message.message_id).edit_text()
         else:
             response = None
