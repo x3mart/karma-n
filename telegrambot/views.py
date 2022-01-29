@@ -218,7 +218,7 @@ class Update():
             object = set_like(object, self.tg_account.account)
             object.save()
             text =  render_to_string('review.html', {'review': object})
-            response = SendMessage(chat_id, text, reply_markup=message.reply_markup, message_id=message.message_id).edit_text()
+            response = SendMessage(chat_id, text, reply_markup=None, message_id=message.message_id).edit_text()
         elif command == 'dislike':
             pass
         else:
