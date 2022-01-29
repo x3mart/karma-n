@@ -188,7 +188,10 @@ class Update():
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
             else:
-                response = SendMessage(chat_id=chat_id, text="Введите аккаунт или номер телефона").send()
+                response = SendMessage(chat_id=chat_id, text="Введите аккаунт (durov или id123456) или номер телефона  (7(xxx)xxx-xx-xx)").send()
+                self.tg_account.await_reply = True
+                self.tg_account.reply_type = 'screen_name'
+                self.tg_account.save()
         else:
             response = None
         return response
@@ -211,6 +214,12 @@ class Update():
             self.tg_account.await_reply = False
             self.tg_account.reply_type = None
             self.tg_account.reply_1 = None
+            self.tg_account.save()
+        if self.tg_account.reply_type =='screen_name':
+            args = [text, '0', '5']
+            response = self.command_dispatcher('message', 'reviews', args)
+            self.tg_account.await_reply = False
+            self.tg_account.reply_type = None
             self.tg_account.save()
         return response
     
