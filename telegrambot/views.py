@@ -218,7 +218,8 @@ class Update():
             if account is not None:
                 self.tg_account.account = account
                 text = render_to_string('start_for_auth.html', {'account': account})
-                response = SendMessage(chat_id=self.message.chat.id, text=text).send()
+                reply_markup = ReplyMarkup().get_markup('start', self.tg_account)
+                response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
                 response = requests.post(TG_URL + 'deleteMessage', data={'chat_id':self.message.chat.id, 'message_id': self.message.message_id})
             else:
                 response = SendMessage(chat_id=self.message.chat.id, text='Фигня').send()
