@@ -1,4 +1,5 @@
 from email import message
+from xml.dom.minidom import Comment
 from django.shortcuts import render
 from django.http import HttpResponseBadRequest
 from rest_framework.response import Response
@@ -19,7 +20,7 @@ from .models import *
 from reviews.models import Review
 
 
-COMMANDS_LIST = ('reviews', 'user_info', 'start', 'login', 'me')
+COMMANDS_LIST = ('reviews', 'user_info', 'start', 'login', 'me', 'like', 'dislike')
 
 def get_tg_account(user):
     tg_account, created = TelegramAccount.objects.get_or_create(tg_id=user['id'])
@@ -91,7 +92,7 @@ class CallbackQuery():
         return response
 
 class SendMessage():
-    def __init__(self, chat_id, text, parse_mode='HTML', reply_markup=None) -> None:
+    def __init__(self, chat_id, text, reply_markup=None, parse_mode='HTML') -> None:
         self.chat_id = chat_id
         self.text = text
         self.parse_mode = parse_mode
@@ -122,56 +123,44 @@ class Update():
                 return (command, command_message)
         else:
             return (None, [])
+
+    def get_chat(self, source):
+        if source == 'callback_query':
+            chat_id=self.callback_query.message.chat.id
+        else:
+            chat_id=self.message.chat.id
+        return chat_id
     
     def command_dispatcher(self, source, command, args=[]):
+        chat_id = self.get_chat(source)
         if command == 'start':
             if self.tg_account.account:
                 text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
             else:
                 text = render_to_string('start.html', {'reviews_count': Review.objects.count(), 'reviewable_count': Reviewable.objects.count()})
             reply_markup = ReplyMarkup().get_markup(command, self.tg_account)
-            response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
+            response = SendMessage(chat_id, text, reply_markup).send()
         elif command == 'user_info':
-            if source == 'callback_query':
-                response = self.callback_query.answer()
-                chat_id=self.callback_query.message.chat.id
-            else:
-                chat_id=self.message.chat.id
             try:
                 text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
                 reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account)
             except:
                 text = "Такого пользователя нет"
                 reply_markup = None
-            response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
+            response = SendMessage(chat_id, text, reply_markup).send()
         elif command == 'me':
-            if source == 'callback_query':
-                response = self.callback_query.answer()
-                chat_id=self.callback_query.message.chat.id
-            else:
-                chat_id=self.message.chat.id
             if self.tg_account and self.tg_account.account:
                 text = render_to_string('user_info.html', {'user': self.tg_account.account})
             else:
                 text = "Что бы посмотреть информацию О себе, надо авторизоваться"
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account)
-            response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
+            response = SendMessage(chat_id, text, reply_markup).send()
         elif command == 'login':
-            if source == 'callback_query':
-                response = self.callback_query.answer()
-                chat_id=self.callback_query.message.chat.id
-            else:
-                chat_id=self.message.chat.id
             self.tg_account.await_reply = True
             self.tg_account.reply_type = 'email'
             self.tg_account.save()
-            response = SendMessage(chat_id=chat_id, text='Введите email').send()
+            response = SendMessage(chat_id, 'Введите email').send()
         elif command == 'reviews':
-            if source == 'callback_query':
-                response = self.callback_query.answer()
-                chat_id=self.callback_query.message.chat.id
-            else:
-                chat_id=self.message.chat.id
             if len(args):
                 kwargs = {}
                 account_id = self.tg_account.account.id if self.tg_account.account else 1
@@ -186,7 +175,7 @@ class Update():
                 reviews = reviews[offset_start:offset_end]
                 count = len(reviews)
                 if not reviews.exists():
-                    response = SendMessage(chat_id=chat_id, text="Отзывов нет").send()
+                    response = SendMessage(chat_id, "Отзывов нет").send()
                 for review in reviews:
                     count -= 1
                     kwargs['more'] = False if count > 0 or offset_end >= reviews_count else True
@@ -197,12 +186,14 @@ class Update():
                     kwargs['offset_end'] = offset_end + 5 if offset_end + 5 < reviews_count else reviews_count
                     text =  render_to_string('review.html', {'review': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
-                    response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
+                    response = SendMessage(chat_id, text, reply_markup).send()
             else:
-                response = SendMessage(chat_id=chat_id, text="Введите аккаунт (durov или id123456) или номер телефона  (7(xxx)xxx-xx-xx)").send()
+                response = SendMessage(chat_id, "Введите аккаунт (durov или id123456) или номер телефона (7(xxx)xxx-xx-xx)").send()
                 self.tg_account.await_reply = True
                 self.tg_account.reply_type = 'screen_name'
                 self.tg_account.save()
+        elif command == 'like':
+            pass
         else:
             response = None
         return response
@@ -252,11 +243,11 @@ class Update():
     def callback_dispatcher(self):
         command, args = self.command_handler(self.callback_query.data)
         self.tg_account = get_tg_account(self.callback_query.user)
+        response = self.callback_query.answer()
         if command:
             response = self.command_dispatcher('callback_query', command, args)
         else:
             text = "No commands in callback_query"
-            response = self.callback_query.answer()
             # response = SendMessage(chat_id=self.message.chat.id, text=text).send()
         return response
 

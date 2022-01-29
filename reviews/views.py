@@ -21,23 +21,21 @@ from .models import Attribute, AttributeTitle, Review, Comment, Like, ReviewTemp
 from .serializers import ReviewSerializer, CommentSerializer, LikeSerializer, ReviewTemplateSerializer, AttributeTitleSerializer
 
 # Create your views here.
-def set_like(object, request, pk):
-    remove = request.data.get('remove')
-    dislike = request.data.get('dislike')
-    like = object.likes.filter(owner=request.user).first()
+def set_like(object, user, remove=None, dislike=None):
+    like = object.likes.filter(owner=user).first()
     if dislike and like and not like.dislike:
         like.dislike = True
         like.save()
         object.count_likes -= 2
     if dislike and not like:
-        object.likes.create(owner=request.user, dislike=True)
+        object.likes.create(owner=user, dislike=True)
         object.count_likes -= 1
     if not dislike and like and like.dislike:
         like.dislike = False
         like.save()
         object.count_likes += 2
     if not dislike and not like:
-        object.likes.create(owner=request.user)
+        object.likes.create(owner=user)
         object.count_likes += 1
     if remove and like:
         if like.dislike:
@@ -170,8 +168,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['patch'])
     def like(self, request, pk=None):
+        remove = request.data.get('remove')
+        dislike = request.data.get('dislike')
         review = self.get_object()
-        review = set_like(review, request, pk)
+        review = set_like(review, request.user, remove, dislike)
         review.save()
         qs = self.get_queryset()
         review = qs.get(pk=review.id)
@@ -208,8 +208,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['patch'])
     def like(self, request, pk=None):
+        remove = request.data.get('remove')
+        dislike = request.data.get('dislike')
         comment = self.get_object()
-        comment = set_like(comment, request, pk)
+        comment = set_like(comment, request.user, remove, dislike)
         comment.save()
         qs = self.get_queryset()
         comment = qs.get(pk=comment.id)
