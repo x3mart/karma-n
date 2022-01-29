@@ -183,6 +183,8 @@ class Update():
                     text =  render_to_string('review.html', {'review': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
+            else:
+                response = SendMessage(chat_id=chat_id, text="Введите аккаунт или номер телефона").send()
         else:
             response = None
         return response
