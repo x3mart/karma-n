@@ -194,7 +194,7 @@ class Update():
         elif command == 'like':
             if not self.tg_account.account or len(args) < 3:
                 return None
-            model = apps.get_model('reviewables', args[0].capitalize())
+            model = apps.get_model('reviews', args[0].capitalize())
             object = model.objects.get(pk=int(args[1]))
             object = set_like(object)
             object.save()
