@@ -143,7 +143,7 @@ class Update():
     
     def get_message(self,source):
         if source == 'callback_query':
-            message=self.callback_query.message.message
+            message=self.callback_query.message
         else:
             message=self.message
         return message
