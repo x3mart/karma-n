@@ -27,22 +27,22 @@ def set_like(object, user, dislike=None):
         like.dislike = True
         like.save()
         object.count_likes -= 2
-        return object
-    if dislike and not like:
+        # return object
+    elif dislike and not like:
         object.likes.create(owner=user, dislike=True)
         object.count_likes -= 1
-    if not dislike and like and like.dislike:
+    elif not dislike and like and like.dislike:
         like.dislike = False
         like.save()
         object.count_likes += 2
-        return object
-    if not dislike and not like:
+        # return object
+    elif not dislike and not like:
         object.likes.create(owner=user)
         object.count_likes += 1
-    if dislike and like and like.dislike:
+    elif dislike and like and like.dislike:
         like.delete()
         object.count_likes += 1
-    if like and not like.dislike:
+    elif like and not like.dislike:
         like.delete()
         object.count_likes -= 1
     return object
