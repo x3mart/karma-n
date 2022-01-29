@@ -211,7 +211,7 @@ class Update():
         #     response = self.await_despatcher(self.message.text)
         if command:
             response = SendMessage(chat_id=1045490278, text=command).send()
-            response = self.command_dispatcher('message', command, args)
+            # response = self.command_dispatcher('message', command, args)
         else:
             text = "No commands in message"
             response = SendMessage(chat_id=self.message.chat.id, text=text).send()
