@@ -62,7 +62,7 @@ class ReplyMarkup():
             if kwargs['more']:
                 button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
                 keyboard.append([button])
-            else:
+            elif kwargs['last']:
                 button = InlineButton(text='Это все отзывы. Искать еще?', callback_data=f'/reviews')
                 keyboard.append([button])
         else:
@@ -190,6 +190,7 @@ class Update():
                 for review in reviews:
                     count -= 1
                     kwargs['more'] = False if count > 0 or offset_end >= reviews_count else True
+                    kwargs['last'] = False if count > 0 or kwargs['more'] else True
                     kwargs['review']= review
                     kwargs['screen_name']= args[0]
                     kwargs['offset_start'] = offset_end
