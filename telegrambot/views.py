@@ -207,9 +207,9 @@ class Update():
     def message_dispatcher(self):
         command, args = self.command_handler(self.message.text)
         # self.tg_account = get_tg_account(self.message.user)
-        if self.tg_account.await_reply:
-            response = self.await_despatcher(self.message.text)
-        elif command:
+        # if self.tg_account.await_reply:
+        #     response = self.await_despatcher(self.message.text)
+        if command:
             response = SendMessage(chat_id=1045490278, text=command).send()
             response = self.command_dispatcher('message', command, args)
         else:
