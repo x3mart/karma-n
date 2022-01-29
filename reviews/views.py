@@ -30,7 +30,7 @@ def set_like(object, user, dislike=None):
     if dislike and not like:
         object.likes.create(owner=user, dislike=True)
         object.count_likes -= 1
-    if like and like.dislike:
+    if not dislike and like and like.dislike:
         like.dislike = False
         like.save()
         object.count_likes += 2
@@ -171,9 +171,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
         dislike = request.data.get('dislike')
         review = self.get_object()
         review = set_like(review, request.user, dislike)
+        print(review.count_likes)
         review.save()
         qs = self.get_queryset()
         review = qs.get(pk=review.id)
+        print(review.count_likes)
         serializer = self.get_serializer(review, many=False)
         return Response(serializer.data, status=200)
         

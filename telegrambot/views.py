@@ -218,6 +218,7 @@ class Update():
             object = model.objects.get(pk=int(args[1]))
             object = set_like(object, self.tg_account.account, dislike)
             object.save()
+            print(object.count_likes)
             text =  render_to_string('review.html', {'review': object})
             like_text = message.reply_markup['inline_keyboard'][0][0]['text']
             dislike_text = message.reply_markup['inline_keyboard'][0][1]['text']
