@@ -34,6 +34,14 @@ class ReplyMarkup():
     def __init__(self):
         pass
 
+    def get_likes_markup(self, review):
+        text1 = 'I Like It' if review.is_my_like else 'Like'
+        text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
+        button1 = InlineButton(text=text1, callback_data=f'/like review {review.id}')
+        button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id}')
+        keyboard = [[button1, button2]]
+        return keyboard
+
     def get_markup(self, name, tg_account=None, **kwargs):
         if name == 'start' and tg_account and tg_account.account:
             button1 = InlineButton(text='Инфа о себе', callback_data=f'/me')
@@ -52,11 +60,7 @@ class ReplyMarkup():
         elif name == 'reviews':
             review = kwargs.get('review')
             if tg_account.account:
-                text1 = 'I Like It' if review.is_my_like else 'Like'
-                text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
-                button1 = InlineButton(text=text1, callback_data=f'/like review {review.id}')
-                button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id}')
-                keyboard = [[button1, button2]]
+                keyboard = self.get_likes_markup(review)
             else:
                 keyboard = []
             if kwargs['more']:
@@ -91,11 +95,17 @@ class CallbackQuery():
         return response
 
 class SendMessage():
-    def __init__(self, chat_id, text, reply_markup=None, parse_mode='HTML') -> None:
+    def __init__(self, chat_id, text, reply_markup=None, message_id=None, parse_mode='HTML') -> None:
         self.chat_id = chat_id
         self.text = text
         self.parse_mode = parse_mode
         self.reply_markup = reply_markup
+        self.message_id = message_id
+    
+    def edit_text(self):
+        data = SendMessageSerializer(self).data
+        response = requests.post(TG_URL + 'editMessageText', data)
+        return response
     
     def send(self):
         data = SendMessageSerializer(self).data
@@ -130,8 +140,16 @@ class Update():
             chat_id=self.message.chat.id
         return chat_id
     
+    def get_message(self,source):
+        if source == 'callback_query':
+            message_id=self.callback_query.message.message_id
+        else:
+            message_id=self.message.message_id
+        return message_id
+    
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
+        message_id = self.get_message(source)
         if command == 'start':
             if self.tg_account.account:
                 text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
@@ -193,15 +211,13 @@ class Update():
                 self.tg_account.save()
         elif command == 'like':
             if not self.tg_account.account or len(args) < 2:
-                print(len(args))
                 return None
             model = apps.get_model('reviews', args[0].capitalize())
             object = model.objects.get(pk=int(args[1]))
             object = set_like(object, self.tg_account.account)
             object.save()
-            print(object)
             text =  render_to_string('review.html', {'review': object})
-            response = SendMessage(chat_id, text).send()
+            response = SendMessage(chat_id, text, message_id=message_id).edit_text()
         elif command == 'dislike':
             pass
         else:
