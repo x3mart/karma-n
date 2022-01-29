@@ -244,8 +244,8 @@ class Update():
             response = self.command_dispatcher('callback_query', command, args)
         else:
             text = "No commands in callback_query"
+            response = self.callback_query.answer()
             # response = SendMessage(chat_id=self.message.chat.id, text=text).send()
-            response = None
         return response
 
 
