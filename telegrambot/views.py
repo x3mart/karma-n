@@ -38,8 +38,8 @@ class ReplyMarkup():
     def get_likes_markup(self, review):
         text1 = 'I Like It' if review.is_my_like else 'Like'
         text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
-        button1 = InlineButton(text=text1, callback_data=f'/like review {review.id} False')
-        button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id} True')
+        button1 = InlineButton(text=text1, callback_data=f'/like review {review.id}')
+        button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id}')
         keyboard = [[button1, button2]]
         return keyboard
 
