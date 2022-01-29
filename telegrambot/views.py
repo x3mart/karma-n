@@ -38,16 +38,12 @@ class ReplyMarkup():
 
     def get_button_position(self, markup, text, action=None, **kwargs):
         row = 0
-        position = 0
-        finded = False
         for line in markup:
             for button in range(0,len(line)): 
                 if markup[row][button]['text'] in text:
-                    finded = True
-                    break
-                position = button
+                    return (row, button)
             row +=1
-            return (row, position) if finded else (None, None) 
+            return (None, None) 
     
     def get_edited_markup(self, markup, text, action=None, **kwargs):
         pass
@@ -237,6 +233,9 @@ class Update():
             object.save()
             text =  render_to_string('review.html', {'review': object})
             row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Like', 'I Don\'t Like It'])
+            print(row)
+            print(position)
+            print(message.reply_markup['inline_keyboard'])
             like_text = message.reply_markup['inline_keyboard'][row][position]['text']
             dislike_text = message.reply_markup['inline_keyboard'][row][position + 1]['text']
             message.reply_markup['inline_keyboard'][row][position]['text'] = 'I Like It' if like_text == 'Like' and not dislike else 'Like'
