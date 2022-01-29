@@ -13,6 +13,7 @@ from rest_framework.renderers import JSONRenderer
 from django.contrib.auth import authenticate
 
 from reviewables.models import Reviewable
+from reviews.views import get_reviews
 from .serializers import *
 from .models import *
 from reviews.models import Review
@@ -45,16 +46,24 @@ class ReplyMarkup():
             for reviewable in tg_account.account.reviewables.all():
                 executor_rating = reviewable.executor_rating if reviewable.executor_rating else 0
                 customer_rating = reviewable.customer_rating if reviewable.customer_rating else 0
-                button = InlineButton(text=f'Отзывы о {reviewable.screen_name} Рейтинг {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.screen_name} 0 5')
+                button = InlineButton(text=f'{reviewable.screen_name} {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.screen_name} 0 5')
                 keyboard.append([button])
             keyboard.append([button2])
         elif name == 'reviews':
             review = kwargs.get('review')
-            button1 = InlineButton(text='Like', callback_data=f'/like review {review.id}')
-            button2 = InlineButton(text='Dislike', callback_data=f'/dislike review {review.id}')
-            keyboard = [[button1, button2]]
+            if self.tg_account.account:
+                text1 = 'I Like It' if review.is_my_like else 'Like'
+                text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
+                button1 = InlineButton(text=text1, callback_data=f'/like review {review.id}')
+                button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id}')
+                keyboard = [[button1, button2]]
+            else:
+                keyboard = []
             if kwargs['more']:
                 button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
+                keyboard.append([button])
+            else:
+                button = InlineButton(text='Это все отзывы. Искать еще?', callback_data=f'/reviews')
                 keyboard.append([button])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
@@ -165,7 +174,8 @@ class Update():
                 chat_id=self.message.chat.id
             if len(args):
                 kwargs = {}
-                reviews = Review.objects.filter(reviewable__screen_name=args[0]).order_by('-created_at')
+                account_id = self.tg_account.account.id if self.tg_account.account else 1
+                reviews = get_reviews(account_id).filter(reviewable__screen_name=args[0]).order_by('-created_at')
                 reviews_count = reviews.count()
                 try:
                     offset_start = int(args[1])
