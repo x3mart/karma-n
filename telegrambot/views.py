@@ -35,6 +35,23 @@ class ReplyMarkup():
     def __init__(self):
         pass
 
+
+    def get_button_position(self, markup, text, action=None, **kwargs):
+        row = 0
+        position = 0
+        finded = False
+        for line in markup:
+            for button in range(0,len(line)): 
+                if markup[row][button]['text'] in text:
+                    finded = True
+                    break
+                position = button
+            row +=1
+            return (row, position) if finded else (None, None) 
+    
+    def get_edited_markup(self, markup, text, action=None, **kwargs):
+        pass
+
     def get_likes_markup(self, review):
         text1 = 'I Like It' if review.is_my_like else 'Like'
         text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
@@ -218,12 +235,12 @@ class Update():
             object = model.objects.get(pk=int(args[1]))
             object = set_like(object, self.tg_account.account, dislike)
             object.save()
-            print(object.count_likes)
             text =  render_to_string('review.html', {'review': object})
-            like_text = message.reply_markup['inline_keyboard'][0][0]['text']
-            dislike_text = message.reply_markup['inline_keyboard'][0][1]['text']
-            message.reply_markup['inline_keyboard'][0][0]['text'] = 'I Like It' if like_text == 'Like' and not dislike else 'Like'
-            message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if dislike_text == 'Dislike' and dislike else 'Dislike'
+            row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Like', 'I Don\'t Like It'])
+            like_text = message.reply_markup['inline_keyboard'][row][position]['text']
+            dislike_text = message.reply_markup['inline_keyboard'][row][position + 1]['text']
+            message.reply_markup['inline_keyboard'][row][position]['text'] = 'I Like It' if like_text == 'Like' and not dislike else 'Like'
+            message.reply_markup['inline_keyboard'][row][position + 1]['text'] = 'I Don\'t Like It' if dislike_text == 'Dislike' and dislike else 'Dislike'
             reply_markup = JSONRenderer().render(message.reply_markup)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         # elif command == 'dislike':
