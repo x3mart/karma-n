@@ -220,9 +220,16 @@ class Update():
             text =  render_to_string('review.html', {'review': object})
             message.reply_markup['inline_keyboard'][0][0]['text'] = 'I Like It' if message.reply_markup['inline_keyboard'][0][0]['text'] == 'Like' else 'Like'
             response = SendMessage(chat_id, text, reply_markup=JSONRenderer().render(message.reply_markup), message_id=message.message_id).edit_text()
-            print(response.json())
         elif command == 'dislike':
-            pass
+            if not self.tg_account.account or len(args) < 2:
+                return None
+            model = apps.get_model('reviews', args[0].capitalize())
+            object = model.objects.get(pk=int(args[1]))
+            object = set_like(object, self.tg_account.account, dislike=True)
+            object.save()
+            text =  render_to_string('review.html', {'review': object})
+            message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if message.reply_markup['inline_keyboard'][0][2]['text'] == 'Dislike' else 'Dislike'
+            response = SendMessage(chat_id, text, reply_markup=JSONRenderer().render(message.reply_markup), message_id=message.message_id).edit_text()
         else:
             response = None
         return response
