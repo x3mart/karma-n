@@ -1,5 +1,4 @@
-from email import message
-from xml.dom.minidom import Comment
+from django.apps import apps
 from django.shortcuts import render
 from django.http import HttpResponseBadRequest
 from rest_framework.response import Response
@@ -14,7 +13,7 @@ from rest_framework.renderers import JSONRenderer
 from django.contrib.auth import authenticate
 
 from reviewables.models import Reviewable
-from reviews.views import get_reviews
+from reviews.views import get_reviews, set_like
 from .serializers import *
 from .models import *
 from reviews.models import Review
@@ -193,6 +192,15 @@ class Update():
                 self.tg_account.reply_type = 'screen_name'
                 self.tg_account.save()
         elif command == 'like':
+            if not self.tg_account.account or len(args) < 3:
+                return None
+            model = apps.get_model('reviewables', args[0].capitalize())
+            object = model.objects.get(pk=int(args[1]))
+            object = set_like(object)
+            object.save()
+            text =  render_to_string('review.html', {'review': object})
+            response = SendMessage(chat_id, text).send()
+        elif command == 'dislike':
             pass
         else:
             response = None
