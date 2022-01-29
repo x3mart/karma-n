@@ -37,12 +37,12 @@ def set_like(object, user, dislike=None):
     if not dislike and not like:
         object.likes.create(owner=user)
         object.count_likes += 1
-    if dislike and like and like.dislike:
-        like.delete()
-        object.count_likes += 1
-    if like and not like.dislike:
-        like.delete()
-        object.count_likes -= 1
+    # if dislike and like and like.dislike:
+    #     like.delete()
+    #     object.count_likes += 1
+    # if like and not like.dislike:
+    #     like.delete()
+    #     object.count_likes -= 1
     return object
 
 def get_reviews(user_id):
