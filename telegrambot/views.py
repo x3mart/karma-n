@@ -109,7 +109,7 @@ class CallbackQuery():
         return response
 
 class SendMessage():
-    def __init__(self, chat_id, text, reply_markup=None, message_id=None, parse_mode='HTML') -> None:
+    def __init__(self, chat_id, text=None, reply_markup=None, message_id=None, parse_mode='HTML') -> None:
         self.chat_id = chat_id
         self.text = text
         self.parse_mode = parse_mode
@@ -121,6 +121,11 @@ class SendMessage():
         response = requests.post(TG_URL + 'editMessageText', data)
         return response
     
+    def edit_markup(self):
+        data = SendMessageSerializer(self).data
+        response = requests.post(TG_URL + 'editMessageReplyMarkup', data)
+        return response
+
     def send(self):
         data = SendMessageSerializer(self).data
         response = requests.post(TG_URL + 'sendMessage', data)
@@ -207,6 +212,12 @@ class Update():
                 count = len(reviews)
                 if not reviews.exists():
                     response = SendMessage(chat_id, "Отзывов нет").send()
+                # Убираем кнопку "Показать еще" у последнего показанного сообщения
+                if offset_start > 0:
+                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Показать еще'])
+                    message.reply_markup['inline_keyboard'].pop(row)
+                    reply_markup = JSONRenderer().render(message.reply_markup)
+                    response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
                 for review in reviews:
                     count -= 1
                     kwargs['more'] = False if count > 0 or offset_end >= reviews_count else True
@@ -239,16 +250,6 @@ class Update():
             message.reply_markup['inline_keyboard'][row][position + 1]['text'] = 'I Don\'t Like It' if dislike_text == 'Dislike' and dislike else 'Dislike'
             reply_markup = JSONRenderer().render(message.reply_markup)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
-        # elif command == 'dislike':
-        #     if not self.tg_account.account or len(args) < 2:
-        #         return None
-        #     model = apps.get_model('reviews', args[0].capitalize())
-        #     object = model.objects.get(pk=int(args[1]))
-        #     object = set_like(object, self.tg_account.account, dislike=True)
-        #     object.save()
-        #     text =  render_to_string('review.html', {'review': object})
-        #     message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if message.reply_markup['inline_keyboard'][0][1]['text'] == 'Dislike' else 'Dislike'
-        #     response = SendMessage(chat_id, text, reply_markup=JSONRenderer().render(message.reply_markup), message_id=message.message_id).edit_text()
         else:
             response = None
         return response
@@ -311,19 +312,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    # try:
-    update = Update(request.data)
-    if hasattr(update,'message'):
-        # response = SendMessage(chat_id=1045490278, text='message').send()
-        update.message_dispatcher()
-    elif hasattr(update,'callback_query'):
-        update.callback_dispatcher()
+    try:
+        update = Update(request.data)
+        if hasattr(update,'message'):
+            # response = SendMessage(chat_id=1045490278, text='message').send()
+            update.message_dispatcher()
+        elif hasattr(update,'callback_query'):
+            update.callback_dispatcher()
     # method = "sendMessage"
     # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
     # data = SendMessageSerializer(send_message).data
     # requests.post(TG_URL + method, data)
-    # except:
-    #     pass
+    except:
+        pass
     return Response({}, status=200)
 
     
