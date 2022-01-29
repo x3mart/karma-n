@@ -38,8 +38,8 @@ class ReplyMarkup():
     def get_likes_markup(self, review):
         text1 = 'I Like It' if review.is_my_like else 'Like'
         text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
-        button1 = InlineButton(text=text1, callback_data=f'/like review {review.id}')
-        button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id}')
+        button1 = InlineButton(text=text1, callback_data=f'/like review {review.id} False')
+        button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id} True')
         keyboard = [[button1, button2]]
         return keyboard
 
@@ -210,26 +210,31 @@ class Update():
                 self.tg_account.await_reply = True
                 self.tg_account.reply_type = 'screen_name'
                 self.tg_account.save()
-        elif command == 'like':
+        elif command in ['like', 'dislike']:
             if not self.tg_account.account or len(args) < 2:
                 return None
+            dislike = command == 'dislike'
             model = apps.get_model('reviews', args[0].capitalize())
             object = model.objects.get(pk=int(args[1]))
-            object = set_like(object, self.tg_account.account)
+            object = set_like(object, self.tg_account.account, dislike)
             object.save()
             text =  render_to_string('review.html', {'review': object})
-            message.reply_markup['inline_keyboard'][0][0]['text'] = 'I Like It' if message.reply_markup['inline_keyboard'][0][0]['text'] == 'Like' else 'Like'
-            response = SendMessage(chat_id, text, reply_markup=JSONRenderer().render(message.reply_markup), message_id=message.message_id).edit_text()
-        elif command == 'dislike':
-            if not self.tg_account.account or len(args) < 2:
-                return None
-            model = apps.get_model('reviews', args[0].capitalize())
-            object = model.objects.get(pk=int(args[1]))
-            object = set_like(object, self.tg_account.account, dislike=True)
-            object.save()
-            text =  render_to_string('review.html', {'review': object})
-            message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if message.reply_markup['inline_keyboard'][0][1]['text'] == 'Dislike' else 'Dislike'
-            response = SendMessage(chat_id, text, reply_markup=JSONRenderer().render(message.reply_markup), message_id=message.message_id).edit_text()
+            like_text = message.reply_markup['inline_keyboard'][0][0]['text']
+            dislike_text = message.reply_markup['inline_keyboard'][0][1]['text']
+            message.reply_markup['inline_keyboard'][0][0]['text'] = 'I Like It' if like_text == 'Like' and not dislike else 'Like'
+            message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if dislike_text == 'Dislike' and dislike else 'Dislike'
+            reply_markup = JSONRenderer().render(message.reply_markup)
+            response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
+        # elif command == 'dislike':
+        #     if not self.tg_account.account or len(args) < 2:
+        #         return None
+        #     model = apps.get_model('reviews', args[0].capitalize())
+        #     object = model.objects.get(pk=int(args[1]))
+        #     object = set_like(object, self.tg_account.account, dislike=True)
+        #     object.save()
+        #     text =  render_to_string('review.html', {'review': object})
+        #     message.reply_markup['inline_keyboard'][0][1]['text'] = 'I Don\'t Like It' if message.reply_markup['inline_keyboard'][0][1]['text'] == 'Dislike' else 'Dislike'
+        #     response = SendMessage(chat_id, text, reply_markup=JSONRenderer().render(message.reply_markup), message_id=message.message_id).edit_text()
         else:
             response = None
         return response
