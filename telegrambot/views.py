@@ -128,8 +128,12 @@ class Update():
                 chat_id=self.callback_query.message.chat.id
             else:
                 chat_id=self.message.chat.id
-            text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
-            reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account)
+            try:
+                text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
+                reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account)
+            except:
+                text = "Такого пользователя нет"
+                reply_markup = None
             response = SendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup).send()
         elif command == 'me':
             if source == 'callback_query':
@@ -206,15 +210,16 @@ class Update():
     
     def message_dispatcher(self):
         command, args = self.command_handler(self.message.text)
-        # self.tg_account = get_tg_account(self.message.user)
-        # if self.tg_account.await_reply:
-        #     response = self.await_despatcher(self.message.text)
+        self.tg_account = get_tg_account(self.message.user)
+        if self.tg_account.await_reply:
+            response = self.await_despatcher(self.message.text)
         if command:
-            response = SendMessage(chat_id=1045490278, text=command).send()
-            # response = self.command_dispatcher('message', command, args)
+            # response = SendMessage(chat_id=1045490278, text=command).send()
+            response = self.command_dispatcher('message', command, args)
         else:
             text = "No commands in message"
-            response = SendMessage(chat_id=self.message.chat.id, text=text).send()
+            # response = SendMessage(chat_id=self.message.chat.id, text=text).send()
+            response = None
         return response
     
     def callback_dispatcher(self):
@@ -224,17 +229,18 @@ class Update():
             response = self.command_dispatcher('callback_query', command, args)
         else:
             text = "No commands in callback_query"
-            response = SendMessage(chat_id=self.message.chat.id, text=text).send()
+            # response = SendMessage(chat_id=self.message.chat.id, text=text).send()
+            response = None
         return response
 
 
 @api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
-    response = SendMessage(chat_id=1045490278, text='update').send()
+    # response = SendMessage(chat_id=1045490278, text='update').send()
     update = Update(request.data)
     if hasattr(update,'message'):
-        response = SendMessage(chat_id=1045490278, text='message').send()
+        # response = SendMessage(chat_id=1045490278, text='message').send()
         update.message_dispatcher()
     elif hasattr(update,'callback_query'):
         update.callback_dispatcher()
