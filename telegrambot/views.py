@@ -51,7 +51,7 @@ class ReplyMarkup():
             keyboard.append([button2])
         elif name == 'reviews':
             review = kwargs.get('review')
-            if self.tg_account.account:
+            if tg_account.account:
                 text1 = 'I Like It' if review.is_my_like else 'Like'
                 text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
                 button1 = InlineButton(text=text1, callback_data=f'/like review {review.id}')
