@@ -230,6 +230,7 @@ class Update():
 @api_view(["POST", "GET"])
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
+    response = SendMessage(chat_id=1045490278, text='update').send()
     update = Update(request.data)
     if hasattr(update,'message'):
         response = SendMessage(chat_id=1045490278, text='text').send()
