@@ -1,3 +1,4 @@
+from email import message
 from django.apps import apps
 from django.shortcuts import render
 from django.http import HttpResponseBadRequest
@@ -142,14 +143,14 @@ class Update():
     
     def get_message(self,source):
         if source == 'callback_query':
-            message_id=self.callback_query.message.message_id
+            message=self.callback_query.message.message
         else:
-            message_id=self.message.message_id
-        return message_id
+            message=self.message
+        return message
     
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
-        message_id = self.get_message(source)
+        message_id = self.get_message(source).message_id
         if command == 'start':
             if self.tg_account.account:
                 text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
@@ -282,19 +283,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    try:
-        update = Update(request.data)
-        if hasattr(update,'message'):
-            # response = SendMessage(chat_id=1045490278, text='message').send()
-            update.message_dispatcher()
-        elif hasattr(update,'callback_query'):
-            update.callback_dispatcher()
-        # method = "sendMessage"
-        # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
-        # data = SendMessageSerializer(send_message).data
-        # requests.post(TG_URL + method, data)
-    except:
-        pass
+    # try:
+    update = Update(request.data)
+    if hasattr(update,'message'):
+        # response = SendMessage(chat_id=1045490278, text='message').send()
+        update.message_dispatcher()
+    elif hasattr(update,'callback_query'):
+        update.callback_dispatcher()
+    method = "sendMessage"
+    send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
+    data = SendMessageSerializer(send_message).data
+    requests.post(TG_URL + method, data)
+    # except:
+    #     pass
     return Response({}, status=200)
 
     
