@@ -150,7 +150,7 @@ class Update():
     
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
-        message_id = self.get_message(source).message_id
+        message = self.get_message(source)
         if command == 'start':
             if self.tg_account.account:
                 text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
@@ -218,7 +218,7 @@ class Update():
             object = set_like(object, self.tg_account.account)
             object.save()
             text =  render_to_string('review.html', {'review': object})
-            response = SendMessage(chat_id, text, message_id=message_id).edit_text()
+            response = SendMessage(chat_id, text, message_id=message.message_id).edit_text()
         elif command == 'dislike':
             pass
         else:
