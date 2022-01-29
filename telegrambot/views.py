@@ -232,14 +232,11 @@ class Update():
             object = set_like(object, self.tg_account.account, dislike)
             object.save()
             text =  render_to_string('review.html', {'review': object})
-            row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Like', 'I Don\'t Like It'])
-            print(row)
-            print(position)
-            print(message.reply_markup['inline_keyboard'])
+            row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Like', 'I Dont Like It'])
             like_text = message.reply_markup['inline_keyboard'][row][position]['text']
             dislike_text = message.reply_markup['inline_keyboard'][row][position + 1]['text']
             message.reply_markup['inline_keyboard'][row][position]['text'] = 'I Like It' if like_text == 'Like' and not dislike else 'Like'
-            message.reply_markup['inline_keyboard'][row][position + 1]['text'] = 'I Don\'t Like It' if dislike_text == 'Dislike' and dislike else 'Dislike'
+            message.reply_markup['inline_keyboard'][row][position + 1]['text'] = 'I Dont Like It' if dislike_text == 'Dislike' and dislike else 'Dislike'
             reply_markup = JSONRenderer().render(message.reply_markup)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         # elif command == 'dislike':
