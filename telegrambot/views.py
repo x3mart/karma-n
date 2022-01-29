@@ -40,7 +40,7 @@ class ReplyMarkup():
         row = 0
         for line in markup:
             for button in range(0,len(line)): 
-                if markup[row][button]['text'] in text:
+                if markup[row][button]['text'].decode('utf-8') in text:
                     return (row, button)
             row +=1
             return (None, None) 
