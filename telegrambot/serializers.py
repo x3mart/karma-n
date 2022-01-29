@@ -33,4 +33,4 @@ class SendMessageSerializer(serializers.Serializer):
     text = serializers.CharField()
     parse_mode = serializers.CharField()
     reply_markup = serializers.JSONField(required=False)
-    message_id = serializers.IntegerField(equired=False)
+    message_id = serializers.IntegerField(required=False)
