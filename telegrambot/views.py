@@ -215,12 +215,12 @@ class Update():
                 count = len(reviews)
                 if not reviews.exists():
                     response = SendMessage(chat_id, "Отзывов нет").send()
-                # Убираем кнопку "Показать еще" у последнего показанного сообщения
+                # Убираем кнопку "Показать еще" после нажатия
                 if offset_start > 0:
                     row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Показать еще',])
                     message.reply_markup['inline_keyboard'].pop(row)
                     reply_markup = JSONRenderer().render(message.reply_markup)
-                    response = SendMessage(chat_id, str(row), reply_markup, message.message_id).edit_text()
+                    response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
                 for review in reviews:
                     count -= 1
                     kwargs['more'] = False if count > 0 or offset_end >= reviews_count else True
