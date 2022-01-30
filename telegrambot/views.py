@@ -79,6 +79,7 @@ class ReplyMarkup():
                 keyboard = []
             if review.comments:
                 button = InlineButton(text='Посмотреть коментарии', callback_data=f'/commens {review.id}')
+                keyboard.append([button])
             if kwargs['more']:
                 button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
                 keyboard.append([button])
