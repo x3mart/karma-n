@@ -40,7 +40,7 @@ class ReplyMarkup():
         row = 0
         for line in markup:
             for button in range(0,len(line)): 
-                if markup[row][button]['text'].decode('utf-8') in text:
+                if markup[row][button]['text'] in text:
                     return (row, button)
             row +=1
             return (None, None) 
@@ -215,7 +215,7 @@ class Update():
                 # Убираем кнопку "Показать еще" у последнего показанного сообщения
                 if offset_start > 0:
                     row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Показать еще'])
-                    # message.reply_markup['inline_keyboard'].pop(row)
+                    message.reply_markup['inline_keyboard'].pop(1)
                     reply_markup = JSONRenderer().render(message.reply_markup)
                     response = SendMessage(chat_id, str(row), reply_markup, message.message_id).edit_text()
                 for review in reviews:
