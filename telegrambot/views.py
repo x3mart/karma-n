@@ -272,13 +272,13 @@ class Update():
             comments = get_comments(account_id)
             comments_count = comments.count()
             comment = comments.filter(commented_review_id=int(args[0]))[int(args[1])]
-            text =  render_to_string('comment.html', {'comment': comment})
+            # text =  render_to_string('comment.html', {'comment': comment})
             kwargs['comment'] = comment
             kwargs['number'] = int(args[1])
             kwargs['review_id'] = int(args[0])
             kwargs['comments_count'] = comments_count
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
-            response = SendMessage(chat_id, text, None, message.message_id).edit_text()
+            response = SendMessage(chat_id, 'text', None, message.message_id).edit_text()
         else:
             response = None
         return response
