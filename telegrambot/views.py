@@ -78,7 +78,7 @@ class ReplyMarkup():
             else:
                 keyboard = []
             if kwargs['more']:
-                button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
+                button = InlineButton(text='More', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
                 keyboard.append([button])
             elif kwargs['last']:
                 button = InlineButton(text='Это все отзывы. Искать еще?', callback_data=f'/reviews')
@@ -214,7 +214,7 @@ class Update():
                     response = SendMessage(chat_id, "Отзывов нет").send()
                 # Убираем кнопку "Показать еще" у последнего показанного сообщения
                 if offset_start > 0:
-                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ["Показать еще",])
+                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['More',])
                     text = message.reply_markup['inline_keyboard'][1][0]['text']
                     message.reply_markup['inline_keyboard'].pop(1)
                     reply_markup = JSONRenderer().render(message.reply_markup)
