@@ -95,7 +95,7 @@ class ReplyMarkup():
             button2 = InlineButton(text='>>', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] + 1}')
             comment_buttons = [button1, button2]
             if kwargs['number'] == kwargs['number'] - 1:
-                comment_buttons.pop()
+                comment_buttons.pop(1)
             keyboard.append(comment_buttons)
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
