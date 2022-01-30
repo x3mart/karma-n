@@ -1,12 +1,12 @@
-<b>{{ review.reviewable.screen_name }}</b>
-{{ review.created_at }}
-От: <i>{% firstof review.owner.full_name review.owner.name %}</i>
-Общая оценка: <i>{{ review.rating }}</i>
-{% if review.about_customer %}Отзыв о потребителе{% else %}Отзыв об исполнителе{% endif %}
-Лайки {{ review.count_likes }} Дизлайки
-Коментарии: {{ review.count_comments }}
+<b>{{ likeable.likeableable.screen_name }}</b>
+{{ likeable.created_at }}
+От: <i>{% firstof likeable.owner.full_name likeable.owner.name %}</i>
+Общая оценка: <i>{{ likeable.rating }}</i>
+{% if likeable.about_customer %}Отзыв о потребителе{% else %}Отзыв об исполнителе{% endif %}
+Лайки {{ likeable.count_likes }} Дизлайки
+Коментарии: {{ likeable.count_comments }}
 
-{{ review.body }}
+{{ likeable.body }}
 
-{% for attribute in review.attributes.all %}{{ attribute.title }}-{{attribute.value}}
+{% for attribute in likeable.attributes.all %}{{ attribute.title }}-{{attribute.value}}
 {% endfor %}

@@ -1,5 +1,5 @@
-{{ comment.created_at }}
-От: <i>{% firstof comment.owner.full_name comment.owner.name %}</i>
-Лайки {{ comment.count_likes }} Дизлайки
+{{ likeable.created_at }}
+От: <i>{% firstof likeable.owner.full_name likeable.owner.name %}</i>
+Лайки {{ likeable.count_likes }} Дизлайки
 
-{{ comment.body }}
+{{ likeable.body }}

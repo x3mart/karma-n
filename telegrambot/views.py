@@ -258,7 +258,7 @@ class Update():
             object = model.objects.get(pk=int(args[1]))
             object = set_like(object, self.tg_account.account, dislike)
             object.save()
-            text =  render_to_string(f'{args[0]}.html', {'review': object})
+            text =  render_to_string(f'{args[0]}.html', {'likeable': object})
             row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Like', 'I Like It'])
             like_text = message.reply_markup['inline_keyboard'][row][position]['text']
             dislike_text = message.reply_markup['inline_keyboard'][row][position + 1]['text']
