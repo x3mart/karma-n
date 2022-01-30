@@ -242,7 +242,7 @@ class Update():
                     kwargs['screen_name']= args[0]
                     kwargs['offset_start'] = offset_end
                     kwargs['offset_end'] = offset_end + 5 if offset_end + 5 < reviews_count else reviews_count
-                    text =  render_to_string('review.html', {'review': review})
+                    text =  render_to_string('review.html', {'likeable': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id, text, reply_markup).send()
             else:
@@ -271,7 +271,7 @@ class Update():
             comments = get_comments(account_id)
             comments_count = comments.count()
             comment = comments.filter(commented_review_id=int(args[0]))[int(args[1])]
-            text =  render_to_string('comment.html', {'comment': comment})
+            text =  render_to_string('comment.html', {'likeable': comment})
             kwargs['comment'] = comment
             kwargs['number'] = int(args[1])
             kwargs['review_id'] = int(args[0])
