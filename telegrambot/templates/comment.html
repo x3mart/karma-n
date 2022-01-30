@@ -1,0 +1,5 @@
+{{ comment.created_at }}
+От: <i>{% firstof comment.owner.full_name comment.owner.name %}</i>
+Лайки {{ comment.count_likes }} Дизлайки
+
+{{ comment.body }}
