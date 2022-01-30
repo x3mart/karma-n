@@ -65,6 +65,13 @@ def get_reviews(user_id):
     reviews = Review.objects.prefetch_related('owner', prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
     return reviews
 
+def get_comments(user_id):
+    my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=user_id)))
+    my_dislike = Count('likes', filter=(Q(likes__dislike=True) & Q(likes__owner=user_id)))
+    likes = Like.objects.prefetch_related('owner')
+    prefetch_likes = Prefetch('likes', queryset=likes)
+    comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
+    return comments
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
@@ -202,11 +209,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
     
     def get_queryset(self):
-        my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))
-        my_dislike = Count('likes', filter=(Q(likes__dislike=True) & Q(likes__owner=self.request.user.id)))
-        likes = Like.objects.prefetch_related('owner')
-        prefetch_likes = Prefetch('likes', queryset=likes)
-        comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
+        comments = get_comments(self.request.user.id)
         return comments.order_by('-created_at')
     
     @action(detail=True, methods=['patch'])

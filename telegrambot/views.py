@@ -14,7 +14,7 @@ from rest_framework.renderers import JSONRenderer
 from django.contrib.auth import authenticate
 
 from reviewables.models import Reviewable
-from reviews.views import get_reviews, set_like
+from reviews.views import get_comments, get_reviews, set_like
 from .serializers import *
 from .models import *
 from reviews.models import Review
@@ -48,12 +48,14 @@ class ReplyMarkup():
     def get_edited_markup(self, markup, text, action=None, **kwargs):
         pass
 
-    def get_likes_markup(self, review):
-        text1 = 'I Like It' if review.is_my_like else 'Like'
-        text2 = 'I Don\'t Like It' if review.is_my_dislike else 'Dislike'
-        button1 = InlineButton(text=text1, callback_data=f'/like review {review.id}')
-        button2 = InlineButton(text=text2, callback_data=f'/dislike review {review.id}')
-        keyboard = [[button1, button2]]
+    def get_likes_markup(self, likeable, tg_account):
+        keyboard = []
+        if tg_account.account:
+            text1 = 'I Like It' if likeable.is_my_like else 'Like'
+            text2 = 'I Don\'t Like It' if likeable.is_my_dislike else 'Dislike'
+            button1 = InlineButton(text=text1, callback_data=f'/like review {likeable.id}')
+            button2 = InlineButton(text=text2, callback_data=f'/dislike review {likeable.id}')
+            keyboard = [[button1, button2]]
         return keyboard
 
     def get_markup(self, name, tg_account=None, **kwargs):
@@ -78,7 +80,7 @@ class ReplyMarkup():
             else:
                 keyboard = []
             if review.comments.exists():
-                button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id}')
+                button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
                 keyboard.append([button])
             if kwargs['more']:
                 button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
@@ -86,6 +88,18 @@ class ReplyMarkup():
             elif kwargs['last']:
                 button = InlineButton(text='Это все отзывы. Искать еще?', callback_data=f'/reviews')
                 keyboard.append([button])
+        elif name =='comments':
+            comment = kwargs.get('comment')
+            keyboard = self.get_likes_markup(comment, tg_account)
+            if kwargs['number'] == 0:
+                button1 = InlineButton(text='<<', callback_data=f'/review {kwargs["review_id"]}')
+            else:
+                button1 = InlineButton(text='<<', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] - 1}')
+            button2 = InlineButton(text='<<', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] + 1}')
+            comment_buttons = [button1, button2]
+            if kwargs['number'] == kwargs['number'] - 1:
+                comment_buttons.pop()
+            keyboard.append(comment_buttons)
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -144,6 +158,8 @@ class Update():
                 self.__setattr__(key, CallbackQuery(value))
             else:
                 self.__setattr__(key, value)
+    def get_account_id(self):
+        return self.tg_account.account.id if self.tg_account.account else 1
     
     def command_handler(self, text):
         command = ''
@@ -172,6 +188,7 @@ class Update():
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
         message = self.get_message(source)
+        kwargs = {}
         if command == 'start':
             if self.tg_account.account:
                 text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
@@ -201,8 +218,7 @@ class Update():
             response = SendMessage(chat_id, 'Введите email').send()
         elif command == 'reviews':
             if len(args):
-                kwargs = {}
-                account_id = self.tg_account.account.id if self.tg_account.account else 1
+                account_id = self.get_account_id()
                 reviews = get_reviews(account_id).filter(reviewable__screen_name=args[0]).order_by('-created_at')
                 reviews_count = reviews.count()
                 try:
@@ -252,6 +268,18 @@ class Update():
             message.reply_markup['inline_keyboard'][row][position]['text'] = 'I Like It' if like_text == 'Like' and not dislike else 'Like'
             message.reply_markup['inline_keyboard'][row][position + 1]['text'] = 'I Don\'t Like It' if dislike_text == 'Dislike' and dislike else 'Dislike'
             reply_markup = JSONRenderer().render(message.reply_markup)
+            response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
+        elif command == 'comments':
+            account_id = self.get_account_id()
+            comments = get_comments(account_id)
+            comments_count = comments.count()
+            comment = comments.filter(commented_review_id=int(args[0]))[int(args[1])]
+            text =  render_to_string('comment.html', {'comment': comment})
+            kwargs['comment'] = comment
+            kwargs['number'] = int(args[1])
+            kwargs['review_id'] = int(args[0])
+            kwargs['comments_count'] = comments_count
+            reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         else:
             response = None
