@@ -20,7 +20,7 @@ from .models import *
 from reviews.models import Review
 
 
-COMMANDS_LIST = ('reviews', 'user_info', 'start', 'login', 'me', 'like', 'dislike')
+COMMANDS_LIST = ('reviews', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments')
 
 def get_tg_account(user):
     tg_account, created = TelegramAccount.objects.get_or_create(tg_id=user['id'])
@@ -48,13 +48,13 @@ class ReplyMarkup():
     def get_edited_markup(self, markup, text, action=None, **kwargs):
         pass
 
-    def get_likes_markup(self, likeable, tg_account):
+    def get_likes_markup(self, likeable, tg_account, c_type):
         keyboard = []
         if tg_account.account:
             text1 = 'I Like It' if likeable.is_my_like else 'Like'
             text2 = 'I Don\'t Like It' if likeable.is_my_dislike else 'Dislike'
-            button1 = InlineButton(text=text1, callback_data=f'/like review {likeable.id}')
-            button2 = InlineButton(text=text2, callback_data=f'/dislike review {likeable.id}')
+            button1 = InlineButton(text=text1, callback_data=f'/like {c_type} {likeable.id}')
+            button2 = InlineButton(text=text2, callback_data=f'/dislike {c_type} {likeable.id}')
             keyboard = [[button1, button2]]
         return keyboard
 
@@ -75,7 +75,7 @@ class ReplyMarkup():
             keyboard.append([button2])
         elif name == 'reviews':
             review = kwargs.get('review')
-            keyboard = self.get_likes_markup(review, tg_account)
+            keyboard = self.get_likes_markup(review, tg_account, 'review')
             if review.comments.exists():
                 button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
                 keyboard.append([button])
@@ -87,7 +87,7 @@ class ReplyMarkup():
                 keyboard.append([button])
         elif name =='comments':
             comment = kwargs.get('comment')
-            keyboard = self.get_likes_markup(comment, tg_account)
+            keyboard = self.get_likes_markup(comment, tg_account, 'comment')
             if kwargs['number'] == 0:
                 button1 = InlineButton(text='<<', callback_data=f'/review {kwargs["review_id"]}')
             else:
@@ -272,13 +272,15 @@ class Update():
             comments = get_comments(account_id)
             comments_count = comments.count()
             comment = comments.filter(commented_review_id=int(args[0]))[int(args[1])]
-            # text =  render_to_string('comment.html', {'comment': comment})
+            print(comment.id)
+            text =  render_to_string('comment.html', {'comment': comment})
             kwargs['comment'] = comment
             kwargs['number'] = int(args[1])
             kwargs['review_id'] = int(args[0])
             kwargs['comments_count'] = comments_count
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
-            response = SendMessage(chat_id, 'text', None, message.message_id).edit_text()
+            print(reply_markup)
+            response = SendMessage(chat_id, text, None, message.message_id).edit_text()
         else:
             response = None
         return response
