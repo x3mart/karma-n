@@ -218,7 +218,7 @@ class Update():
                     text = type(message.reply_markup['inline_keyboard'][1][0]['text'])
                     message.reply_markup['inline_keyboard'].pop(1)
                     reply_markup = JSONRenderer().render(message.reply_markup)
-                    response = SendMessage(chat_id, str(text), reply_markup, message.message_id).edit_text()
+                    response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
                 for review in reviews:
                     count -= 1
                     kwargs['more'] = False if count > 0 or offset_end >= reviews_count else True
