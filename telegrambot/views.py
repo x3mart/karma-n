@@ -75,10 +75,7 @@ class ReplyMarkup():
             keyboard.append([button2])
         elif name == 'reviews':
             review = kwargs.get('review')
-            if tg_account.account:
-                keyboard = self.get_likes_markup(review)
-            else:
-                keyboard = []
+            keyboard = self.get_likes_markup(review, tg_account)
             if review.comments.exists():
                 button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
                 keyboard.append([button])
@@ -95,7 +92,7 @@ class ReplyMarkup():
                 button1 = InlineButton(text='<<', callback_data=f'/review {kwargs["review_id"]}')
             else:
                 button1 = InlineButton(text='<<', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] - 1}')
-            button2 = InlineButton(text='<<', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] + 1}')
+            button2 = InlineButton(text='>>', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] + 1}')
             comment_buttons = [button1, button2]
             if kwargs['number'] == kwargs['number'] - 1:
                 comment_buttons.pop()
