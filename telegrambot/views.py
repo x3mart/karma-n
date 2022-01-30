@@ -215,7 +215,7 @@ class Update():
                 # Убираем кнопку "Показать еще" у последнего показанного сообщения
                 if offset_start > 0:
                     row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Показать еще'])
-                    text = type(message.reply_markup['inline_keyboard'][1][0]['text'])
+                    text = message.reply_markup['inline_keyboard'][1][0]['text']
                     message.reply_markup['inline_keyboard'].pop(1)
                     reply_markup = JSONRenderer().render(message.reply_markup)
                     response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
