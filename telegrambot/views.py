@@ -77,8 +77,8 @@ class ReplyMarkup():
                 keyboard = self.get_likes_markup(review)
             else:
                 keyboard = []
-            if review.comments:
-                button = InlineButton(text='Посмотреть коментарии', callback_data=f'/commens {review.id}')
+            if review.comments.exists():
+                button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id}')
                 keyboard.append([button])
             if kwargs['more']:
                 button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
