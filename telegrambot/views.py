@@ -283,8 +283,9 @@ class Update():
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         elif command == 'review':
-            qs = get_reviews()
-            review = qs.get(pk=int([args[0]]))
+            account_id = self.get_account_id()
+            qs = get_reviews(account_id)
+            review = qs.get(pk=int(args[0]))
             kwargs['review']= review
             text =  render_to_string('review.html', {'likeable': review})
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
