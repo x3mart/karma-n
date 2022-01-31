@@ -47,13 +47,21 @@ const Register = ({
   const [errorStatus, setErrorStatus] = useState('')
   const [errorText, setErrorText] = useState([])
 
-  const handleRegister = () => {
+  const handleRegister = e => {
+    const data = {
+      name: name,
+      email: email,
+      password: password,
+      re_password: rePassword,
+    }
+    e.preventDefault()
     if (password === rePassword) {
-      signup(phone, email, name, password, rePassword)
-      setAccountCreated(true)
+      signup(data)
     }
   }
-
+  
+  // setAccountCreated(true)
+  
   useEffect(() => {
     setPhoneNumber(phone)
   }, [phone])
@@ -141,7 +149,7 @@ const Register = ({
                         <div className='login-form-container'>
                           <div className='login-register-form'>
                             <div>
-                              <form
+                              {/* <form
                                 onSubmit={event => event.preventDefault()}
                                 className={`${phone_approved ? 'd-none' : ''}`}
                               >
@@ -206,8 +214,8 @@ const Register = ({
                                     </div>
                                   </div>
                                 </div>
-                              </form>
-                              <form
+                              </form> */}
+                              {/* <form
                                 onSubmit={event => event.preventDefault()}
                                 className={`${phone_approved ? 'd-none' : ''}`}
                               >
@@ -245,27 +253,11 @@ const Register = ({
                                     </div>
                                   </div>
                                 </div>
-                              </form>
+                              </form> */}
                               <form
-                                onSubmit={event => event.preventDefault()}
-                                className={`${phone_approved ? '' : 'd-none'}`}
+                                onSubmit={handleRegister}
+                                // className={`${phone_approved ? '' : 'd-none'}`}
                               >
-                                <input
-                                  type='text'
-                                  name='phone'
-                                  value={phoneNumber}
-                                  readOnly
-                                  style={{ pointerEvents: 'none' }}
-                                ></input>
-                                <input
-                                  type='text'
-                                  name='name'
-                                  placeholder='Имя пользователя'
-                                  onChange={v => {
-                                    setName(v.target.value)
-                                  }}
-                                  value={name}
-                                />
                                 <input
                                   name='user-email'
                                   placeholder='Email'
@@ -274,6 +266,15 @@ const Register = ({
                                     setEmail(v.target.value)
                                   }}
                                   value={email}
+                                />
+                                <input
+                                  name='name'
+                                  placeholder='Имя пользователя'
+                                  type='text'
+                                  onChange={v => {
+                                    setName(v.target.value)
+                                  }}
+                                  value={name}
                                 />
                                 <input
                                   name='password'
@@ -294,7 +295,7 @@ const Register = ({
                                   value={rePassword}
                                 />
                                 <div className='button-box'>
-                                  <button onClick={() => handleRegister()}>
+                                  <button type='submit'>
                                     <span>Зарегистрироваться</span>
                                   </button>
                                 </div>

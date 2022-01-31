@@ -87,7 +87,7 @@ const Profile = ({
 
   useEffect(() => {
     if (isNotEmptyObject(user)) {
-      setActivePhone(user.phones[0])
+      // setActivePhone(user.phones[0])
       getReviewsAboutMe(user.phone)
       getMyReviews(user.id)
       setUpdateProfile({
@@ -184,11 +184,7 @@ const Profile = ({
       <div className='panel mb-4'>
         <div className='bio-graph-heading'>Моя страница</div>
         <div className='panel-body bio-graph-info'>
-          <PersonalInfo
-            user={user}
-            add_phone_action={add_extra_phone}
-            update_action={update_user}
-          />
+          <PersonalInfo user={user} />
         </div>
       </div>
 
@@ -214,7 +210,7 @@ const Profile = ({
         </Fragment>
       )} */}
 
-      {user && user.phones.length > 1 && (
+      {user && user.phones && user.phones.length > 1 && (
         <div className='select-phone-options'>
           <label htmlFor='state' className='form-label'>
             Номер телефона

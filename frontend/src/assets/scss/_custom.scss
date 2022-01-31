@@ -1057,6 +1057,10 @@ ul.summary-list > li:last-child {
   &:disabled {
     border: none;
   }
+  &:focus {
+    border: 0px solid #333;
+    border-bottom: 1px solid #353535;
+  }
 }
 
 .logo-sidetext {
@@ -1407,4 +1411,9 @@ ul.summary-list > li:last-child {
 
 .personal-info-wrapper {
   color: #353535;
+}
+
+input {
+  padding: 4px 0 4px 10px !important;
+  margin-bottom: 10px;
 }
