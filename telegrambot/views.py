@@ -89,7 +89,7 @@ class ReplyMarkup():
             comment = kwargs.get('comment')
             keyboard = self.get_likes_markup(comment, tg_account, 'comment')
             if kwargs['number'] == 0:
-                button1 = InlineButton(text='<<', callback_data=f'/review {kwargs["review_id"]}')
+                button1 = InlineButton(text=kwargs['review_id'], callback_data=f'/review {kwargs["review_id"]}')
             else:
                 button1 = InlineButton(text=kwargs['comments_count'], callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] - 1}')
             button2 = InlineButton(text=kwargs['number'], callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] + 1}')
