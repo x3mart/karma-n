@@ -51,7 +51,9 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
         city: user.city,
         birthday: user.birthday,
         email: user.email,
-        phones: user.phones.filter(item => item.phone_number != user.phone),
+        phones: `${user.phones && user.phones.filter(
+          item => item.phone_number != user.phone
+        )}`,
       })
   }, [user])
 
@@ -109,6 +111,12 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
             <div
               style={{ lineHeight: '42px', margin: '0 0 20px 5px' }}
               className='d-none d-xl-block'
+            >
+              Редактировать
+            </div>
+            <div
+              style={{ lineHeight: '42px', margin: '0 0 20px 5px' }}
+              className='d-block d-xl-none'
             >
               Редактировать
             </div>
@@ -204,10 +212,23 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
           </div>
         </div>
         <div className='row pl-3'>
+          <div className='col-md-4 inner-row-left'>Обо мне:</div>
+          <div className='col-md-8 inner-row-right'>
+            <textarea
+              style={{ resize: `${edit ? '' : 'none'}` }}
+              disabled={!edit}
+              name='about'
+              className='personal-info-input'
+              value={userData.about}
+              onChange={handleUserUpdate}
+            />
+          </div>
+        </div>
+        <div className='row pl-3'>
           <div className='col-md-4 inner-row-left'>Email:</div>
           <div className='col-md-8 inner-row-right'>
             <input
-              disabled={!edit}
+              disabled
               name='email'
               className='personal-info-input'
               type='email'
@@ -218,7 +239,12 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
         </div>
       </div>
 
-      {userData &&
+      <div className='personal-info-heading'>
+        <h1>Аккаунты:</h1>
+      </div>
+
+      {/* {userData &&
+        userData.phones &&
         userData.phones.length > 0 &&
         userData.phones.map((item, index) => (
           <div className='row pl-3' style={{ color: '#333' }}>
@@ -235,11 +261,11 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
               />
             </div>
           </div>
-        ))}
+        ))} */}
 
       <div className='row pl-3' style={{ color: '#333' }}>
         <div className='col-md-4 inner-row-left'>
-          {userData.phones.length === 0 ? 'Телефоны:' : ''}
+          {userData.phones && userData.phones.length === 0 ? 'Телефоны:' : ''}
         </div>
         <div className='col-md-8 inner-row-right d-flex'>
           <input
