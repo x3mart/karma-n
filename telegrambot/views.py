@@ -100,6 +100,8 @@ class ReplyMarkup():
         elif name == 'review':
             review = kwargs.get('review')
             keyboard = self.get_likes_markup(review, tg_account, 'review')
+            button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
+            keyboard.append([button])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
