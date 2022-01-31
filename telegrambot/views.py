@@ -273,9 +273,9 @@ class Update():
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         elif command == 'comments':
             account_id = self.get_account_id()
-            comments = get_comments(account_id)
+            comments = get_comments(account_id).filter(commented_review_id=int(args[0]))
             comments_count = comments.count()
-            comment = comments.filter(commented_review_id=int(args[0]))[int(args[1])]
+            comment = comments[int(args[1])]
             text =  render_to_string('comment.html', {'likeable': comment})
             kwargs['comment'] = comment
             kwargs['number'] = int(args[1])
