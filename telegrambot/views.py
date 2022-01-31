@@ -20,7 +20,7 @@ from .models import *
 from reviews.models import Review
 
 
-COMMANDS_LIST = ('reviews', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments')
+COMMANDS_LIST = ('reviews', 'review', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments')
 
 def get_tg_account(user):
     tg_account, created = TelegramAccount.objects.get_or_create(tg_id=user['id'])
@@ -93,10 +93,14 @@ class ReplyMarkup():
             else:
                 button1 = InlineButton(text='<<', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] - 1}')
             button2 = InlineButton(text='>>', callback_data=f'/comments {kwargs["review_id"]} {kwargs["number"] + 1}')
-            comment_buttons = [button1, button2]
             if kwargs['number'] == kwargs['comments_count'] - 1:
-                comment_buttons.pop(1)
+                button2 = InlineButton(text='>>', callback_data=f'/review {kwargs["review_id"]}')
+            comment_buttons = [button1, button2]
             keyboard.append(comment_buttons)
+        elif name == 'review':
+            review = kwargs.get('review')
+            keyboard = self.get_likes_markup(review, tg_account, 'review')
+            return keyboard
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -276,6 +280,13 @@ class Update():
             kwargs['number'] = int(args[1])
             kwargs['review_id'] = int(args[0])
             kwargs['comments_count'] = comments_count
+            reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
+            response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
+        elif command == 'review':
+            qs = get_reviews()
+            review = qs.get(pk=int([args[0]]))
+            kwargs['review']= review
+            text =  render_to_string('review.html', {'likeable': review})
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         else:
