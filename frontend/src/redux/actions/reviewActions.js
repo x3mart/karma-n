@@ -23,8 +23,9 @@ export const getReviewTemplates = n => async dispatch => {
   };
 
   try {
+    
     const res = await axios.get(
-      `http://novosti247.ru/api/reviewtemplates/?is_customer=${n}`,
+      `${process.env.REACT_APP_API_URL}/api/reviewtemplates/?is_customer=${n}`,
       config
     )
 
@@ -55,7 +56,11 @@ export const setReview = ({phone_number, attributes, body}) => async dispatch =>
   const content = JSON.stringify({ phone_number, attributes, body })
 
   try {
-    const res = await axios.post(`http://novosti247.ru/api/reviews/`, content, config);
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/reviews/`,
+      content,
+      config
+    )
 
     dispatch({
       type: SET_REVIEW_SUCCESS,
@@ -91,9 +96,9 @@ export const getReviewsAboutMe = phone_number => async dispatch => {
 
   try {
     const res = await axios.get(
-      `http://novosti247.ru/api/reviews/?phone__phone_number=${getPhone(
-        phone_number
-      )}/`,
+      `${
+        process.env.REACT_APP_API_URL
+      }/api/reviews/?phone__phone_number=${getPhone(phone_number)}/`,
       config
     )
 
@@ -123,7 +128,10 @@ export const getMyReviews = id => async dispatch => {
   };
 
   try {
-    const res = await axios.get(`http://novosti247.ru/api/reviews/?owner=${id}`, config);
+    const res = await axios.get(
+      `${process.env.REACT_APP_API_URL}/api/reviews/?owner=${id}`,
+      config
+    )
 
     const data = {
       my_reviews: res.data
@@ -154,7 +162,11 @@ export const setComment = (review, body, owner_id) => async dispatch => {
   const content = JSON.stringify({review, body});
 
   try {
-    await axios.post(`http://novosti247.ru/api/comments/`, content, config);
+    await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/comments/`,
+      content,
+      config
+    )
 
     dispatch({
       type: SET_COMMENT_SUCCESS
