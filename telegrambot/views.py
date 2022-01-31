@@ -76,7 +76,7 @@ class ReplyMarkup():
         elif name == 'reviews':
             review = kwargs.get('review')
             keyboard = self.get_likes_markup(review, tg_account, 'review')
-            if review.comments.exists():
+            if review.comments.filter(is_active=True).exists():
                 button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
                 keyboard.append([button])
             if kwargs['more']:

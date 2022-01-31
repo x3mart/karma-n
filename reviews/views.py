@@ -70,7 +70,7 @@ def get_comments(user_id):
     my_dislike = Count('likes', filter=(Q(likes__dislike=True) & Q(likes__owner=user_id)))
     likes = Like.objects.prefetch_related('owner')
     prefetch_likes = Prefetch('likes', queryset=likes)
-    comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
+    comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike).filter(is_active=True)
     return comments
 
 class ReviewViewSet(viewsets.ModelViewSet):
