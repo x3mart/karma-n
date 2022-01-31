@@ -52,8 +52,8 @@ def get_reviews(user_id):
     my_dislike = Count('likes', filter=(Q(likes__dislike=True) & Q(likes__owner=user_id)))
     likes = Like.objects.prefetch_related('owner')
     prefetch_likes = Prefetch('likes', queryset=likes)
-    # comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
-    # prefetch_comments = Prefetch('comments', queryset=comments)
+    comments = Comment.objects.prefetch_related('owner', prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike).filter(is_active=True)
+    prefetch_comments = Prefetch('comments', queryset=comments)
     reviewables_customer_attributes_avg = ReviewableCustomerAttributeAvgValue.objects.prefetch_related('title')
     prefetch_reviewables_customer_attributes_avg = Prefetch('reviewables_customer_attributes_avg', reviewables_customer_attributes_avg)
     reviewables_executor_attributes_avg = ReviewableExecutorAttributeAvgValue.objects.prefetch_related('title')
@@ -62,7 +62,7 @@ def get_reviews(user_id):
     prefetch_reviewable = Prefetch('reviewable', queryset=reviewable)
     attributes = Attribute.objects.prefetch_related('title')
     prefetch_attributes = Prefetch('attributes', queryset=attributes)
-    reviews = Review.objects.prefetch_related('owner', prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
+    reviews = Review.objects.prefetch_related('owner', prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes, prefetch_comments).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
     return reviews
 
 def get_comments(user_id):
