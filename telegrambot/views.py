@@ -100,7 +100,6 @@ class ReplyMarkup():
         elif name == 'review':
             review = kwargs.get('review')
             keyboard = self.get_likes_markup(review, tg_account, 'review')
-            return keyboard
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -289,7 +288,9 @@ class Update():
             kwargs['review']= review
             text =  render_to_string('review.html', {'likeable': review})
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
+            print(reply_markup)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
+            print(response.json())
         else:
             response = None
         return response
