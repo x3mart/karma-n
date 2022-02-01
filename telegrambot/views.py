@@ -94,10 +94,10 @@ class ReplyMarkup():
             if review.comments.filter(is_active=True).exists():
                 button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
                 keyboard.append([button])
-            button1 = InlineButton(text='Об авторе', callback_data=f'/user_info {review.owner.id}')
+            button1 = InlineButton(text='Об авторе', callback_data=f'/user_info {review.owner_id}')
             info_buttons = [button1]
             if review.reviewable.owner:
-                button2 = InlineButton(text='О владельце', callback_data=f'/user_info {review.reviewable.owner.id}')
+                button2 = InlineButton(text='О владельце', callback_data=f'/user_info {review.reviewable.owner_id}')
                 info_buttons.append(button2)
             keyboard.append(info_buttons)
             if kwargs['more']:
