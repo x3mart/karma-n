@@ -297,6 +297,8 @@ class Update():
                     reply_markup = JSONRenderer().render(message.reply_markup)
                     response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
                 else:
+                    reply_markup = [ReplyMarkup().get_resource_type_buttons()]
+                    reply_markup = JSONRenderer().render(reply_markup)
                     response = SendMessage(chat_id, "Что будем искать?").send()
                 # self.tg_account.await_reply = True
                 # self.tg_account.reply_type = 'screen_name'
