@@ -285,7 +285,7 @@ class Update():
                     kwargs['last'] = False if count > 0 or kwargs['more'] else True
                     kwargs['review']= review
                     kwargs['screen_name']= args[1]
-                    kwargs['resource_type']= args[1]
+                    kwargs['resource_type']= args[0]
                     kwargs['offset_start'] = offset_end
                     kwargs['offset_end'] = offset_end + 5 if offset_end + 5 < reviews_count else reviews_count
                     text =  render_to_string('review.html', {'likeable': review})
