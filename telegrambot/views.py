@@ -57,6 +57,12 @@ class ReplyMarkup():
             button2 = InlineButton(text=text2, callback_data=f'/dislike {c_type} {likeable.id}')
             keyboard = [[button1, button2]]
         return keyboard
+    
+    def get_more_button(inline_keyboard):
+        row, position = ReplyMarkup().get_button_position(inline_keyboard, ['Показать еще',])
+        if row:
+            return inline_keyboard[row]
+        return None
 
     def get_markup(self, name, tg_account=None, **kwargs):
         if name == 'start' and tg_account and tg_account.account:
@@ -97,15 +103,17 @@ class ReplyMarkup():
                 button2 = InlineButton(text='>>', callback_data=f'/review {kwargs["review_id"]}')
             comment_buttons = [button1, button2]
             keyboard.append(comment_buttons)
-            row, position = ReplyMarkup().get_button_position(kwargs['inline_keyboard'], ['Показать еще',])
-            if row:
-                button = kwargs['inline_keyboard'][row]
+            button = self.get_more_button(kwargs['inline_keyboard'])
+            if button:
                 keyboard.append(button)
         elif name == 'review':
             review = kwargs.get('review')
             keyboard = self.get_likes_markup(review, tg_account, 'review')
             button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
             keyboard.append([button])
+            button = self.get_more_button(kwargs['inline_keyboard'])
+            if button:
+                keyboard.append(button)
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -293,11 +301,10 @@ class Update():
             qs = get_reviews(account_id)
             review = qs.get(pk=int(args[0]))
             kwargs['review']= review
+            kwargs['inline_keyboard'] = message.reply_markup['inline_keyboard']
             text =  render_to_string('review.html', {'likeable': review})
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
-            print(reply_markup)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
-            print(response.json())
         else:
             response = None
         return response
