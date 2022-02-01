@@ -36,9 +36,9 @@ class ReplyMarkup():
         pass
     
     def get_resource_type_buttons(self):
-        button1 = InlineButton(text='Телефон', callback_data=f'/phone')
-        button2 = InlineButton(text='VK', callback_data=f'/vk')
-        button3 = InlineButton(text='Instagram', callback_data=f'/instagram')
+        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/phone')).data
+        button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/vk')).data
+        button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/instagram')).data
         return [button1, button2, button3]
 
     def get_button_position(self, markup, text, action=None, **kwargs):
@@ -297,7 +297,7 @@ class Update():
                     reply_markup = JSONRenderer().render(message.reply_markup)
                     response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
                 else:
-                    reply_markup = [ReplyMarkup().get_resource_type_buttons()]
+                    reply_markup = {'inline_keyboard': [ReplyMarkup().get_resource_type_buttons()]}
                     reply_markup = JSONRenderer().render(reply_markup)
                     response = SendMessage(chat_id, "Что будем искать?").send()
                 # self.tg_account.await_reply = True
