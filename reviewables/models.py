@@ -7,7 +7,7 @@ class Reviewable(PolymorphicModel):
     screen_name = models.CharField(max_length=150, null=True, blank=True)
     executor_rating = models.DecimalField(decimal_places=1, max_digits=2, null=True, blank=True)
     customer_rating = models.DecimalField(decimal_places=1, max_digits=2, null=True, blank=True)
-    owner = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, verbose_name='Владелец', null=True, related_name='reviewables')
+    owner = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, verbose_name='Владелец', null=True, blank=True, related_name='reviewables')
 
     class Meta:
         unique_together = ['screen_name', 'polymorphic_ctype']
