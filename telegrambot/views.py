@@ -97,6 +97,10 @@ class ReplyMarkup():
                 button2 = InlineButton(text='>>', callback_data=f'/review {kwargs["review_id"]}')
             comment_buttons = [button1, button2]
             keyboard.append(comment_buttons)
+            row, position = ReplyMarkup().get_button_position(kwargs['inline_keyboard'], ['Показать еще',])
+            if row:
+                button = kwargs['inline_keyboard'][row]
+                keyboard.append(button)
         elif name == 'review':
             review = kwargs.get('review')
             keyboard = self.get_likes_markup(review, tg_account, 'review')
@@ -281,6 +285,7 @@ class Update():
             kwargs['number'] = int(args[1])
             kwargs['review_id'] = int(args[0])
             kwargs['comments_count'] = comments_count
+            kwargs['inline_keyboard'] = message.reply_markup['inline_keyboard']
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         elif command == 'review':
