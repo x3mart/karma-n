@@ -34,7 +34,12 @@ def get_tg_account(user):
 class ReplyMarkup():
     def __init__(self):
         pass
-
+    
+    def get_resource_type_buttons(self):
+        button1 = InlineButton(text='Телефон', callback_data=f'/phone')
+        button2 = InlineButton(text='VK', callback_data=f'/vk')
+        button3 = InlineButton(text='Instagram', callback_data=f'/instagram')
+        return [button1, button2, button3]
 
     def get_button_position(self, markup, text, action=None, **kwargs):
         row = 0
@@ -286,10 +291,16 @@ class Update():
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id, text, reply_markup).send()
             else:
-                response = SendMessage(chat_id, "Введите аккаунт (durov или id123456) или номер телефона (7xxxxxxxxxx)").send()
-                self.tg_account.await_reply = True
-                self.tg_account.reply_type = 'screen_name'
-                self.tg_account.save()
+                if source == 'callback_query':
+                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы',])
+                    message.reply_markup['inline_keyboard'][row] = ReplyMarkup().get_resource_type_buttons()
+                    reply_markup = JSONRenderer().render(message.reply_markup)
+                    response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
+                else:
+                    response = SendMessage(chat_id, "Что будем искать?").send()
+                # self.tg_account.await_reply = True
+                # self.tg_account.reply_type = 'screen_name'
+                # self.tg_account.save()
         elif command in ['like', 'dislike']:
             if not self.tg_account.account or len(args) < 2:
                 return None
