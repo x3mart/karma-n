@@ -36,9 +36,9 @@ class ReplyMarkup():
         pass
     
     def get_resource_type_buttons(self):
-        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/phone')).data
-        button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/vk')).data
-        button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/instagram')).data
+        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/reviews phone')).data
+        button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/reviews vk')).data
+        button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/reviews instagram')).data
         return [button1, button2, button3]
 
     def get_button_position(self, markup, text, action=None, **kwargs):
@@ -89,7 +89,7 @@ class ReplyMarkup():
             for reviewable in kwargs['account'].reviewables.all():
                 executor_rating = reviewable.executor_rating if reviewable.executor_rating else 0
                 customer_rating = reviewable.customer_rating if reviewable.customer_rating else 0
-                button = InlineButton(text=f'{reviewable.screen_name} {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.screen_name} 0 5')
+                button = InlineButton(text=f'{reviewable.screen_name} {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.polymorphic_ctype.model} {reviewable.screen_name} 0 5')
                 keyboard.append([button])
             button = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
             keyboard.append([button])
@@ -106,7 +106,7 @@ class ReplyMarkup():
                 info_buttons.append(button2)
             keyboard.append(info_buttons)
             if kwargs['more']:
-                button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
+                button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["resource_type"]} {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
                 keyboard.append([button])
             elif kwargs['last']:
                 button = InlineButton(text='Это все отзывы. Искать еще?', callback_data=f'/reviews')
@@ -259,13 +259,13 @@ class Update():
             self.tg_account.save()
             response = SendMessage(chat_id, 'Введите email').send()
         elif command == 'reviews':
-            if len(args):
+            if len(args) > 1:
                 account_id = self.get_account_id()
-                reviews = get_reviews(account_id).filter(reviewable__screen_name=args[0]).order_by('-created_at')
+                reviews = get_reviews(account_id).filter(reviewable__polymorphic_ctype__model=args[0]).filter(reviewable__screen_name=args[1]).order_by('-created_at')
                 reviews_count = reviews.count()
                 try:
-                    offset_start = int(args[1])
-                    offset_end = int(args[2])
+                    offset_start = int(args[2])
+                    offset_end = int(args[3])
                 except:
                     offset_start = 0
                     offset_end = 5
@@ -284,7 +284,8 @@ class Update():
                     kwargs['more'] = False if count > 0 or offset_end >= reviews_count else True
                     kwargs['last'] = False if count > 0 or kwargs['more'] else True
                     kwargs['review']= review
-                    kwargs['screen_name']= args[0]
+                    kwargs['screen_name']= args[1]
+                    kwargs['resource_type']= args[1]
                     kwargs['offset_start'] = offset_end
                     kwargs['offset_end'] = offset_end + 5 if offset_end + 5 < reviews_count else reviews_count
                     text =  render_to_string('review.html', {'likeable': review})
