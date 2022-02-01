@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 import json
 from rest_framework.renderers import JSONRenderer
 from django.contrib.auth import authenticate
-
+from utils.reviewables import clean_phone
 from reviewables.models import Reviewable
 from reviews.views import get_comments, get_reviews, set_like
 from .serializers import *
@@ -286,7 +286,7 @@ class Update():
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id, text, reply_markup).send()
             else:
-                response = SendMessage(chat_id, "Введите аккаунт (durov или id123456) или номер телефона (7(xxx)xxx-xx-xx)").send()
+                response = SendMessage(chat_id, "Введите аккаунт (durov или id123456) или номер телефона (7xxxxxxxxxx)").send()
                 self.tg_account.await_reply = True
                 self.tg_account.reply_type = 'screen_name'
                 self.tg_account.save()
