@@ -79,12 +79,27 @@ class ReplyMarkup():
                 button = InlineButton(text=f'{reviewable.screen_name} {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.screen_name} 0 5')
                 keyboard.append([button])
             keyboard.append([button2])
+        elif name == 'user_info':
+            keyboard = []
+            for reviewable in kwargs['account'].reviewables.all():
+                executor_rating = reviewable.executor_rating if reviewable.executor_rating else 0
+                customer_rating = reviewable.customer_rating if reviewable.customer_rating else 0
+                button = InlineButton(text=f'{reviewable.screen_name} {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.screen_name} 0 5')
+                keyboard.append([button])
+            button = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
+            keyboard.append([button])
         elif name == 'reviews':
             review = kwargs.get('review')
             keyboard = self.get_likes_markup(review, tg_account, 'review')
             if review.comments.filter(is_active=True).exists():
                 button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
                 keyboard.append([button])
+            button1 = InlineButton(text='Об авторе', callback_data=f'/user_info {review.owner.id}')
+            info_buttons = [button1]
+            if review.reviewable.owner:
+                button2 = InlineButton(text='О владельце', callback_data=f'/user_info {review.reviewable.owner.id}')
+                info_buttons.append(button2)
+            keyboard.append(info_buttons)
             if kwargs['more']:
                 button = InlineButton(text='Показать еще', callback_data=f'/reviews {kwargs["screen_name"]} {kwargs["offset_start"]} {kwargs["offset_end"]}')
                 keyboard.append([button])
@@ -212,8 +227,9 @@ class Update():
             response = SendMessage(chat_id, text, reply_markup).send()
         elif command == 'user_info':
             try:
-                text = render_to_string('user_info.html', {'user': Account.objects.get(pk=int(args[0]))})
-                reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account)
+                account = Account.objects.get(pk=int(args[0]))
+                text = render_to_string('user_info.html', {'user': account})
+                reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             except:
                 text = "Такого пользователя нет"
                 reply_markup = None
