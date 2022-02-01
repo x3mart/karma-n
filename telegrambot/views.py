@@ -291,7 +291,7 @@ class Update():
                     text =  render_to_string('review.html', {'likeable': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id, text, reply_markup).send()
-            if len(args) == 1:
+            elif len(args) == 1:
                 self.tg_account.await_reply = True
                 self.tg_account.reply_1 = args[0]
                 self.tg_account.reply_type = 'screen_name'
