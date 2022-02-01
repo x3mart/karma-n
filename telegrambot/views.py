@@ -58,7 +58,7 @@ class ReplyMarkup():
             keyboard = [[button1, button2]]
         return keyboard
     
-    def get_more_button(inline_keyboard):
+    def get_more_button(self, inline_keyboard):
         row, position = ReplyMarkup().get_button_position(inline_keyboard, ['Показать еще',])
         if row:
             return inline_keyboard[row]
