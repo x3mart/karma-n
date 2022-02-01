@@ -296,6 +296,7 @@ class Update():
                 self.tg_account.reply_1 = args[0]
                 self.tg_account.reply_type = 'screen_name'
                 self.tg_account.save()
+                response = SendMessage(chat_id, f"Введите {'телефон' if args[0] == 'phone' else 'акаунт'}").send()
             else:
                 if source == 'callback_query':
                     row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы',])
