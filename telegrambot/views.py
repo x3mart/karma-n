@@ -299,7 +299,7 @@ class Update():
                 response = SendMessage(chat_id, f"Введите {'телефон' if args[0] == 'phone' else 'акаунт'}").send()
             else:
                 if source == 'callback_query':
-                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы',])
+                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы', 'Это все отзывы. Искать еще?'])
                     message.reply_markup['inline_keyboard'][row] = ReplyMarkup().get_resource_type_buttons()
                     reply_markup = JSONRenderer().render(message.reply_markup)
                     response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
