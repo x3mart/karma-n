@@ -126,6 +126,12 @@ class ReplyMarkup():
             keyboard = self.get_likes_markup(review, tg_account, 'review')
             button = InlineButton(text='Посмотреть коментарии', callback_data=f'/comments {review.id} 0')
             keyboard.append([button])
+            button1 = InlineButton(text='Об авторе', callback_data=f'/user_info {review.owner_id}')
+            info_buttons = [button1]
+            if review.reviewable.owner:
+                button2 = InlineButton(text='О владельце', callback_data=f'/user_info {review.reviewable.owner_id}')
+                info_buttons.append(button2)
+            keyboard.append(info_buttons)
             button = self.get_more_button(kwargs['inline_keyboard'])
             if button:
                 keyboard.append(button)
