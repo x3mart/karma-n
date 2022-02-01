@@ -228,6 +228,7 @@ class Update():
         elif command == 'user_info':
             try:
                 account = Account.objects.get(pk=int(args[0]))
+                kwargs['account'] = account
                 text = render_to_string('user_info.html', {'user': account})
                 reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             except:
