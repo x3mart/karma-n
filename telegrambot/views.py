@@ -43,7 +43,7 @@ class ReplyMarkup():
                 if markup[row][button]['text'] in text:
                     return (row, button)
             row +=1
-        return (123, 123) 
+        return (None, None) 
     
     def get_edited_markup(self, markup, text, action=None, **kwargs):
         pass
@@ -59,7 +59,7 @@ class ReplyMarkup():
         return keyboard
     
     def get_more_button(self, inline_keyboard):
-        row, position = ReplyMarkup().get_button_position(inline_keyboard, ['Показать еще',])
+        row, position = self.get_button_position(inline_keyboard, ['Показать еще',])
         if row:
             return inline_keyboard[row]
         return None
