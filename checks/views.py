@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from .serializers import GetCodeSerializer, CheckCodeSerializer
 from karman.settings import SMS_SECRET, VK_SECRET, VK_TOKEN
 import numpy as np
+from utils.reviewables import clean_phone
 from reviewables.models import Vk, Phone, Instagram, Reviewable
 
 # Create your views here.
@@ -52,15 +53,16 @@ def get_code(request):
     type = data.get('resourcetype', None)
     code = set_code()
     if screen_name and type == 'phone':
+        screen_name = clean_phone(screen_name)
+        data['screen_name'] = screen_name
         check, created = Check.objects.get_or_create(**data)
         error_message = send_code_possibility(check, created)
         if error_message:
             return Response(error_message, status=400)
-        phone_number = screen_name.replace(' ','').replace('(','').replace(')','').replace('-','')
         url = 'https://sms.ru/sms/send'
         sms_data = {
             'api_id': SMS_SECRET,
-            'to':phone_number,
+            'to':screen_name,
             'msg':f'Ваш код подтверждения телефона на сайте Karma-N {code}',
             'json':1
             }
