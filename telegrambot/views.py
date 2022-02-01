@@ -299,7 +299,7 @@ class Update():
                 else:
                     reply_markup = {'inline_keyboard': [ReplyMarkup().get_resource_type_buttons()]}
                     reply_markup = JSONRenderer().render(reply_markup)
-                    response = SendMessage(chat_id, "Что будем искать?").send()
+                    response = SendMessage(chat_id, "Что будем искать?", reply_markup).send()
                 # self.tg_account.await_reply = True
                 # self.tg_account.reply_type = 'screen_name'
                 # self.tg_account.save()
