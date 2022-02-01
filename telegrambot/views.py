@@ -291,6 +291,11 @@ class Update():
                     text =  render_to_string('review.html', {'likeable': review})
                     reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
                     response = SendMessage(chat_id, text, reply_markup).send()
+            if len(args) == 1:
+                self.tg_account.await_reply = True
+                self.tg_account.reply_1 = args[0]
+                self.tg_account.reply_type = 'screen_name'
+                self.tg_account.save()
             else:
                 if source == 'callback_query':
                     row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы',])
@@ -301,9 +306,6 @@ class Update():
                     reply_markup = {'inline_keyboard': [ReplyMarkup().get_resource_type_buttons()]}
                     reply_markup = JSONRenderer().render(reply_markup)
                     response = SendMessage(chat_id, "Что будем искать?", reply_markup).send()
-                # self.tg_account.await_reply = True
-                # self.tg_account.reply_type = 'screen_name'
-                # self.tg_account.save()
         elif command in ['like', 'dislike']:
             if not self.tg_account.account or len(args) < 2:
                 return None
@@ -367,9 +369,10 @@ class Update():
             self.tg_account.reply_1 = None
             self.tg_account.save()
         if self.tg_account.reply_type =='screen_name':
-            args = [text, '0', '5']
+            args = [self.tg_account.reply_1, text, '0', '5']
             response = self.command_dispatcher('message', 'reviews', args)
             self.tg_account.await_reply = False
+            self.tg_account.reply_1 = None
             self.tg_account.reply_type = None
             self.tg_account.save()
         return response
