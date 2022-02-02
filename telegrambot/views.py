@@ -287,10 +287,14 @@ class Update():
             response = SendMessage(chat_id, 'Введите email').send()
         elif command == 'addreview' and not len(args):
             response = self.change_to_resource_type_buttons(message, chat_id, command)
-        elif command == 'addreview' and len(args):
-            self.tg_account.await_reply = True
+        elif command == 'addreview' and len(args) and not self.tg_account.reply_1:
+            response = self.change_to_about_customer_buttons(message, chat_id, command)
             self.tg_account.reply_1 = args[0]
-            self.tg_account.reply_type = 'screen_name'
+            self.tg_account.save()
+        elif command == 'addreview' and len(args) and self.tg_account.reply_1:
+            self.tg_account.await_reply = True
+            self.tg_account.reply_type = 'addreview screen_name'
+            self.tg_account.reply_2 = args[0]
             self.tg_account.save()
             text = "Введите номер или аккаунт"
             response = SendMessage(chat_id, text).send()
@@ -400,7 +404,7 @@ class Update():
             self.tg_account.reply_type = None
             self.tg_account.reply_1 = None
             self.tg_account.save()
-        elif self.tg_account.reply_type =='screen_name' and not command:
+        elif self.tg_account.reply_type =='screen_name':
             if self.tg_account.reply_1 == 'phone':
                 text = clean_phone(text)
             args = [self.tg_account.reply_1, text, '0', '5']
@@ -409,17 +413,16 @@ class Update():
             self.tg_account.reply_1 = None
             self.tg_account.reply_type = None
             self.tg_account.save()
-        elif self.tg_account.reply_type =='screen_name' and command == 'addreview':
+        elif self.tg_account.reply_type =='addreview screen_name':
             chat_id = self.get_chat('callback_query')
             message = self.get_message('callback_query')
             if self.tg_account.reply_1 == 'phone':
                 text = clean_phone(text)
-            response = self.change_to_about_customer_buttons(message, chat_id, command)
-            self.tg_account.reply_2 = text
-            self.tg_account.reply_type = 'review_body'
-            self.tg_account.save()
-        elif self.tg_account.reply_type == 'review_body' and command == 'addreview':
             self.tg_account.reply_3 = text
+            self.tg_account.reply_type = 'addreview body'
+            self.tg_account.save()
+        elif self.tg_account.reply_type == 'addreview body':
+            self.tg_account.reply_4 = text
             self.tg_account.reply_type = 'attributes'
             self.tg_account.save()
         return response
