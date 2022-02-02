@@ -1,6 +1,5 @@
 from django.db import models
 from polymorphic.models import PolymorphicModel
-from phonenumber_field.modelfields import PhoneNumberField
 
 # Create your models here.
 class Reviewable(PolymorphicModel):

@@ -137,6 +137,8 @@ def check_code(request):
         return Response({'error':'Истек срок ввода кода подтверждения'}, status=400)
     if code == check.code:
         check.aproved = True
+        if check.email and check.email != request.user.email:
+            reviewable = Reviewable.objects.filter(screen_name=screen_name).filter(polymorphic_ctype__model=type).delete()
         check.email = request.user.email
         check.save()
         model = apps.get_model('reviewables', type.capitalize())

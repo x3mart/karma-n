@@ -19,4 +19,8 @@ class AccountViewSet(UserViewSet):
             return settings.SERIALIZERS.users_list
         return super().get_serializer_class()
     
+    def perform_destroy(self, instance):
+        instance.reviewables.clear()
+        return super().perform_destroy(instance)
+    
         
