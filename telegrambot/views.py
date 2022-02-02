@@ -78,13 +78,14 @@ class ReplyMarkup():
         elif name == 'me' and tg_account and tg_account.account:
             button1 = InlineButton(text='Редактировать', url='https://novosti247.ru')
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
+            button3 = InlineButton(text='Написать отзыв', callback_data=f'/addreview')
             keyboard = [[button1]]
             for reviewable in tg_account.account.reviewables.all():
                 executor_rating = reviewable.executor_rating if reviewable.executor_rating else 0
                 customer_rating = reviewable.customer_rating if reviewable.customer_rating else 0
                 button = InlineButton(text=f'{reviewable.screen_name} {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.polymorphic_ctype.model} {reviewable.screen_name} 0 5')
                 keyboard.append([button])
-            keyboard.append([button2])
+            keyboard.append([button2, button3])
         elif name == 'user_info':
             keyboard = []
             for reviewable in kwargs['account'].reviewables.all():
@@ -234,6 +235,12 @@ class Update():
         response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
         return response
     
+    def change_to_resource_type_buttons(self, message, chat_id, command):
+        row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы', 'Это все отзывы. Искать еще?', 'Написать отзыв'])
+        message.reply_markup['inline_keyboard'][row] = ReplyMarkup().get_resource_type_buttons(command)
+        reply_markup = JSONRenderer().render(message.reply_markup)
+        response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
+    
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
         message = self.get_message(source)
@@ -267,6 +274,11 @@ class Update():
             self.tg_account.reply_type = 'email'
             self.tg_account.save()
             response = SendMessage(chat_id, 'Введите email').send()
+        elif command == 'addreview':
+            response = self.change_to_resource_type_buttons(message, chat_id, command)
+            self.tg_account.await_reply = True
+            self.tg_account.reply_type = 'screen_name'
+            self.tg_account.save()
         elif command == 'reviews':
             if len(args) > 1:
                 account_id = self.get_account_id()
@@ -305,10 +317,7 @@ class Update():
                 response = SendMessage(chat_id, f"Введите {'телефон' if args[0] == 'phone' else 'акаунт'}").send()
             else:
                 if source == 'callback_query':
-                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы', 'Это все отзывы. Искать еще?'])
-                    message.reply_markup['inline_keyboard'][row] = ReplyMarkup().get_resource_type_buttons(command)
-                    reply_markup = JSONRenderer().render(message.reply_markup)
-                    response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
+                    response = self.change_to_resource_type_buttons(message, chat_id, command)
                 else:
                     reply_markup = {'inline_keyboard': [ReplyMarkup().get_resource_type_buttons(command)]}
                     reply_markup = JSONRenderer().render(reply_markup)
