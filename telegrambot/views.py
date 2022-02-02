@@ -285,11 +285,15 @@ class Update():
             self.tg_account.reply_type = 'email'
             self.tg_account.save()
             response = SendMessage(chat_id, 'Введите email').send()
-        elif command == 'addreview':
+        elif command == 'addreview' and not len(args):
             response = self.change_to_resource_type_buttons(message, chat_id, command)
+        elif command == 'addreview' and len(args):
             self.tg_account.await_reply = True
+            self.tg_account.reply_1 = args[0]
             self.tg_account.reply_type = 'screen_name'
             self.tg_account.save()
+            text = "Введите номер или аккаунт"
+            response = SendMessage(chat_id, text).send()
         elif command == 'reviews':
             if len(args) > 1:
                 account_id = self.get_account_id()
@@ -450,19 +454,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    try:
-        update = Update(request.data)
-        if hasattr(update,'message'):
-            # response = SendMessage(chat_id=1045490278, text='message').send()
-            update.message_dispatcher()
-        elif hasattr(update,'callback_query'):
+    # try:
+    update = Update(request.data)
+    if hasattr(update,'message'):
+        # response = SendMessage(chat_id=1045490278, text='message').send()
+        update.message_dispatcher()
+    elif hasattr(update,'callback_query'):
             update.callback_dispatcher()
         # method = "sendMessage"
         # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
         # data = SendMessageSerializer(send_message).data
         # requests.post(TG_URL + method, data)
-    except:
-        pass
+    # except:
+        # pass
     return Response({}, status=200)
 
     
