@@ -40,6 +40,11 @@ class ReplyMarkup():
         button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/{command} vk')).data
         button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/{command} instagram')).data
         return [button1, button2, button3]
+    
+    def get_about_customer_buttons(self, command):
+        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Об Исполнителе', callback_data=f'/{command} executor')).data
+        button2 = InlineKeyboardButtonSerializer(InlineButton(text='О Клиенте', callback_data=f'/{command} customer')).data
+        return [button1, button2]
 
     def get_button_position(self, markup, text, action=None, **kwargs):
         row = 0
@@ -241,6 +246,12 @@ class Update():
         reply_markup = JSONRenderer().render(message.reply_markup)
         response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
     
+    def change_to_about_customer_buttons(self, message, chat_id, command):
+        row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Телефон', 'VK', 'Instagram'])
+        message.reply_markup['inline_keyboard'][row] = ReplyMarkup().get_about_customer_buttons(command)
+        reply_markup = JSONRenderer().render(message.reply_markup)
+        response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
+    
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
         message = self.get_message(source)
@@ -394,9 +405,19 @@ class Update():
             self.tg_account.reply_1 = None
             self.tg_account.reply_type = None
             self.tg_account.save()
-        elif self.tg_account.reply_type =='screen_name' and not command:
+        elif self.tg_account.reply_type =='screen_name' and command == 'addreview':
+            chat_id = self.get_chat('callback_query')
+            message = self.get_message('callback_query')
             if self.tg_account.reply_1 == 'phone':
                 text = clean_phone(text)
+            response = self.change_to_about_customer_buttons(message, chat_id, command)
+            self.tg_account.reply_2 = text
+            self.tg_account.reply_type = 'review_body'
+            self.tg_account.save()
+        elif self.tg_account.reply_type == 'review_body' and command == 'addreview':
+            self.tg_account.reply_3 = text
+            self.tg_account.reply_type = 'attributes'
+            self.tg_account.save()
         return response
     
     def message_dispatcher(self):
