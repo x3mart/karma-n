@@ -198,6 +198,7 @@ class Update():
                 self.__setattr__(key, CallbackQuery(value))
             else:
                 self.__setattr__(key, value)
+    
     def get_account_id(self):
         return self.tg_account.account.id if self.tg_account.account else 1
     
@@ -224,6 +225,13 @@ class Update():
         else:
             message=self.message
         return message
+    
+    def remove_more_button(self, message, chat_id):
+        row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Показать еще',])
+        message.reply_markup['inline_keyboard'].pop(row)
+        reply_markup = JSONRenderer().render(message.reply_markup)
+        response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
+        return response
     
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
@@ -275,10 +283,7 @@ class Update():
                     response = SendMessage(chat_id, "Отзывов нет").send()
                 # Убираем кнопку "Показать еще" после нажатия
                 if offset_start > 0:
-                    row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Показать еще',])
-                    message.reply_markup['inline_keyboard'].pop(row)
-                    reply_markup = JSONRenderer().render(message.reply_markup)
-                    response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
+                    response = self.remove_more_button(message, chat_id)
                 for review in reviews:
                     count -= 1
                     kwargs['more'] = False if count > 0 or offset_end >= reviews_count else True
@@ -370,6 +375,8 @@ class Update():
             self.tg_account.reply_1 = None
             self.tg_account.save()
         if self.tg_account.reply_type =='screen_name':
+            if self.tg_account.reply_1 == 'phone':
+                text = clean_phone(text)
             args = [self.tg_account.reply_1, text, '0', '5']
             response = self.command_dispatcher('message', 'reviews', args)
             self.tg_account.await_reply = False
