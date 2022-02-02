@@ -73,8 +73,8 @@ class ReplyMarkup():
         if name == 'start' and tg_account and tg_account.account:
             button1 = InlineButton(text='Инфа о себе', callback_data=f'/me')
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
-            button2 = InlineButton(text='Написать отзыв', callback_data=f'/addreview')
-            keyboard = [[button1], [button2]]
+            button3 = InlineButton(text='Написать отзыв', callback_data=f'/addreview')
+            keyboard = [[button1], [button2, button3]]
         elif name == 'me' and tg_account and tg_account.account:
             button1 = InlineButton(text='Редактировать', url='https://novosti247.ru')
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
@@ -240,6 +240,7 @@ class Update():
         kwargs = {}
         if command == 'start':
             if self.tg_account.account:
+                print(self.tg_account.account)
                 text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
             else:
                 text = render_to_string('start.html', {'reviews_count': Review.objects.count(), 'reviewable_count': Reviewable.objects.count()})
