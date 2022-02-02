@@ -384,6 +384,8 @@ class Update():
         return response
     
     def await_despatcher(self, text, command=None, args=None):
+        chat_id = self.get_chat('callback_query')
+        message = self.get_message('callback_query')
         if self.tg_account.reply_type =='email':
             self.tg_account.reply_type = 'password'
             self.tg_account.reply_1 = text.strip()
@@ -414,17 +416,17 @@ class Update():
             self.tg_account.reply_type = None
             self.tg_account.save()
         elif self.tg_account.reply_type =='addreview screen_name':
-            chat_id = self.get_chat('callback_query')
-            message = self.get_message('callback_query')
             if self.tg_account.reply_1 == 'phone':
                 text = clean_phone(text)
             self.tg_account.reply_3 = text
             self.tg_account.reply_type = 'addreview body'
             self.tg_account.save()
+            response = SendMessage(chat_id, 'Напишите текст отзыва').send()
         elif self.tg_account.reply_type == 'addreview body':
             self.tg_account.reply_4 = text
             self.tg_account.reply_type = 'attributes'
             self.tg_account.save()
+            response = SendMessage(chat_id, 'Оцените').send()
         return response
     
     def message_dispatcher(self):

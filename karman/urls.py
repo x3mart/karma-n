@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/', include('notifications.urls')),
     path('api/', include('complaints.urls')),
     path('api/', include('services.urls')),
+    path('api/', include('reviewables.urls')),
     path('api/', include('telegrambot.urls')),
 ]
 if settings.DEBUG:
