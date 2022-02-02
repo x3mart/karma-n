@@ -364,7 +364,7 @@ class Update():
             response = None
         return response
     
-    def await_despatcher(self, text,):
+    def await_despatcher(self, text, command=None, args=None):
         if self.tg_account.reply_type =='email':
             self.tg_account.reply_type = 'password'
             self.tg_account.reply_1 = text.strip()
@@ -385,7 +385,7 @@ class Update():
             self.tg_account.reply_type = None
             self.tg_account.reply_1 = None
             self.tg_account.save()
-        if self.tg_account.reply_type =='screen_name':
+        elif self.tg_account.reply_type =='screen_name' and not command:
             if self.tg_account.reply_1 == 'phone':
                 text = clean_phone(text)
             args = [self.tg_account.reply_1, text, '0', '5']
@@ -394,13 +394,16 @@ class Update():
             self.tg_account.reply_1 = None
             self.tg_account.reply_type = None
             self.tg_account.save()
+        elif self.tg_account.reply_type =='screen_name' and not command:
+            if self.tg_account.reply_1 == 'phone':
+                text = clean_phone(text)
         return response
     
     def message_dispatcher(self):
         command, args = self.command_handler(self.message.text)
         self.tg_account = get_tg_account(self.message.user)
         if self.tg_account.await_reply:
-            response = self.await_despatcher(self.message.text)
+            response = self.await_despatcher(self.message.text, command, args)
         if command:
             # response = SendMessage(chat_id=1045490278, text=command).send()
             response = self.command_dispatcher('message', command, args)

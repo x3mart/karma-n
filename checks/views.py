@@ -15,6 +15,8 @@ from karman.settings import SMS_SECRET, VK_SECRET, VK_TOKEN
 import numpy as np
 from utils.reviewables import clean_phone
 from reviewables.models import Vk, Phone, Instagram, Reviewable
+from accounts.models import Account
+from accounts.serializers import AccountSerializer
 
 # Create your views here.
 def set_code():
@@ -154,7 +156,8 @@ def check_code(request):
             reviewable.user_type = response.get('type', None)
         reviewable.owner = request.user
         reviewable.save()
-        return Response({},status=200)
+        account = Account.objects.get(pk=request.user.id)
+        return Response(AccountSerializer(account).data, status=200)
     else:
         return Response({'error':'Неверный код подтверждения'}, status=400)
 
