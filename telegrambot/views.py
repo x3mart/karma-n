@@ -36,9 +36,9 @@ class ReplyMarkup():
         pass
     
     def get_resource_type_buttons(self, command):
-        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/command phone')).data
-        button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/command vk')).data
-        button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/command instagram')).data
+        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/{command} phone')).data
+        button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/{command} vk')).data
+        button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/{command} instagram')).data
         return [button1, button2, button3]
 
     def get_button_position(self, markup, text, action=None, **kwargs):
@@ -240,7 +240,6 @@ class Update():
         kwargs = {}
         if command == 'start':
             if self.tg_account.account:
-                print(self.tg_account.account)
                 text = render_to_string('start_for_auth.html', {'account': self.tg_account.account})
             else:
                 text = render_to_string('start.html', {'reviews_count': Review.objects.count(), 'reviewable_count': Reviewable.objects.count()})
