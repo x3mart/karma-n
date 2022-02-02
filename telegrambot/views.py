@@ -35,10 +35,10 @@ class ReplyMarkup():
     def __init__(self):
         pass
     
-    def get_resource_type_buttons(self):
-        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/reviews phone')).data
-        button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/reviews vk')).data
-        button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/reviews instagram')).data
+    def get_resource_type_buttons(self, command):
+        button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/command phone')).data
+        button2 = InlineKeyboardButtonSerializer(InlineButton(text='VK', callback_data=f'/command vk')).data
+        button3 = InlineKeyboardButtonSerializer(InlineButton(text='Instagram', callback_data=f'/command instagram')).data
         return [button1, button2, button3]
 
     def get_button_position(self, markup, text, action=None, **kwargs):
@@ -73,6 +73,7 @@ class ReplyMarkup():
         if name == 'start' and tg_account and tg_account.account:
             button1 = InlineButton(text='Инфа о себе', callback_data=f'/me')
             button2 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
+            button2 = InlineButton(text='Написать отзыв', callback_data=f'/addreview')
             keyboard = [[button1], [button2]]
         elif name == 'me' and tg_account and tg_account.account:
             button1 = InlineButton(text='Редактировать', url='https://novosti247.ru')
@@ -305,11 +306,11 @@ class Update():
             else:
                 if source == 'callback_query':
                     row, position = ReplyMarkup().get_button_position(message.reply_markup['inline_keyboard'], ['Искать отзывы', 'Это все отзывы. Искать еще?'])
-                    message.reply_markup['inline_keyboard'][row] = ReplyMarkup().get_resource_type_buttons()
+                    message.reply_markup['inline_keyboard'][row] = ReplyMarkup().get_resource_type_buttons(command)
                     reply_markup = JSONRenderer().render(message.reply_markup)
                     response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
                 else:
-                    reply_markup = {'inline_keyboard': [ReplyMarkup().get_resource_type_buttons()]}
+                    reply_markup = {'inline_keyboard': [ReplyMarkup().get_resource_type_buttons(command)]}
                     reply_markup = JSONRenderer().render(reply_markup)
                     response = SendMessage(chat_id, "Что будем искать?", reply_markup).send()
         elif command in ['like', 'dislike']:
@@ -362,6 +363,7 @@ class Update():
             response = SendMessage(chat_id=self.message.chat.id, text='Введите пароль').send()
         elif self.tg_account.reply_type =='password':
             account = authenticate(email=self.tg_account.reply_1, password=text.strip())
+            reply_markup = ReplyMarkup().get_markup('start', self.tg_account)
             if account is not None:
                 self.tg_account.account = account
                 text = render_to_string('start_for_auth.html', {'account': account})
@@ -369,7 +371,7 @@ class Update():
                 response = SendMessage(chat_id=self.message.chat.id, text=text, reply_markup=reply_markup).send()
                 response = requests.post(TG_URL + 'deleteMessage', data={'chat_id':self.message.chat.id, 'message_id': self.message.message_id})
             else:
-                response = SendMessage(chat_id=self.message.chat.id, text='Фигня').send()
+                response = SendMessage(chat_id=self.message.chat.id, text='Учетные данные не верны', reply_markup=reply_markup).send()
             self.tg_account.await_reply = False
             self.tg_account.reply_type = None
             self.tg_account.reply_1 = None
