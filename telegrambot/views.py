@@ -436,8 +436,8 @@ class Update():
         command, args = self.command_handler(self.message.text)
         self.tg_account = get_tg_account(self.message.user)
         if self.tg_account.await_reply:
-            response = SendMessage(1045490278, self.message.text).send()
             response = self.await_despatcher(self.message.text, command, args)
+            response = SendMessage(1045490278, response.json).send()
         if command:
             # response = SendMessage(chat_id=1045490278, text=command).send()
             response = self.command_dispatcher('message', command, args)
