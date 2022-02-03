@@ -411,6 +411,7 @@ class Update():
             if self.tg_account.reply_1 == 'phone':
                 text = clean_phone(text)
             args = [self.tg_account.reply_1, text, '0', '5']
+            response = SendMessage(chat_id, text).send()
             response = self.command_dispatcher('message', 'reviews', args)
             self.tg_account.await_reply = False
             self.tg_account.reply_1 = None
