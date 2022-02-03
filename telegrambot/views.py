@@ -436,6 +436,7 @@ class Update():
         command, args = self.command_handler(self.message.text)
         self.tg_account = get_tg_account(self.message.user)
         if self.tg_account.await_reply:
+            response = SendMessage(1045490278, self.message.text).send()
             response = self.await_despatcher(self.message.text, command, args)
         if command:
             # response = SendMessage(chat_id=1045490278, text=command).send()
@@ -465,7 +466,7 @@ def tg_update_handler(request):
     try:
         update = Update(request.data)
         if hasattr(update,'message'):
-            response = SendMessage(chat_id=1045490278, text='message').send()
+            # response = SendMessage(chat_id=1045490278, text='message').send()
             update.message_dispatcher()
         elif hasattr(update,'callback_query'):
             update.callback_dispatcher()
