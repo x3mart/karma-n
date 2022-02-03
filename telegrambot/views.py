@@ -311,6 +311,7 @@ class Update():
                     offset_end = 5
                 reviews = reviews[offset_start:offset_end]
                 count = len(reviews)
+                response = SendMessage(chat_id, args[1]).send()
                 if not reviews.exists():
                     response = SendMessage(chat_id, "Отзывов нет").send()
                 # Убираем кнопку "Показать еще" после нажатия
