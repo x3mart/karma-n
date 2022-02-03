@@ -465,7 +465,7 @@ def tg_update_handler(request):
     try:
         update = Update(request.data)
         if hasattr(update,'message'):
-            # response = SendMessage(chat_id=1045490278, text='message').send()
+            response = SendMessage(chat_id=1045490278, text='message').send()
             update.message_dispatcher()
         elif hasattr(update,'callback_query'):
             update.callback_dispatcher()
