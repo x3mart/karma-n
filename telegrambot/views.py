@@ -165,7 +165,8 @@ class ReplyMarkup():
             if button:
                 keyboard.append(button)
         elif name == 'addreview':
-            response = SendMessage(1045490278, kwargs['attribute']).send()
+            SendMessage(1045490278, 'kwargs').send()
+            SendMessage(1045490278, kwargs['attribute']).send()
             keyboard = self.get_review_attributes_buttons(kwargs['attribute'])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
