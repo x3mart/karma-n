@@ -300,7 +300,6 @@ class Update():
             response = SendMessage(chat_id, text).send()
         elif command == 'reviews':
             if len(args) > 1:
-                response = SendMessage(chat_id, args[1]).send()
                 account_id = self.get_account_id()
                 reviews = get_reviews(account_id).filter(reviewable__polymorphic_ctype__model=args[0]).filter(reviewable__screen_name=args[1]).order_by('-created_at')
                 reviews_count = reviews.count()
@@ -387,7 +386,7 @@ class Update():
     def await_despatcher(self, text, command=None, args=None):
         chat_id = self.get_chat('callback_query')
         message = self.get_message('callback_query')
-        response = SendMessage(chat_id, text).send()
+        # response = SendMessage(chat_id, text).send()
         if self.tg_account.reply_type =='email':
             self.tg_account.reply_type = 'password'
             self.tg_account.reply_1 = text.strip()
@@ -412,7 +411,7 @@ class Update():
             if self.tg_account.reply_1 == 'phone':
                 text = clean_phone(text)
             args = [self.tg_account.reply_1, text, '0', '5']
-            response = SendMessage(chat_id, text).send()
+            # response = SendMessage(chat_id, text).send()
             response = self.command_dispatcher('message', 'reviews', args)
             self.tg_account.await_reply = False
             self.tg_account.reply_1 = None
@@ -450,8 +449,6 @@ class Update():
         command, args = self.command_handler(self.callback_query.data)
         self.tg_account = get_tg_account(self.callback_query.user)
         response = self.callback_query.answer()
-        # if self.tg_account.await_reply:
-        #     response = self.await_despatcher(self.callback_query.data, command, args)
         if command:
             response = self.command_dispatcher('callback_query', command, args)
         else:
