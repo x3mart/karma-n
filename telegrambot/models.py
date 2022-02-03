@@ -18,6 +18,11 @@ class TelegramAccount(models.Model):
     reply_3 = models.TextField(null=True, blank=True)
     reply_4 = models.TextField(null=True, blank=True)
     reply_5 = models.TextField(null=True, blank=True)
+    reply_6 = models.TextField(null=True, blank=True)
+    reply_7 = models.TextField(null=True, blank=True)
+    reply_8 = models.TextField(null=True, blank=True)
+    reply_9 = models.TextField(null=True, blank=True)
+    reply_10 = models.TextField(null=True, blank=True)
 
     # def __str__(self) -> str:
     #     return self.username
