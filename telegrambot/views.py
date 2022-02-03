@@ -448,6 +448,8 @@ class Update():
             self.tg_account.save()
             reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account)
             response = SendMessage(chat_id, text, reply_markup).send()
+        else:
+            response = self.command_dispatcher('message', command, args) if command else None     
         return response
     
     def message_dispatcher(self):
