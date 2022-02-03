@@ -387,6 +387,7 @@ class Update():
     def await_despatcher(self, text, command=None, args=None):
         chat_id = self.get_chat('callback_query')
         message = self.get_message('callback_query')
+        response = SendMessage(chat_id, text).send()
         if self.tg_account.reply_type =='email':
             self.tg_account.reply_type = 'password'
             self.tg_account.reply_1 = text.strip()
