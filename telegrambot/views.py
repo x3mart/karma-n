@@ -31,24 +31,25 @@ def get_tg_account(user):
         tg_account = tg_account.first()
     return tg_account
 
+def get_attributes(about):
+    if about == 'customer':
+        return AttributeTitle.objects.filter(about_customer=True)
+    else:
+        return AttributeTitle.objects.filter(about_customer=False)
+
+
 class ReplyMarkup():
     def __init__(self):
         pass
 
-    def get_review_attributes_buttons(self, about):
-        if about == 'customer':
-            attributes = AttributeTitle.objects.filter(about_customer=True)
-        else:
-            attributes = AttributeTitle.objects.filter(about_customer=False)
+    def get_review_attributes_buttons(self, attribute):
         buttons = []
-        for attribute in attributes:
-            button1 = InlineKeyboardButtonSerializer(InlineButton(text=f'{attribute.title}', callback_data=f'/{attribute.id}')).data
-            button2 = InlineKeyboardButtonSerializer(InlineButton(text=f'1', callback_data=f'/attribute_value {attribute.id} 1')).data
-            button3 = InlineKeyboardButtonSerializer(InlineButton(text=f'2', callback_data=f'/attribute_value {attribute.id} 2')).data
-            button4 = InlineKeyboardButtonSerializer(InlineButton(text=f'3', callback_data=f'/attribute_value {attribute.id} 3')).data
-            button5 = InlineKeyboardButtonSerializer(InlineButton(text=f'4', callback_data=f'/attribute_value {attribute.id} 4')).data
-            button6 = InlineKeyboardButtonSerializer(InlineButton(text=f'5', callback_data=f'/attribute_value {attribute.id} 5')).data
-            buttons.append([button1, button2, button3, button4, button5, button6])
+        button2 = InlineKeyboardButtonSerializer(InlineButton(text=f'1', callback_data=f'/attribute_value {attribute} 1')).data
+        button3 = InlineKeyboardButtonSerializer(InlineButton(text=f'2', callback_data=f'/attribute_value {attribute} 2')).data
+        button4 = InlineKeyboardButtonSerializer(InlineButton(text=f'3', callback_data=f'/attribute_value {attribute} 3')).data
+        button5 = InlineKeyboardButtonSerializer(InlineButton(text=f'4', callback_data=f'/attribute_value {attribute} 4')).data
+        button6 = InlineKeyboardButtonSerializer(InlineButton(text=f'5', callback_data=f'/attribute_value {attribute} 5')).data
+        buttons.append([button2, button3, button4, button5, button6])
         return buttons
     
     def get_resource_type_buttons(self, command):
@@ -164,7 +165,7 @@ class ReplyMarkup():
             if button:
                 keyboard.append(button)
         elif name == 'addreview':
-            keyboard = self.get_review_attributes_buttons(tg_account.reply_2)
+            keyboard = self.get_review_attributes_buttons(kwargs['attribute'])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -444,12 +445,18 @@ class Update():
             response = SendMessage(chat_id, 'Напишите текст отзыва').send()
         elif self.tg_account.reply_type == 'addreview body':
             self.tg_account.reply_4 = text
-            self.tg_account.reply_type = 'addreview attributes'
+            self.tg_account.reply_type = 'addreview attribute 1'
             self.tg_account.save()
-            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account)
+            attribute = get_attributes(self.tg_account.reply_2)[0]
+            text = f'Оцените {attribute.title}'
+            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, {'atribute': attribute.id})
             response = SendMessage(chat_id, text, reply_markup).send()
         else:
-            response = self.command_dispatcher('message', command, args) if command else None     
+            response = self.command_dispatcher('message', command, args) if command else None 
+            self.tg_account.await_reply = False
+            self.tg_account.reply_1 = None
+            self.tg_account.reply_type = None
+            self.tg_account.save()    
         return response
     
     def message_dispatcher(self):
