@@ -17,7 +17,7 @@ from reviewables.models import Reviewable
 from reviews.views import get_comments, get_reviews, set_like
 from .serializers import *
 from .models import *
-from reviews.models import Review
+from reviews.models import AttributeTitle, Review
 
 
 COMMANDS_LIST = ('reviews', 'review', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments', 'addreview')
@@ -34,6 +34,21 @@ def get_tg_account(user):
 class ReplyMarkup():
     def __init__(self):
         pass
+
+    def get_review_attributes_buttons(self, about):
+        if about == 'customer':
+            attributes = AttributeTitle.objects.filter(about_customer=True)
+        else:
+            attributes = AttributeTitle.objects.filter(about_customer=False)
+        buttons = []
+        for attribute in attributes:
+            button1 = InlineKeyboardButtonSerializer(InlineButton(text=f'{attribute.title}', callback_data=f'/{attribute.id}')).data
+            button2 = InlineKeyboardButtonSerializer(InlineButton(text=f'1', callback_data=f'/attribute_value {attribute.id} 1')).data
+            button3 = InlineKeyboardButtonSerializer(InlineButton(text=f'2', callback_data=f'/attribute_value {attribute.id} 2')).data
+            button4 = InlineKeyboardButtonSerializer(InlineButton(text=f'3', callback_data=f'/attribute_value {attribute.id} 3')).data
+            button5 = InlineKeyboardButtonSerializer(InlineButton(text=f'4', callback_data=f'/attribute_value {attribute.id} 4')).data
+            button6 = InlineKeyboardButtonSerializer(InlineButton(text=f'5', callback_data=f'/attribute_value {attribute.id} 5')).data
+            buttons.append([button1, button2, button3, button4, button5, button6])
     
     def get_resource_type_buttons(self, command):
         button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/{command} phone')).data
@@ -147,6 +162,8 @@ class ReplyMarkup():
             button = self.get_more_button(kwargs['inline_keyboard'])
             if button:
                 keyboard.append(button)
+        elif name == 'addreview':
+            keyboard = self.get_review_attributes_buttons(tg_account.reply_2)
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -426,9 +443,10 @@ class Update():
             response = SendMessage(chat_id, 'Напишите текст отзыва').send()
         elif self.tg_account.reply_type == 'addreview body':
             self.tg_account.reply_4 = text
-            self.tg_account.reply_type = 'attributes'
+            self.tg_account.reply_type = 'addreview attributes'
             self.tg_account.save()
-            response = SendMessage(chat_id, 'Оцените').send()
+            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account)
+            response = SendMessage(chat_id, text, reply_markup).send()
         return response
     
     def message_dispatcher(self):
