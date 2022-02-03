@@ -300,6 +300,7 @@ class Update():
             response = SendMessage(chat_id, text).send()
         elif command == 'reviews':
             if len(args) > 1:
+                response = SendMessage(chat_id, args[1]).send()
                 account_id = self.get_account_id()
                 reviews = get_reviews(account_id).filter(reviewable__polymorphic_ctype__model=args[0]).filter(reviewable__screen_name=args[1]).order_by('-created_at')
                 reviews_count = reviews.count()
@@ -311,7 +312,6 @@ class Update():
                     offset_end = 5
                 reviews = reviews[offset_start:offset_end]
                 count = len(reviews)
-                response = SendMessage(chat_id, args[1]).send()
                 if not reviews.exists():
                     response = SendMessage(chat_id, "Отзывов нет").send()
                 # Убираем кнопку "Показать еще" после нажатия
