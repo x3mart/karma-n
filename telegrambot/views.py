@@ -219,15 +219,15 @@ class Update():
         else:
             return (None, [])
 
-    def get_chat(self, source):
-        if source == 'callback_query':
+    def get_chat(self, source=None):
+        if hasattr(self, 'callback_query'):
             chat_id=self.callback_query.message.chat.id
         else:
             chat_id=self.message.chat.id
         return chat_id
     
-    def get_message(self,source):
-        if source == 'callback_query':
+    def get_message(self,source=None):
+        if hasattr(self, 'callback_query'):
             message=self.callback_query.message
         else:
             message=self.message
@@ -437,8 +437,7 @@ class Update():
         self.tg_account = get_tg_account(self.message.user)
         if self.tg_account.await_reply:
             response = self.await_despatcher(self.message.text, command, args)
-            response = SendMessage(1045490278, response.json).send()
-        if command:
+        elif command:
             # response = SendMessage(chat_id=1045490278, text=command).send()
             response = self.command_dispatcher('message', command, args)
         else:
@@ -451,6 +450,8 @@ class Update():
         command, args = self.command_handler(self.callback_query.data)
         self.tg_account = get_tg_account(self.callback_query.user)
         response = self.callback_query.answer()
+        # if self.tg_account.await_reply:
+        #     response = self.await_despatcher(self.callback_query.data, command, args)
         if command:
             response = self.command_dispatcher('callback_query', command, args)
         else:
@@ -463,19 +464,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    try:
-        update = Update(request.data)
-        if hasattr(update,'message'):
-            # response = SendMessage(chat_id=1045490278, text='message').send()
-            update.message_dispatcher()
-        elif hasattr(update,'callback_query'):
-            update.callback_dispatcher()
+    # try:
+    update = Update(request.data)
+    if hasattr(update,'message'):
+        # response = SendMessage(chat_id=1045490278, text='message').send()
+        update.message_dispatcher()
+    elif hasattr(update,'callback_query'):
+        update.callback_dispatcher()
         # method = "sendMessage"
         # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
         # data = SendMessageSerializer(send_message).data
         # requests.post(TG_URL + method, data)
-    except:
-        pass
+    # except:
+        # pass
     return Response({}, status=200)
 
     
