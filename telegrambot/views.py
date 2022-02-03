@@ -49,6 +49,7 @@ class ReplyMarkup():
             button5 = InlineKeyboardButtonSerializer(InlineButton(text=f'4', callback_data=f'/attribute_value {attribute.id} 4')).data
             button6 = InlineKeyboardButtonSerializer(InlineButton(text=f'5', callback_data=f'/attribute_value {attribute.id} 5')).data
             buttons.append([button1, button2, button3, button4, button5, button6])
+        return buttons
     
     def get_resource_type_buttons(self, command):
         button1 = InlineKeyboardButtonSerializer(InlineButton(text='Телефон', callback_data=f'/{command} phone')).data
