@@ -451,8 +451,9 @@ class Update():
             self.tg_account.save()
             attribute = get_attributes(self.tg_account.reply_2)[0]
             text = f'Оцените {attribute.title}'
+            kwargs={'attribute': attribute.id}
             response = SendMessage(chat_id, text).send()
-            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, kwargs={'attribute': attribute.id})
+            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, kwargs)
             response = SendMessage(chat_id, text, reply_markup).send()
         else:
             response = self.command_dispatcher('message', command, args) if command else None 
