@@ -59,10 +59,11 @@ class ReviewSerializer(serializers.ModelSerializer):
     rating = serializers.DecimalField(read_only=True, max_digits=2, decimal_places=1)
     service = ServiceSerializer(many=False, read_only=True,)
     reviewable = ReviewablePolymorphicSerializer(many=False, read_only=True)
+    comments = CommentSerializer(read_only=True, many=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'service', 'created_at', 'is_my_like', 'is_my_dislike', 'count_comments', 'count_likes', 'rating', 'attributes','owner', 'body', 'rating', 'about_customer', 'reviewable']
+        fields = ['id', 'service', 'created_at', 'is_my_like', 'is_my_dislike', 'count_comments', 'comments' ,'count_likes', 'rating', 'attributes','owner', 'body', 'rating', 'about_customer', 'reviewable']
 
 
 class ReviewTemplateSerializer(serializers.ModelSerializer):
