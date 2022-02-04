@@ -173,18 +173,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def get_queryset(self):
-        return get_reviews(self.request.user.id)
+        return get_reviews(self.request.user.id).order_by('-created_at')
     
     @action(detail=True, methods=['patch'])
     def like(self, request, pk=None):
         dislike = request.data.get('dislike')
         review = self.get_object()
         review = set_like(review, request.user, dislike)
-        print(review.count_likes)
         review.save()
         qs = self.get_queryset()
         review = qs.get(pk=review.id)
-        print(review.count_likes)
         serializer = self.get_serializer(review, many=False)
         return Response(serializer.data, status=200)
         
