@@ -14,7 +14,7 @@ from rest_framework.renderers import JSONRenderer
 from django.contrib.auth import authenticate
 from utils.reviewables import clean_phone
 from reviewables.models import Reviewable
-from reviews.views import get_comments, get_reviews, set_like
+from reviews.views import get_comments, get_review_rating, get_reviews, set_like, create_attributes
 from .serializers import *
 from .models import *
 from reviews.models import AttributeTitle, Review
@@ -276,6 +276,17 @@ class Update():
         reply_markup = JSONRenderer().render(message.reply_markup)
         response = SendMessage(chat_id, None, reply_markup, message.message_id).edit_markup()
     
+    def get_new_review_attributes(self):
+        attrs = self.tg_account.reply_5
+        attrs = attrs.split(',')
+        attrs = list(map(lambda attr: tuple(attr.split(' ')), attrs))
+        attributes = []
+        for attribute in attrs:
+            id, value = attribute
+            attribute = get_attributes(self.tg_account.reply_2).get(pk=int(id))
+            attributes.append({'value': value, 'title': attribute.title, 'title_id': attribute.id})
+        return attributes
+    
     def command_dispatcher(self, source, command, args=[]):
         chat_id = self.get_chat(source)
         message = self.get_message(source)
@@ -404,7 +415,6 @@ class Update():
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         elif command == 'attribute_value':
-            print('wow')
             if args[2] == '1':
                 self.tg_account.reply_5 = f'{get_attributes(self.tg_account.reply_2)[0].id} {args[1]}'
                 self.tg_account.save()
@@ -412,17 +422,7 @@ class Update():
                 attribute = get_attributes(self.tg_account.reply_2)[int(args[2])-1]
                 self.tg_account.reply_5 = self.tg_account.reply_5 + f',{attribute.id} {args[1]}'
                 self.tg_account.save()
-            attrs = self.tg_account.reply_5
-            attrs = attrs.split(',')
-            attrs = list(map(lambda attr: tuple(attr.split(' ')), attrs))
-            attributes = []
-            for attribute in attrs:
-                id, value = attribute
-                print(id)
-                attribute = get_attributes(self.tg_account.reply_2).get(pk=int(id))
-                attributes.append({'value': value, 'title': attribute.title})
-            print(attributes)
-            attr = int(args[2]) - 1
+            attributes = self.get_new_review_attributes()
             if int(args[2]) < 4:
                 next = get_attributes(self.tg_account.reply_2)[int(args[2])]
                 text =  render_to_string('review_attrs.html', {'attributes': attributes, 'next_title': next.title})
@@ -433,10 +433,14 @@ class Update():
                 reply_markup = ReplyMarkup().get_markup('confirm_addreview', self.tg_account)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         elif command == 'confirm_addreview':
+            attributes = self.get_new_review_attributes()
             model = apps.get_model('reviewables', self.tg_account.reply_1.capitalize())
             reviewable, created = model.objects.get_or_create(screen_name=self.tg_account.reply_3)
             about = True if self.tg_account.reply_2 == 'customer' else False
             review = Review.objects.create(body=self.tg_account.reply_4, about_customer=about, owner=self.tg_account.account, reviewable=reviewable)
+            create_attributes(review, attributes)
+            review.rating = get_review_rating(review)
+            review.save()
             text =  render_to_string('review.html', {'likeable': review})
             # reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, None, message.message_id).edit_text()
@@ -532,19 +536,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    # try:
-    update = Update(request.data)
-    if hasattr(update,'message'):
-        # response = SendMessage(chat_id=1045490278, text='message').send()
-        update.message_dispatcher()
-    elif hasattr(update,'callback_query'):
-        update.callback_dispatcher()
+    try:
+        update = Update(request.data)
+        if hasattr(update,'message'):
+            # response = SendMessage(chat_id=1045490278, text='message').send()
+            update.message_dispatcher()
+        elif hasattr(update,'callback_query'):
+            update.callback_dispatcher()
         # method = "sendMessage"
         # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
         # data = SendMessageSerializer(send_message).data
         # requests.post(TG_URL + method, data)
-    # except:
-        # pass
+    except:
+        pass
     return Response({}, status=200)
 
     

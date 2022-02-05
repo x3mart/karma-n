@@ -47,6 +47,15 @@ def set_like(object, user, dislike=None):
         object.count_likes -= 1
     return object
 
+def get_review_rating(review):
+        return review.attributes.aggregate(avg=Avg('value'))['avg']
+
+def create_attributes(review, attributes):
+        objs = []
+        for attribute in attributes:
+            objs.append(Attribute(review=review, title_id=attribute['title'], value=float(attribute['value'])))
+        Attribute.objects.bulk_create(objs)
+
 def get_reviews(user_id):
     my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=user_id)))
     my_dislike = Count('likes', filter=(Q(likes__dislike=True) & Q(likes__owner=user_id)))
@@ -114,16 +123,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         model = apps.get_model('reviewables', ctype.capitalize())
         reviewable, created = model.objects.get_or_create(**reviewable)
         return (reviewable, ctype)
-    
-    def create_attributes(self, review, attributes):
-        objs = []
-        for attribute in attributes:
-            objs.append(Attribute(review=review, title_id=attribute['title'], value=float(attribute['value'])))
-        Attribute.objects.bulk_create(objs)
-
-    
-    def get_rating(self, review):
-        return review.attributes.aggregate(avg=Avg('value'))['avg']
 
     def create(self, request):
         serializer = ReviewSerializer(data=request.data)
@@ -148,10 +147,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
             self.create_message(reviewable)
         if template:
             attributes = self.get_template_attributes(template)
-        self.create_attributes(review, attributes)
+        create_attributes(review, attributes)
         if service:
             review.service = Service.objects.get(pk=service)
-        review.rating = self.get_rating(review)
+        review.rating = get_review_rating(review)
         review.save()
         return Response(ReviewSerializer(review).data, status=201)
 
