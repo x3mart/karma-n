@@ -405,7 +405,7 @@ class Update():
                 self.tg_account.reply_5 = f'{get_attributes(self.tg_account.reply_2)[0]} {args[1]}'
                 self.tg_account.save()
             else:
-                attribute = get_attributes(self.tg_account.reply_2)[int(args[2] - 1)]
+                attribute = get_attributes(self.tg_account.reply_2)[int(args[2])-1]
                 self.tg_account.reply_5 = self.tg_account.reply_5 + f',{attribute.id} {args[1]}'
                 self.tg_account.save()
                 attrs = self.tg_account.reply_5
