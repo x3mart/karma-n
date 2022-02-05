@@ -4,10 +4,20 @@ import {clearReviews} from "./reviewActions";
 
 export const GET_PHONE_CODE_SUCCESS = "GET_PHONE_CODE_SUCCESS";
 export const GET_PHONE_CODE_FAIL = "GET_PHONE_CODE_FAIL";
+export const GET_SCREENNAME_CODE_SUCCESS = "GET_SCREENNAME_CODE_SUCCESS";
+export const GET_SCREENNAME_CODE_FAIL = "GET_SCREENNAME_CODE_FAIL";
+export const CHECK_SCREENNAME_CODE_SUCCESS = 'CHECK_SCREENNAME_CODE_SUCCESS'
+export const CHECK_SCREENNAME_CODE_FAIL = 'CHECK_SCREENNAME_CODE_FAIL'
+export const RESET_SCREENNAME = 'RESET_SCREENNAME'
+export const DELETE_SCREENNAME_SUCCESS = 'DELETE_SCREENNAME_SUCCESS'
+export const DELETE_SCREENNAME_FAIL = 'DELETE_SCREENNAME_FAIL'
 export const SET_PHONE_APPROVED_SUCCESS = "SET_PHONE_APPROVED_SUCCESS";
 export const SET_PHONE_APPROVED_FAIL = "SET_PHONE_APPROVED_FAIL";
 export const REGISTER_USER_SUCCESS = "REGISTER_USER_SUCCESS";
 export const REGISTER_USER_FAIL = "REGISTER_USER_FAIL";
+
+export const SET_USER_STATUS_SUCCESS = 'SET_USER_STATUS_SUCCESS'
+export const SET_USER_STATUS_FAIL = 'SET_USER_STATUS_FAIL'
 
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
@@ -67,6 +77,108 @@ export const getPhoneCode = (raw) => async dispatch => {
   }
 };
 
+export const getCode = (data) => async dispatch => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${localStorage.getItem('access')}`,
+      Accept: 'application/json',
+    },
+  }
+
+  const body = JSON.stringify(data)
+
+  try {
+    await axios.post(
+      `${process.env.REACT_APP_API_URL}/register/getcode/`,
+      body,
+      config
+    )
+
+    dispatch({
+      type: GET_SCREENNAME_CODE_SUCCESS,
+    })
+  } catch (err) {
+    const data = {
+      screenname_error: err.response,
+    }
+    dispatch({
+      type: GET_SCREENNAME_CODE_FAIL,
+      payload: data,
+    })
+  }
+}
+
+export const checkCode = data => async dispatch => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${localStorage.getItem('access')}`,
+      Accept: 'application/json',
+    },
+  }
+
+  const body = JSON.stringify(data)
+
+  try {
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL}/register/checkcode/`,
+      body,
+      config
+    )
+
+    dispatch({
+      type: CHECK_SCREENNAME_CODE_SUCCESS,
+      payload: res.data,
+    })
+  } catch (err) {
+    dispatch({
+      type: CHECK_SCREENNAME_CODE_FAIL,
+      payload: err.response,
+    })
+  }
+}
+
+export const deleteScreenName = id => async dispatch => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${localStorage.getItem('access')}`,
+      Accept: 'application/json',
+    },
+  }
+
+  try {
+    const res = await axios.delete(
+      `${process.env.REACT_APP_API_URL}/api/reviewables/${id}/`,
+      config
+    )
+
+    dispatch({
+      type: DELETE_SCREENNAME_SUCCESS,
+      payload: res.data,
+    })
+  } catch (err) {
+    dispatch({
+      type: DELETE_SCREENNAME_FAIL,
+      payload: err.response,
+    })
+  }
+}
+
+export const resetScreenName = () => dispatch => {
+  dispatch({
+    type: RESET_SCREENNAME,
+  })
+}
+
+export const setUserStatus = status => dispatch => {
+  dispatch({
+    type: SET_USER_STATUS_SUCCESS,
+    payload: status,
+  })
+}
+
 export const setPhoneApproved = (raw, code) => async dispatch => {
   const config = {
     headers: {
@@ -121,8 +233,8 @@ export const load_user = () => async dispatch => {
 
       dispatch({
         type: USER_LOADED_SUCCESS,
-        payload: res.data
-      });
+        payload: res.data,
+      })
     } catch (err) {
       dispatch({
         type: USER_LOADED_FAIL
@@ -221,10 +333,13 @@ export const signup = (data) => async dispatch => {
       config
     )
 
+    console.log(res)
+
     dispatch({
       type: SIGNUP_SUCCESS,
-      payload: res.data
+      // payload: res.status
     });
+    dispatch(load_user())
   } catch (err) {
     dispatch({
       type: SIGNUP_FAIL
@@ -326,6 +441,8 @@ export const update_user = ({name, full_name, city, birthday, avatar, about}) =>
         'Accept': 'application/json'
       }
     };
+
+    console.log(avatar)
 
     const content = JSON.stringify({name, full_name, city, birthday, avatar, about});
 

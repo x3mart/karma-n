@@ -4,25 +4,47 @@ import user_svg from '../../assets/user.svg'
 import { connect } from 'react-redux'
 import MenuItemSpeciality from './MenuItemSpeciality'
 import MenuItemProfile from './MenuItemProfile'
+import { update_user, setUserStatus } from '../../redux/actions/authActions'
 
-const SideBar = ({ isAuthenticated, user, cat }) => {
-
+const SideBar = ({
+  isAuthenticated,
+  user,
+  cat,
+  update_user,
+  setUserStatus,
+  userStatus,
+}) => {
   const searchInput = useRef(null)
+  const fileInput = useRef(null)
 
   const [avatar, setAvatar] = useState(<img src={user_svg} alt='user' />)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [specialityOpened, setSpecialityOpened] = useState(false)
   const [specialityFormActive, setSpecialityFormActive] = useState(false)
-  const [categoryFormActive, setCategoryFormActive] =
-    useState(false)
+  const [categoryFormActive, setCategoryFormActive] = useState(false)
   const [textInput, setTextInput] = useState(false)
+  const [userData, setUserData] = useState(null)
 
   useEffect(() => {
     if (textInput) {
       searchInput.current.focus()
     }
   }, [textInput])
+
+  useEffect(() => {
+    if (user) {
+      if(!userStatus) {
+        let status =
+          user &&
+          user.reviews_executors_about_me_count === 0 &&
+          user.reviews_customers_about_me_count === 0
+            ? 'customer'
+            : 'executor'
+        setUserStatus(status)
+      }
+    }
+  }, [user, userStatus])
 
   useEffect(() => {
     if (user && user.avatar) {
@@ -38,13 +60,16 @@ const SideBar = ({ isAuthenticated, user, cat }) => {
     }
   }, [user])
 
+  const handleUserUpdate = e => {
+    update_user({ avatar: e.target.files[0] })
+  }
+
   const handleSpecialityToggle = e => {
     e.preventDefault()
     setSpecialityOpened(!specialityOpened)
   }
 
   const HandleAddSpeciality = () => {
-    
     console.log('Speciality added')
   }
 
@@ -58,6 +83,12 @@ const SideBar = ({ isAuthenticated, user, cat }) => {
         >
           {isAuthenticated && (
             <Fragment>
+              <div style={{ position: 'relative' }}>
+                <label className='custom-file-upload'>
+                  <input type='file' onChange={handleUserUpdate} />
+                  <i class='pe-7s-note' style={{ fontSize: 20 }}></i>
+                </label>
+              </div>
               <a href='' style={{ pointerEvents: 'none' }}>
                 {avatar}
               </a>
@@ -70,8 +101,8 @@ const SideBar = ({ isAuthenticated, user, cat }) => {
         <ul className='profile-sidebar-nav profile-sidebar-nav-pills profile-sidebar-nav-stacked'>
           {isAuthenticated && (
             <Fragment>
-              <MenuItemSpeciality/>
-              <MenuItemProfile/>
+              <MenuItemSpeciality />
+              <MenuItemProfile />
               <li className={cat === 'review' ? 'active' : ''}>
                 <Link to='/review'> Добавить отзыв</Link>
               </li>
@@ -89,6 +120,7 @@ const SideBar = ({ isAuthenticated, user, cat }) => {
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
   user: state.auth.user,
+  userStatus: state.auth.user_status,
 })
 
-export default connect(mapStateToProps)(SideBar)
+export default connect(mapStateToProps, { update_user, setUserStatus })(SideBar)

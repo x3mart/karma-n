@@ -34,11 +34,11 @@ const Review = ({
     if (template) {
       if (data && data.rating) {
         if (data && data.rating <= 2) {
-          setBackground('#f8d7da')
+          setBackground('rgba(205, 5, 5, 0.3)')
         } else if (data && data.rating > 2 && data.rating < 4) {
-          setBackground('#fff3cd')
+          setBackground('rgba(238, 221, 68, 0.4)')
         } else if (data && data.rating >= 4) {
-          setBackground('#d1e7dd')
+          setBackground('rgba(68, 238, 149, 0.4)')
         }
       } else {
         setBackground('#cfe2ff')
@@ -190,10 +190,13 @@ const Review = ({
       </Modal>
 
       <div
-        className={`quick-review-wrap ${
+        className={`quick-review-wrap w-100 ${
           active ? 'quick-review-border-active' : 'quick-review-border'
         }`}
-        style={{ backgroundColor: background }}
+        style={{
+          backgroundColor: background,
+          border: `2px solid ${background}`,
+        }}
         onClick={handleModalOpenButton}
       >
         <div className='quick-review'>{title}</div>

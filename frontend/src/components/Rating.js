@@ -20,7 +20,7 @@ const Rating = ({ratingValue}) => {
       rating[Math.floor(ratingValue)] = <i className="fa fa-star-half-o" key={Math.floor(ratingValue)}/>;
     }
   }
-  return <Fragment>{rating}</Fragment>;
+  return <div className='rating-specifications-rating'>{rating}</div>
 };
 
 export default Rating;

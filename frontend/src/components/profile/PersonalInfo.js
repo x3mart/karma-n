@@ -3,7 +3,14 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import user_svg from '../../assets/user.svg'
-import { update_user } from '../../redux/actions/authActions'
+import {
+  update_user,
+  setUserStatus,
+  getCode,
+  checkCode,
+  resetScreenName,
+  deleteScreenName,
+} from '../../redux/actions/authActions'
 
 import { useForm } from 'react-hook-form'
 import {
@@ -20,13 +27,22 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 
-const PersonalInfo = ({ user, update_action, add_phone_action }) => {
+const PersonalInfo = ({
+  user,
+  update_user,
+  getCode,
+  checkCode,
+  sentStatus,
+  checkedStatus,
+  resetScreenName,
+  deleteScreenName,
+  user_status,
+}) => {
   const [updateProfile, setUpdateProfile] = useState({
     name: '',
     full_name: '',
     city: '',
     birthday: null,
-    avatar: null,
     about: '',
   })
 
@@ -36,12 +52,34 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
     city: '',
     birthday: '',
     email: '',
-    phones: [],
+    about: '',
   })
+
+  const [screenName, setScreenName] = useState('')
+  const [screenNameCode, setScreenNameCode] = useState('')
+  const [screenNameType, setScreenNameType] = useState('')
 
   const [currentData, setCurrentData] = useState({})
   const [extraPhone, setExtraPhone] = useState('')
   const [extraPhoneAddActive, setExtraPhoneAddActive] = useState(false)
+  const [isOpened, setIsOpened] = useState(false)
+  const handleClose = () => {
+    resetScreenName()
+    setScreenName('')
+    setScreenNameCode('')
+    setScreenNameType('')
+    setIsOpened(false)
+  }
+
+  const handleAccountDelete = id => {
+    deleteScreenName(id)
+  }
+
+  useEffect(() => {
+    if (isOpened && checkedStatus) {
+      setIsOpened(false)
+    }
+  }, [checkedStatus])
 
   useEffect(() => {
     user &&
@@ -51,13 +89,30 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
         city: user.city,
         birthday: user.birthday,
         email: user.email,
-        phones: `${user.phones && user.phones.filter(
-          item => item.phone_number != user.phone
-        )}`,
+        about: user.about,
       })
   }, [user])
 
   const [edit, setEdit] = useState(false)
+
+  const getScreenNameCode = () => {
+    let data = screenNameType === 'phone' ? '7' + screenName : screenName
+    console.log(1, data)
+    getCode({
+      screen_name: data,
+      resourcetype: screenNameType,
+    })
+  }
+
+  const sendScreenNameCode = () => {
+    let data = screenNameType === 'phone' ? '7' + screenName : screenName
+    console.log(2, data)
+    checkCode({
+      screen_name: data,
+      resourcetype: screenNameType,
+      code: screenNameCode,
+    })
+  }
 
   const handleEdit = bool => {
     setCurrentData(userData)
@@ -77,7 +132,7 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
   }
 
   const handleUserSave = () => {
-    update_action(userData)
+    update_user(userData)
     setEdit(false)
   }
 
@@ -85,7 +140,7 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
     setExtraPhoneAddActive(true)
   }
   const handlePhoneAddSave = () => {
-    add_phone_action(extraPhone)
+    // add_phone_action(extraPhone)
     setExtraPhoneAddActive(false)
   }
   const handlePhoneAddReset = () => {
@@ -93,8 +148,69 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
     setExtraPhoneAddActive(false)
   }
 
+  const handleAccountAdd = account => {
+    setIsOpened(true)
+    setScreenNameType(account)
+  }
+
   return (
-    <Fragment>
+    <>
+      <Modal show={isOpened} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Добавить{' '}
+            {screenNameType === 'phone'
+              ? 'телефон'
+              : screenNameType === 'instagram'
+              ? 'инстаграм'
+              : screenNameType === 'vk'
+              ? 'VK'
+              : ''}{' '}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form>
+            <div className='input-control'>
+              <input
+                name='phone'
+                className='input-control-input input-phone'
+                type='tel'
+                pattern='[0-9]{10}'
+                value={screenName}
+                onChange={e => setScreenName(e.target.value)}
+              />
+              <span className='input-control-prefix'>+7</span>
+              {sentStatus && (
+                <input
+                  name='code'
+                  className='input-control-input input-code'
+                  type='text'
+                  value={screenNameCode}
+                  onChange={e => setScreenNameCode(e.target.value)}
+                />
+              )}
+            </div>
+          </form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          {sentStatus ? (
+            <button
+              className='input-control-button'
+              onClick={sendScreenNameCode}
+            >
+              Подтвердить
+            </button>
+          ) : (
+            <button
+              className='input-control-button'
+              onClick={getScreenNameCode}
+            >
+              Получить код
+            </button>
+          )}
+        </Modal.Footer>
+      </Modal>
       <div className='d-flex justify-content-between'>
         <div className='personal-info-heading'>
           <h1>Личная информация</h1>
@@ -118,7 +234,7 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
               style={{ lineHeight: '42px', margin: '0 0 20px 5px' }}
               className='d-block d-xl-none'
             >
-              Редактировать
+              <i class='pe-7s-note' style={{ fontSize: 20 }}></i>
             </div>
           </div>
         )}
@@ -241,6 +357,125 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
 
       <div className='personal-info-heading'>
         <h1>Аккаунты:</h1>
+        <div className='row pl-3'>
+          <div className='col-md-4 account-row-left'>Телефон:</div>
+          <div className='col-md-8 account-row-right'>
+            {user && user.reviewables && (
+              <>
+                {user &&
+                  user.reviewables &&
+                  user.reviewables.map(
+                    item =>
+                      item.resourcetype === 'Phone' && (
+                        <div className='d-flex'>
+                          <div style={{ width: 130 }}>+{item.screen_name}</div>
+                          <div
+                            onClick={() => handleAccountDelete(item.id)}
+                            style={{
+                              fontSize: 24,
+                              lineHeight: '24px',
+                              color: 'red',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <i
+                              className='pe-7s-close-circle'
+                              aria-hidden='true'
+                            />
+                          </div>
+                        </div>
+                      )
+                  )}
+                <div
+                  className='add-account'
+                  onClick={() => {
+                    handleAccountAdd('phone')
+                  }}
+                >
+                  Добавить телефон
+                </div>
+              </>
+            )}
+          </div>
+          <div className='col-md-4 account-row-left'>Инстаграм:</div>
+          <div className='col-md-8 account-row-right '>
+            {user && user.reviewables && (
+              <>
+                {user &&
+                  user.reviewables &&
+                  user.reviewables.map(
+                    item =>
+                      item.resourcetype === 'Instagram' && (
+                        <div className='d-flex'>
+                          <div style={{ width: 130 }}>+{item.screen_name}</div>
+                          <div
+                            onClick={() => handleAccountDelete(item.id)}
+                            style={{
+                              fontSize: 24,
+                              lineHeight: '24px',
+                              color: 'red',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <i
+                              className='pe-7s-close-circle'
+                              aria-hidden='true'
+                            />
+                          </div>
+                        </div>
+                      )
+                  )}
+                <div
+                  className='add-account'
+                  onClick={() => {
+                    handleAccountAdd('instagram')
+                  }}
+                >
+                  Добавить инстаграм
+                </div>
+              </>
+            )}
+          </div>
+          <div className='col-md-4 account-row-left'>Вконтакте:</div>
+          <div className='col-md-8 account-row-right'>
+            {user && user.reviewables && (
+              <>
+                {user &&
+                  user.reviewables &&
+                  user.reviewables.map(
+                    item =>
+                      item.resourcetype === 'VK' && (
+                        <div className='d-flex'>
+                          <div style={{ width: 130 }}>+{item.screen_name}</div>
+                          <div
+                            onClick={() => handleAccountDelete(item.id)}
+                            style={{
+                              fontSize: 24,
+                              lineHeight: '24px',
+                              color: 'red',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <i
+                              className='pe-7s-close-circle'
+                              aria-hidden='true'
+                            />
+                          </div>
+                        </div>
+                      )
+                  )}
+                <div
+                  className='add-account'
+                  onClick={() => {
+                    handleAccountAdd('vk')
+                  }}
+                >
+                  Добавить вконтакте
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* {userData &&
@@ -283,12 +518,12 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
               style={{ cursor: 'pointer' }}
               onClick={handlePhoneAddActivate}
             >
-              <div
+              {/* <div
                 style={{ lineHeight: '42px', margin: '0 0 20px 5px' }}
                 className='d-none d-xl-block'
               >
                 Добавить телефон
-              </div>
+              </div> */}
             </div>
           ) : (
             <div className='d-flex flex-row'>
@@ -326,8 +561,21 @@ const PersonalInfo = ({ user, update_action, add_phone_action }) => {
           )}
         </div>
       </div>
-    </Fragment>
+    </>
   )
 }
 
-export default PersonalInfo
+const mapStateToProps = state => ({
+  sentStatus: state.auth.screenname_sent_success,
+  checkedStatus: state.auth.screenname_checked_success,
+  userStatus: state.auth.user_status,
+})
+
+export default connect(mapStateToProps, {
+  update_user,
+  getCode,
+  checkCode,
+  resetScreenName,
+  deleteScreenName,
+  setUserStatus,
+})(PersonalInfo)

@@ -276,7 +276,7 @@ body {
 .bio-graph-info h1 {
   font-size: 22px;
   font-weight: 300;
-  margin: 0 0 20px;
+  // margin: 0 0 20px;
 }
 
 .bio-row {
@@ -573,19 +573,19 @@ ul.summary-list > li:last-child {
 }
 
 .quick-review-wrap {
-  display: inline-block;
+  display: flex;
   justify-content: center;
-  width: auto;
+  // width: auto;
   margin: 0 10px 20px 0;
-  padding: 5px;
-  //border: 1px solid #8f8f8f;
-  border-radius: 4px;
+  padding: 10px;
+  border: none;
+  border-radius: none;
   // background-color: rgba(0, 0, 0, 0.05);
   cursor: pointer;
 }
 
 .quick-review-border {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: none;
   transition: all 0.3s ease 0s;
   box-shadow: 0px 0px 0px #00ef91;
 
@@ -689,16 +689,17 @@ ul.summary-list > li:last-child {
 .my-rating {
   display: flex;
   align-items: center;
+  height: 36px;
 }
 
 .my-rating .stars {
   margin-right: 10px;
 }
 
-.my-rating .fa {
+.my-rating .fa-star,
+.my-rating .fa-star-o,
+.my-rating .rating-value {
   font-size: 26px;
-  color: #00ef91;
-  margin-right: 3px;
 }
 
 .bio-graph-info h2 {
@@ -716,39 +717,45 @@ ul.summary-list > li:last-child {
 .reviews-about-me-review {
   width: 100%;
   display: flex;
+  padding: 20px;
 }
 
 .reviews-about-me-photo {
   //width: 20%;
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-items: center;
+  justify-items: start;
+  align-items: start;
+  margin-right: 20px;
 }
 
 .reviews-about-me-photo img {
-  width: 56px;
-  height: 56px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   border-radius: 50rem;
 }
 
 .reviews-about-me-body {
   flex: 2;
-  padding: 20px 0;
+  padding: 20px 20px 0 0;
   font-weight: 300;
   color: #333;
 }
 
 .reviews-about-me-head {
+  margin-bottom: 20px;
   width: 100%;
   display: flex;
   justify-content: space-between;
 }
 
-.reviews-about-me-name {
-  margin-bottom: 20px;
+.reviewer-name {
   font-size: 22px;
+}
+
+.name-and-service-wrapper {
+  display: flex;
 }
 
 .reviewer-name {
@@ -758,6 +765,7 @@ ul.summary-list > li:last-child {
 .reviews-about-me-rating {
   display: flex;
   align-items: center;
+  font-size: 22px;
 }
 
 .reviews-about-me-rating .stars {
@@ -768,6 +776,15 @@ ul.summary-list > li:last-child {
   font-size: 20px;
   color: #00ef91;
   margin-right: 3px;
+}
+.reviews-about-me-rating .value {
+  font-size: 22px;
+}
+
+.body-likes-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
 }
 
 .reviews-about-me-body {
@@ -786,12 +803,19 @@ ul.summary-list > li:last-child {
 
 .reviews-about-me-buttons {
   display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.reviews-about-me-comment-buttons {
+  display: flex;
+  justify-content: end;
   margin-bottom: 10px;
 }
 
 .like-buttons {
   display: flex;
-  margin-right: 20px;
+  margin-left: 20px;
 }
 
 .like-buttons div {
@@ -803,6 +827,7 @@ ul.summary-list > li:last-child {
   font-size: 26px;
   cursor: pointer;
   transition: all 0.3s;
+  cursor: pointer;
 }
 
 .like-number {
@@ -821,14 +846,30 @@ ul.summary-list > li:last-child {
   color: var(--danger);
 }
 
-.comment-button button {
-  margin-top: -7px;
+.response-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.button-response {
   color: #333;
-  border: 1px solid #333 !important;
+  border: none !important;
+  background: #e5e5e5;
+  text-transform: uppercase;
+  padding: 15px 40px;
+  margin-right: 20px;
+}
+
+.button-complain {
+  color: #dc3545;
+  border: none !important;
+  padding: 0 !important;
+  background: none;
 }
 
 .reviews-about-me-comments {
   margin-left: 96px;
+  padding: 20px 20px 20px 0;
   width: auto;
   display: flex;
   border-bottom: 1px solid #333;
@@ -910,7 +951,7 @@ ul.summary-list > li:last-child {
   color: #353535;
 }
 
-.profile-sidebar-nav > li > a, 
+.profile-sidebar-nav > li > a,
 .profile-sidebar-nav > li > .menu-item {
   position: relative;
   display: block;
@@ -1047,7 +1088,18 @@ ul.summary-list > li:last-child {
   }
 }
 
-.inner-row-right {
+.account-row-left {
+  line-height: 25px;
+  padding: 0;
+  margin: 10px 0;
+  color: #4e4e4e;
+}
+
+.account-row-right {
+  line-height: 25px;
+  padding-left: 25px;
+  margin: 10px 0;
+  color: #4e4e4e;
 }
 
 .personal-info-input {
@@ -1101,99 +1153,25 @@ ul.summary-list > li:last-child {
   align-items: center;
 }
 
-.main-section-search-block {
-  display: flex;
-}
-
-.search-block {
-  min-width: 98px;
-  height: 98px;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.search-block img {
-  width: 46px;
-  height: 46px;
-}
-
-.search-block.phone {
-  background-color: #ffffff;
-}
-
-.search-block.insta {
-  background-color: #f8f7f5;
-}
-
-.search-block.vk {
-  background-color: #4e4e4e;
-}
-
-.search-block-input {
-  height: 98px;
-  min-width: 400px;
-  padding: 20px 40px;
-  font-size: 22px;
-  line-height: 62px;
-  color: #959595;
-  border: none;
-  transition: width 1s ease-in-out, left 1.5s ease-in-out;
-}
-
-.search-block-input.phone {
-  background-color: #ffffff;
-}
-
-.search-block-input.phone:focus {
-  background-color: #ffffff;
-}
-
-.search-block-input.vk {
-  background-color: #ffffff;
-}
-
-.search-block-input.vk:focus {
-  background-color: #ffffff;
-}
-.search-block-input.insta {
-  background-color: #f8f7f5;
-}
-
-.search-block-input.insta:focus {
-  background-color: #f8f7f5;
-}
-
-.search-block-button {
-  min-width: 372px;
-  height: 98px;
-  background: #44ee95;
-  border: none;
-  font-weight: bold;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-  color: #ffffff;
-}
-
-.user-sidebar-layout {
-  @media #{$xl-layout} {
-    width: 387px;
-  }
-  @media #{$lg-layout} {
-    display: inline-block;
-  }
-  @media #{$md-layout} {
-    max-width: 0;
-    margin-right: 0;
-    display: none;
-  }
-  @media #{$xs-layout} {
-    max-width: 0;
-    margin-right: 0;
-    display: none;
+.user-sidebar {
+  margin-bottom: 1.5rem;
+  &-layout {
+    @media #{$xl-layout} {
+      width: 387px;
+    }
+    @media #{$lg-layout} {
+      display: inline-block;
+    }
+    @media #{$md-layout} {
+      max-width: 0;
+      margin-right: 0;
+      display: none;
+    }
+    @media #{$xs-layout} {
+      max-width: 0;
+      margin-right: 0;
+      display: none;
+    }
   }
 }
 
@@ -1371,7 +1349,7 @@ ul.summary-list > li:last-child {
     display: flex;
   }
   &-wrapper {
-    padding: 0 58px 15px ;
+    padding: 0 58px 15px;
     width: 100%;
   }
   &-category-name {
@@ -1386,14 +1364,13 @@ ul.summary-list > li:last-child {
   &-profile-name {
     font-size: 12px;
     & a {
-      color: #C4C4C4;
+      color: #c4c4c4;
       &:hover {
         color: #44ee95;
       }
       &.active-item {
         color: #44ee95;
       }
-      
     }
   }
   &-add {
@@ -1406,7 +1383,7 @@ ul.summary-list > li:last-child {
 }
 
 .personal-info-heading > h1 {
-  color: #4E4E4E;
+  color: #4e4e4e;
 }
 
 .personal-info-wrapper {
@@ -1417,3 +1394,230 @@ input {
   padding: 4px 0 4px 10px !important;
   margin-bottom: 10px;
 }
+
+.reg-status {
+  text-align: center;
+  h4 {
+    color: #00ef91;
+    font-size: 25px;
+    font-weight: 700;
+  }
+}
+
+.add-account {
+  color: #44ee95;
+  cursor: pointer;
+}
+
+input[type='file'] {
+  display: none;
+}
+.custom-file-upload {
+  // border: 1px solid #ccc;
+  display: inline-block;
+  position: absolute;
+  padding: 0;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+}
+
+.input-control {
+  position: relative;
+}
+
+.input-control-prefix {
+  position: absolute;
+  top: 13px;
+  left: 10px;
+}
+
+.modal-content {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: 0px 10px 70px rgba(0, 0, 0, 0.05);
+  padding: 40px 50px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 !important;
+  padding-bottom: 1rem !important;
+  border-bottom: none !important;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+}
+
+.modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start !important;
+  padding: 0.75rem 0;
+  border-top: none !important;
+}
+
+.modal-dialog .modal-header .close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-weight: 300;
+}
+
+.modal-title.h4 {
+  color: #4e4e4e !important;
+  font-size: 24px;
+}
+
+.input-control-input {
+  font-size: 14px;
+  width: 100%;
+  height: 50px;
+  color: #333;
+  border: 1px solid #eceff8;
+  background-color: transparent;
+  box-shadow: none;
+  &.input-phone {
+    padding-left: 30px !important;
+  }
+  &.input-code {
+    padding-left: 10 !important;
+  }
+}
+
+.input-control-button {
+  height: 50px;
+  width: 200px;
+  background: #44ee95;
+  border: none !important;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 14px;
+  margin-left: -1px;
+}
+
+.rating-wrapper {
+  display: block;
+  width: 100%;
+  position: relative;
+  font-size: 26px;
+  font-weight: 300;
+  color: #333;
+  & .fa-chevron-up,
+  .fa-chevron-down {
+    font-size: 14px;
+    font-weight: 300;
+    color: #333;
+  }
+  & .fa-star,
+  .fa-star-o {
+    color: #00ef91;
+    margin-right: 3px;
+    font-size: 26px;
+  }
+}
+
+.rating-overall {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.rating-value {
+  margin: 0 5px;
+}
+
+.rating-specifications-wrapper {
+  position: absolute;
+  top: 36;
+  right: 0;
+  background-color: #fff !important;
+  z-index: 1;
+  margin-top: 10px;
+  padding: 40px;
+  filter: drop-shadow(0px 40px 60px rgba(149, 149, 149, 0.2));
+  &.wrapper-visible {
+    display: block;
+  }
+  &.wrapper-hidden {
+    display: none;
+  }
+}
+
+.rating-specifications-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px;
+}
+
+.rating-specifications-rating {
+  display: flex;
+}
+
+.rating-specifications-name {
+  margin-right: 30px;
+  font-size: 14px;
+}
+
+.rating-specifications-value-wrapper {
+  display: flex;
+}
+
+.rating-specifications-value {
+  margin-left: 5px;
+}
+
+.reviews-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 300px;
+  padding: 30px 15px;
+  color: #4e4e4e;
+}
+
+.reviews-page-buttons-row {
+  display: flex;
+  & button {
+    padding: 20px;
+    width: 250px;
+    background-color: #e5e5e5;
+    text-transform: uppercase;
+    border: none !important;
+    border-radius: 0% !important;
+    margin-top: 30px;
+    &:first-child {
+      margin-right: 30px;
+    }
+  }
+}
+
+.reviews-services-title {
+  font-size: 18px;
+}
+
+.reviews-services-select {
+  margin: 20px 20px 40px 0;
+  width: 40%;
+
+  @media #{$xl-layout} {
+    width: 40%;
+  }
+  @media #{$lg-layout} {
+    width: 50%;
+  }
+  @media #{$md-layout} {
+    width: 100%;
+  }
+  @media #{$xs-layout} {
+    width: 100%;
+  }
+}
+
+// .reviews-services-select-wrapper {
+//   display: flex;
+// }
+

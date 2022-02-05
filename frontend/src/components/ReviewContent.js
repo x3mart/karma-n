@@ -14,24 +14,37 @@ import {
   resetStatus,
   resetReviewError,
 } from '../redux/actions/reviewActions'
+import { get_all_categories } from '../redux/actions/serviceActions'
 import { isNotEmptyObject } from '../functions'
 import Review from './reviews/Review'
 import PhoneInput from './reviews/PhoneInput'
+import PanelLayout from '../layouts/PanelLayout'
+import SearchBlock from './SearchBlock'
 
 const ReviewContent = ({
   search,
   match,
   isAuthenticated,
   user,
-  review_templates,
+  templates,
   getReviewTemplates,
   setReview,
   set_review_success,
   resetStatus,
   resetReviewError,
   error,
+  get_all_categories,
+  categories,
 }) => {
-  const [templates, setTemplates] = useState([])
+  const [valid, setValid] = useState(false)
+  const [clicked, setClicked] = useState(false)
+  const [category, setCategory] = useState('')
+  const [service, setService] = useState('')
+  const [services, setServices] = useState([])
+
+  const [screenName, setScreenName] = useState('')
+
+  // const [templates, setTemplates] = useState([])
   const [active, setActive] = useState('')
   const [activeReview, setActiveReview] = useState(null)
   const [rating, setRating] = useState(null)
@@ -50,35 +63,51 @@ const ReviewContent = ({
   const [templatesRequestSent, setTemplatesRequestSent] = useState(false)
 
   useEffect(() => {
+    get_all_categories()
     if (search) {
       let num = search.split('=')[1]
       setPhone(num)
     }
   }, [])
 
+  // useEffect(() => {
+  //   if (templates) {
+  //     setTemplates(templates)
+  //   }
+  // }, [templates])
+
   useEffect(() => {
-    if (review_templates) {
-      setTemplates(review_templates)
+    if(category) {
+      let arr = categories
+        .filter(item => item.id == category)[0]
+        .services.map(service => service)
+
+      setServices(arr)
+
     }
-  }, [review_templates])
+  }, [category])
 
   if (!isAuthenticated) {
     return <Redirect to='/login' />
   }
 
-  // const handleQuickReview = (id, text) => {
-  //   setActiveReview(id === activeReview ? null : id)
-  //   setReviewText(text)
-  //   setReviewFull({
-  //     ...reviewFull,
-  //     body: text,
-  //   })
-  // }
+  const clearScreenName = () => {
+    setScreenName('')
+    setCategory('')
+    setService('')
+  }
 
+  const handleCategorySelect = e => {
+    setCategory(e.target.value)
+  }
+  
+  const handleServiceSelect = e => {
+    setService(e.target.value)
+  }
 
   const handleTEmplateRequest = n => {
-    getReviewTemplates(n)
     setTemplatesRequestSent(true)
+    getReviewTemplates(n)
   }
 
   const handleTEmplateReset = () => {
@@ -116,75 +145,107 @@ const ReviewContent = ({
     setReviewClicked(bool)
   }
 
-  return (
-    <Fragment>
-      <div className='panel'>
-        <div className='bio-graph-heading'>Написать отзыв</div>
-        <div className='panel-body bio-graph-info mb-4'>
-          {!templatesRequestSent && (
-            <div
-              className='w-100 d-flex flex-column justify-content-center align-items-center'
-              style={{ minHeight: 300 }}
-            >
-              <div className='mb-4' style={{ fontSize: 24 }}>
-                {' '}
-                Кому Вы хотите оставить отзыв?
-              </div>
-              <div className='d-flex justify-items-around mt-5'>
-                <button
-                  className='btn btn-outline-secondary mr-5'
-                  onClick={() => handleTEmplateRequest(0)}
-                >
-                  ИСПОЛНИТЕЛЮ
-                </button>
-                <button
-                  className='btn btn-outline-secondary ml-5'
-                  onClick={() => handleTEmplateRequest(1)}
-                >
-                  ЗАКАЗЧИКУ
-                </button>
-              </div>
-            </div>
-          )}
-          {templatesRequestSent && (
-            <>
-              <PhoneInput
-                phone_number={phone}
-                review_clicked={reviewClicked}
-                proper_phone={setProperPhone}
-                phoneAction={handlePhone}
-              />
+  const InitialStatus = () => (
+    <div className='reviews-page-buttons-row'>
+      <button onClick={() => handleTEmplateRequest(false)}>ИСПОЛНИТЕЛЮ</button>
+      <button onClick={() => handleTEmplateRequest(true)}>ЗАКАЗЧИКУ</button>
+    </div>
+  )
 
-              <div className='mb-4'>
-                Выберите наиболее подходящий коментарий, либо оставьте свой.
-                Стандартные коментарии можно редактировать перед сохранением.
+  const SecondaryStatus = () => (
+    <>
+      <div className='py-5'>
+        {screenName ? (
+          <div className='d-flex align-items-center'>
+            <div style={{ fontSize: 28, lineHeight: '30px' }}>{screenName}</div>
+            <div
+              style={{
+                fontSize: 30,
+                lineHeight: '30px',
+                color: '#dc3545',
+                marginLeft: 20,
+                cursor: 'pointer',
+              }}
+              onClick={clearScreenName}
+            >
+              <i className='pe-7s-close-circle' aria-hidden='true' />
+            </div>
+          </div>
+        ) : (
+          <SearchBlock
+            buttontexttrue={<i class='fa fa-check' />}
+            buttontextfalse={<i class='fa fa-times' />}
+            size='small'
+            bg={valid ? 'green' : !valid && clicked ? 'red' : 'grey'}
+            action={setScreenName}
+          />
+        )}
+      </div>
+
+      {screenName && (
+        <>
+          <div className='reviews-services-wrapper'>
+            <div className='reviews-services-title'>
+              Выберите/добавьте специализацию
+            </div>
+            <div className='reviews-services-select-wrapper'>
+              <div className='reviews-services-select'>
+                <select
+                  className='form-select'
+                  onChange={handleCategorySelect}
+                  defaultValue='b1b2'
+                  value={category}
+                >
+                  <option value='b1b2' disabled>
+                    Выбор категории
+                  </option>
+                  {categories &&
+                    categories.map(item => (
+                      <option key={item.id} value={item.id}>
+                        {item.title}
+                      </option>
+                    ))}
+                </select>
               </div>
-              <div className='row'>
-                <div className='col-md-8'>
-                  {templates &&
-                    templates.map(item => (
-                      <Review
-                        template={true}
-                        data={item}
-                        key={item.id}
-                        action={handleReviewClick}
-                        text_action={handleReviewText}
-                        attributes_action={handleAttributes}
-                        review_action={handleReview}
-                        proper_phone={properPhone}
-                        success={set_review_success}
-                        error={error}
-                        template_reset={handleTEmplateReset}
-                        />
-                        ))}
-                </div>
-                <div
-                  className='col-md-4 d-flex align-items-center justify-content-center'
-                  style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.08)' }}
+              {category && (
+                <div className='reviews-services-select'>
+                  <select
+                    className='form-select'
+                    onChange={handleServiceSelect}
+                    value={service}
                   >
+                    <option disabled>Выбор специализации</option>
+                    {services &&
+                      services.map(item => (
+                        <option key={item.id} value={item.id}>
+                          {item.title}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className='reviews-services-wrapper'>
+            <div className='reviews-services-title'>
+              Выберите наиболее подходящий коментарий, либо оставьте свой.
+            </div>
+            <div className='mt-3 mb-5'>
+              <p>
+                Стандартные коментарии можно редактировать перед сохранением.
+              </p>
+            </div>
+            
+          </div>
+          
+          <div className='row'>
+            <div className='col-md-7'>
+              {templates &&
+                templates.map(item => (
                   <Review
-                    template={false}
-                    data={templates[0]}
+                    template={true}
+                    data={item}
+                    key={item.id}
                     action={handleReviewClick}
                     text_action={handleReviewText}
                     attributes_action={handleAttributes}
@@ -194,12 +255,42 @@ const ReviewContent = ({
                     error={error}
                     template_reset={handleTEmplateReset}
                   />
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+                ))}
+            </div>
+            <div
+              className='col-md-5'
+            >
+              <Review
+                template={false}
+                data={templates[0]}
+                action={handleReviewClick}
+                text_action={handleReviewText}
+                attributes_action={handleAttributes}
+                review_action={handleReview}
+                proper_phone={properPhone}
+                success={set_review_success}
+                error={error}
+                template_reset={handleTEmplateReset}
+              />
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  )
+
+  return (
+    <Fragment>
+      <PanelLayout
+        title='Написать отзыв'
+        heading={
+          templatesRequestSent
+            ? 'Введите номер телефона, или ник исполнителя'
+            : 'Кому Вы хотите оставить отзыв?'
+        }
+      >
+        {templatesRequestSent ? <SecondaryStatus /> : <InitialStatus />}
+      </PanelLayout>
     </Fragment>
   )
 }
@@ -211,11 +302,12 @@ Review.propTypes = {
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
   user: state.auth.user,
-  review_templates: state.review.review_templates,
+  templates: state.review.review_templates,
   reviews_about_me: state.review.reviews_about_me,
   my_reviews: state.review.my_reviews,
   set_review_success: state.review.set_review_success,
   error: state.review.error,
+  categories: state.service.categories,
 })
 
 export default connect(mapStateToProps, {
@@ -226,4 +318,5 @@ export default connect(mapStateToProps, {
   setComment,
   resetStatus,
   resetReviewError,
+  get_all_categories,
 })(ReviewContent)

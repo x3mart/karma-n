@@ -1,0 +1,160 @@
+$main-size: 98px;
+$img-size: 46px;
+$font-size: 22px;
+$button-font-size: 22px;
+$padding: 20px 40px;
+$small-size: 80px;
+$small-img-size: 38px;
+$small-font-size: 18px;
+$small-button-font-size: 18px;
+$small-padding: 20px 40px;
+$white: #ffffff;
+$light-grey: #f8f7f5;
+$dark-grey: #4e4e4e;
+$green: #44ee95;
+
+.main-section-search-block {
+  display: flex;
+  &.big {
+    & .search-block {
+      min-width: $main-size;
+      height: $main-size;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      & img {
+        width: 46px;
+        height: 46px;
+      }
+      &.phone {
+        background-color: $white;
+      }
+      &.insta {
+        background-color: $light-grey;
+      }
+      &.vk {
+        background-color: #4e4e4e;
+      }
+    }
+
+    & .search-block-input {
+      height: $main-size;
+      min-width: 400px;
+      padding: $padding;
+      font-size: $font-size;
+      line-height: 62px;
+      color: #959595;
+      border: none;
+      transition: width 1s ease-in-out, left 1.5s ease-in-out;
+      &.phone,
+      .phone:focus,
+      .vk,
+      .vk:focus {
+        background-color: $white;
+      }
+      &.insta {
+        background-color: $light-grey;
+      }
+      &.insta:focus {
+        background-color: $light-grey;
+      }
+    }
+
+    & .search-block-button {
+      min-width: 350px;
+      height: $main-size;
+      border: none;
+      font-weight: bold;
+      font-size: $button-font-size;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      background: $green;
+      color: #ffffff;
+      padding: 0 100px;
+      white-space: nowrap;
+      &:disabled {
+        pointer-events: none;
+        background: #bdbdbd;
+      }
+    }
+  }
+  &.small {
+    & .search-block {
+      min-width: $small-size;
+      height: $small-size;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      & img {
+        width: 46px;
+        height: 46px;
+      }
+      &.phone {
+        background-color: $white;
+      }
+      &.insta {
+        background-color: $light-grey;
+      }
+      &.vk {
+        background-color: #4e4e4e;
+      }
+    }
+
+    & .search-block-input {
+      height: $small-size;
+      min-width: 300px;
+      padding: $small-padding;
+      font-size: $small-font-size;
+      line-height: 62px;
+      color: #959595;
+      border: none;
+      transition: width 1s ease-in-out, left 1.5s ease-in-out;
+      &.phone,
+      .phone:focus,
+      .vk,
+      .vk:focus {
+        background-color: $white;
+      }
+      &.insta {
+        background-color: $light-grey;
+      }
+      &.insta:focus {
+        background-color: $light-grey;
+      }
+    }
+
+    & .search-block-button {
+      min-width: $small-size;
+      height: $small-size;
+      background: #44ee95;
+      border: none;
+      font-weight: bold;
+      font-size: $small-button-font-size;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      color: #ffffff;
+      //   padding: 0 100px;
+      white-space: nowrap;
+      &:disabled {
+        pointer-events: none;
+        background: #bdbdbd;
+      }
+      &.grey {
+        background: #bdbdbd;
+        pointer-events: none;
+      }
+      &.green {
+        background: $green;
+        color: #ffffff;
+      }
+      &.red {
+        background: #dc3545;
+        color: #ffffff;
+      }
+    }
+  }
+}

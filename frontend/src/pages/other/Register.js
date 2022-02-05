@@ -17,6 +17,7 @@ import { isNotEmptyObject } from '../../functions'
 import InputMask from 'react-input-mask'
 import { useForm, Controller } from 'react-hook-form'
 import { Link, Redirect } from 'react-router-dom'
+// import RegisterOk from '../../components/RegisterOk'
 
 const Register = ({
   location,
@@ -27,10 +28,9 @@ const Register = ({
   signup,
   phone,
   isAuthenticated,
+  status,
 }) => {
   const { pathname } = location
-
-  const { register, handleSubmit, control } = useForm()
 
   const [phoneNumber, setPhoneNumber] = useState('')
   const [smsCode, setSmsCode] = useState('')
@@ -46,6 +46,7 @@ const Register = ({
 
   const [errorStatus, setErrorStatus] = useState('')
   const [errorText, setErrorText] = useState([])
+  const [regStatus, setRegStatus] = useState(false)
 
   const handleRegister = e => {
     const data = {
@@ -59,9 +60,9 @@ const Register = ({
       signup(data)
     }
   }
-  
+
   // setAccountCreated(true)
-  
+
   useEffect(() => {
     setPhoneNumber(phone)
   }, [phone])
@@ -101,7 +102,7 @@ const Register = ({
   }, [timer, seconds])
 
   if (isAuthenticated) {
-    return <Redirect to='/my-account' />
+    return <Redirect to='/profile' />
   }
   if (accountCreated) {
     setPhoneApproved('+70000000000', '00000')
@@ -148,159 +149,52 @@ const Register = ({
                       <Tab.Pane eventKey='register'>
                         <div className='login-form-container'>
                           <div className='login-register-form'>
-                            <div>
-                              {/* <form
-                                onSubmit={event => event.preventDefault()}
-                                className={`${phone_approved ? 'd-none' : ''}`}
-                              >
-                                <div className='row'>
-                                  <div className='col-lg-8'>
-                                    <Controller
-                                      control={control}
-                                      name='phone'
-                                      defaultValue={phoneNumber}
-                                      render={({ field }) => (
-                                        <InputMask
-                                          type='tel'
-                                          className={
-                                            errorStatus
-                                              ? 'form-control is-invalid'
-                                              : ''
-                                          }
-                                          mask='+7 (999) 999-99-99'
-                                          placeholder='Номер телефона'
-                                          value={phoneNumber}
-                                          onChange={e =>
-                                            field.onChange(
-                                              setPhoneNumber(e.target.value)
-                                            )
-                                          }
-                                        />
-                                      )}
-                                    />
-                                    <div
-                                      className={`small-text ${
-                                        !activated ? 'd-none' : 'd-flex'
-                                      }`}
-                                    >
-                                      Повторно отправить смс вы сможете через{' '}
-                                      {seconds} сек.
-                                    </div>
-                                    {errorText
-                                      ? errorText.map((item, i) => (
-                                          <div
-                                            key={i}
-                                            className='invalid-feedback'
-                                          >
-                                            {item}
-                                          </div>
-                                        ))
-                                      : ''}
-                                  </div>
-
-                                  <div className='col-lg-4 d-flex justify-content-center justify-content-lg-end mb-3 mb-lg-0'>
-                                    <div className='button-box'>
-                                      <button
-                                        className='mb-3 mb-lg-0'
-                                        onClick={() => handleSmsSend()}
-                                        style={
-                                          !buttonActive
-                                            ? { pointerEvents: 'none' }
-                                            : {}
-                                        }
-                                      >
-                                        <span>отправить</span>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </form> */}
-                              {/* <form
-                                onSubmit={event => event.preventDefault()}
-                                className={`${phone_approved ? 'd-none' : ''}`}
-                              >
-                                <div className='row'>
-                                  <div className='col-lg-8'>
-                                    <Controller
-                                      control={control}
-                                      name='code'
-                                      defaultValue={phoneNumber}
-                                      render={({ field }) => (
-                                        <InputMask
-                                          className={
-                                            errorStatus
-                                              ? 'form-control is-invalid'
-                                              : ''
-                                          }
-                                          mask='99999'
-                                          placeholder='Код из SMS'
-                                          value={smsCode}
-                                          onChange={e =>
-                                            field.onChange(
-                                              setSmsCode(e.target.value)
-                                            )
-                                          }
-                                        />
-                                      )}
-                                    />
-                                  </div>
-
-                                  <div className='col-lg-4 d-flex justify-content-center justify-content-lg-end'>
-                                    <div className='button-box'>
-                                      <button onClick={() => handleSmsCheck()}>
-                                        <span>подтвердить</span>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </form> */}
-                              <form
-                                onSubmit={handleRegister}
-                                // className={`${phone_approved ? '' : 'd-none'}`}
-                              >
-                                <input
-                                  name='user-email'
-                                  placeholder='Email'
-                                  type='email'
-                                  onChange={v => {
-                                    setEmail(v.target.value)
-                                  }}
-                                  value={email}
-                                />
-                                <input
-                                  name='name'
-                                  placeholder='Имя пользователя'
-                                  type='text'
-                                  onChange={v => {
-                                    setName(v.target.value)
-                                  }}
-                                  value={name}
-                                />
-                                <input
-                                  name='password'
-                                  placeholder='Пароль'
-                                  type='password'
-                                  onChange={v => {
-                                    setPassword(v.target.value)
-                                  }}
-                                  value={password}
-                                />
-                                <input
-                                  name='re_password'
-                                  placeholder='Подтвердите пароль'
-                                  type='password'
-                                  onChange={v => {
-                                    setRePassword(v.target.value)
-                                  }}
-                                  value={rePassword}
-                                />
-                                <div className='button-box'>
-                                  <button type='submit'>
-                                    <span>Зарегистрироваться</span>
-                                  </button>
-                                </div>
-                              </form>
-                            </div>
+                            <form
+                              onSubmit={handleRegister}
+                              // className={`${phone_approved ? '' : 'd-none'}`}
+                            >
+                              <input
+                                name='user-email'
+                                placeholder='Email'
+                                type='email'
+                                onChange={v => {
+                                  setEmail(v.target.value)
+                                }}
+                                value={email}
+                              />
+                              <input
+                                name='name'
+                                placeholder='Имя пользователя'
+                                type='text'
+                                onChange={v => {
+                                  setName(v.target.value)
+                                }}
+                                value={name}
+                              />
+                              <input
+                                name='password'
+                                placeholder='Пароль'
+                                type='password'
+                                onChange={v => {
+                                  setPassword(v.target.value)
+                                }}
+                                value={password}
+                              />
+                              <input
+                                name='re_password'
+                                placeholder='Подтвердите пароль'
+                                type='password'
+                                onChange={v => {
+                                  setRePassword(v.target.value)
+                                }}
+                                value={rePassword}
+                              />
+                              <div className='button-box'>
+                                <button type='submit'>
+                                  <span>Зарегистрироваться</span>
+                                </button>
+                              </div>
+                            </form>
                           </div>
                         </div>
                       </Tab.Pane>
@@ -325,6 +219,7 @@ const mapStateToProps = state => ({
   phone_error: state.auth.phone_error,
   phone: state.auth.phone,
   isAuthenticated: state.auth.isAuthenticated,
+  status: state.auth.reg_status,
 })
 
 export default connect(mapStateToProps, {
