@@ -42,13 +42,13 @@ class ReplyMarkup():
     def __init__(self):
         pass
 
-    def get_review_attributes_buttons(self, attribute):
+    def get_review_attributes_buttons(self, attribute, reply):
         buttons = []
-        button2 = InlineKeyboardButtonSerializer(InlineButton(text=f'1', callback_data=f'/attribute_value {attribute} 1')).data
-        button3 = InlineKeyboardButtonSerializer(InlineButton(text=f'2', callback_data=f'/attribute_value {attribute} 2')).data
-        button4 = InlineKeyboardButtonSerializer(InlineButton(text=f'3', callback_data=f'/attribute_value {attribute} 3')).data
-        button5 = InlineKeyboardButtonSerializer(InlineButton(text=f'4', callback_data=f'/attribute_value {attribute} 4')).data
-        button6 = InlineKeyboardButtonSerializer(InlineButton(text=f'5', callback_data=f'/attribute_value {attribute} 5')).data
+        button2 = InlineKeyboardButtonSerializer(InlineButton(text=f'1', callback_data=f'/attribute_value {attribute} 1 {reply}')).data
+        button3 = InlineKeyboardButtonSerializer(InlineButton(text=f'2', callback_data=f'/attribute_value {attribute} 2 {reply}')).data
+        button4 = InlineKeyboardButtonSerializer(InlineButton(text=f'3', callback_data=f'/attribute_value {attribute} 3 {reply}')).data
+        button5 = InlineKeyboardButtonSerializer(InlineButton(text=f'4', callback_data=f'/attribute_value {attribute} 4 {reply}')).data
+        button6 = InlineKeyboardButtonSerializer(InlineButton(text=f'5', callback_data=f'/attribute_value {attribute} 5 {reply}')).data
         buttons.append([button2, button3, button4, button5, button6])
         return buttons
     
@@ -168,7 +168,7 @@ class ReplyMarkup():
         elif name == 'addreview':
             SendMessage("1045490278", 'kwargs').send()
             # SendMessage("1045490278", kwargs['attribute']).send()
-            keyboard = self.get_review_attributes_buttons('1')
+            keyboard = self.get_review_attributes_buttons(kwargs['attribute'], kwargs['reply'])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -452,9 +452,9 @@ class Update():
             self.tg_account.save()
             attribute = get_attributes(self.tg_account.reply_2)[0]
             text = f'Оцените {attribute.title}'
-            kwargs={'attribute': attribute.id}
+            kwargs={'attribute': attribute.id, 'reply': 5}
             response = SendMessage(chat_id, kwargs['attribute']).send()
-            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account)
+            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup).send()
         else:
             response = self.command_dispatcher('message', command, args) if command else None 
