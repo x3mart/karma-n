@@ -115,8 +115,9 @@ class ReplyMarkup():
                 customer_rating = reviewable.customer_rating if reviewable.customer_rating else 0
                 button = InlineButton(text=f'{reviewable.screen_name} {executor_rating}/{customer_rating}', callback_data=f'/reviews {reviewable.polymorphic_ctype.model} {reviewable.screen_name} 0 5')
                 keyboard.append([button])
-            button = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
-            keyboard.append([button])
+            button1 = InlineButton(text='Искать отзывы', callback_data=f'/reviews')
+            button2 = InlineButton(text='Написать отзыв', callback_data=f'/addreview')
+            keyboard.append([button1, button2])
         elif name == 'reviews':
             review = kwargs.get('review')
             keyboard = self.get_likes_markup(review, tg_account, 'review')
@@ -165,8 +166,8 @@ class ReplyMarkup():
             if button:
                 keyboard.append(button)
         elif name == 'addreview':
-            SendMessage(1045490278, 'kwargs').send()
-            SendMessage(1045490278, kwargs['attribute']).send()
+            SendMessage("1045490278", 'kwargs').send()
+            SendMessage("1045490278", kwargs['attribute']).send()
             keyboard = self.get_review_attributes_buttons(kwargs['attribute'])
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')

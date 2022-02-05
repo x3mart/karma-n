@@ -63,7 +63,7 @@ def get_reviews(user_id):
     attributes = Attribute.objects.prefetch_related('title')
     prefetch_attributes = Prefetch('attributes', queryset=attributes)
     reviews = Review.objects.prefetch_related('owner', prefetch_attributes, 'service', prefetch_reviewable, prefetch_likes, prefetch_comments).annotate(is_my_like=my_like, is_my_dislike=my_dislike)
-    return reviews
+    return reviews.filter(is_active=True)
 
 def get_comments(user_id):
     my_like = Count('likes', filter=(~Q(likes__dislike=True) & Q(likes__owner=user_id)))
