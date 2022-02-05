@@ -1,7 +1,7 @@
 <b>{{ likeable.likeableable.screen_name }}</b>
 {{ likeable.created_at }}
 От: <i>{% firstof likeable.owner.full_name likeable.owner.name %}</i>
-Общая оценка: <i>{{ likeable.rating }}</i>
+Общая оценка: <i>{{ likeable.rating|floatformat:1 }}</i>
 {% if likeable.about_customer %}Отзыв о потребителе{% else %}Отзыв об исполнителе{% endif %}
 Лайки {{ likeable.count_likes }} Дизлайки
 Коментарии: {{ likeable.count_comments }}
