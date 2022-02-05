@@ -20,7 +20,7 @@ from .models import *
 from reviews.models import AttributeTitle, Review
 
 
-COMMANDS_LIST = ('reviews', 'review', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments', 'addreview')
+COMMANDS_LIST = ('reviews', 'review', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments', 'addreview', 'attribute_value')
 
 def get_tg_account(user):
     tg_account, created = TelegramAccount.objects.get_or_create(tg_id=user['id'])
@@ -166,8 +166,6 @@ class ReplyMarkup():
             if button:
                 keyboard.append(button)
         elif name == 'addreview':
-            SendMessage("1045490278", 'kwargs').send()
-            # SendMessage("1045490278", kwargs['attribute']).send()
             keyboard = self.get_review_attributes_buttons(**kwargs)
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
@@ -401,6 +399,30 @@ class Update():
             text =  render_to_string('review.html', {'likeable': review})
             reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
+        elif command == 'attribute_value':
+            print('wow')
+            if args[2] == '1':
+                self.tg_account.reply_5 = f'{get_attributes(self.tg_account.reply_2)[0]} {args[1]}'
+                self.tg_account.save()
+            else:
+                attribute = get_attributes(self.tg_account.reply_2)[int(args[2] - 1)]
+                self.tg_account.reply_5 = self.tg_account.reply_5 + f',{attribute.id} {args[1]}'
+                self.tg_account.save()
+                attrs = self.tg_account.reply_5
+                attrs = attrs.split(',')
+                attrs = list(map(lambda attr: tuple(attr.split(' ')), attrs))
+                attributes = []
+                for attribute in attrs:
+                    id, value = attribute
+                    title = get_attributes(self.tg_account.reply_2).get(pk=int(id)).title
+                    attributes.append({'value': value, 'title': title})
+                print(attributes)
+            attr = int(args[2]) - 1
+            next = get_attributes(self.tg_account.reply_2)[int(args[2])]
+            text =  render_to_string('review_attrs.html', {'attributes': attributes, 'next_title': next.title})
+            kwargs={'attribute': next.id, 'reply': int(args[2]) + 1}
+            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, **kwargs)
+            response = SendMessage(chat_id, text, reply_markup).send()
         else:
             response = None
         return response
@@ -452,8 +474,7 @@ class Update():
             self.tg_account.save()
             attribute = get_attributes(self.tg_account.reply_2)[0]
             text = f'Оцените {attribute.title}'
-            kwargs={'attribute': attribute.id, 'reply': 5}
-            response = SendMessage(chat_id, kwargs['attribute']).send()
+            kwargs={'attribute': attribute.id, 'reply': 1}
             reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, reply_markup).send()
         else:
@@ -494,19 +515,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    try:
-        update = Update(request.data)
-        if hasattr(update,'message'):
-            # response = SendMessage(chat_id=1045490278, text='message').send()
-            update.message_dispatcher()
-        elif hasattr(update,'callback_query'):
-            update.callback_dispatcher()
+    # try:
+    update = Update(request.data)
+    if hasattr(update,'message'):
+        # response = SendMessage(chat_id=1045490278, text='message').send()
+        update.message_dispatcher()
+    elif hasattr(update,'callback_query'):
+        update.callback_dispatcher()
         # method = "sendMessage"
         # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
         # data = SendMessageSerializer(send_message).data
         # requests.post(TG_URL + method, data)
-    except:
-        pass
+    # except:
+        # pass
     return Response({}, status=200)
 
     
