@@ -42,7 +42,7 @@ class ReplyMarkup():
     def __init__(self):
         pass
 
-    def get_review_attributes_buttons(self, attribute, reply):
+    def get_review_attributes_buttons(self, attribute, reply, **kwargs):
         buttons = []
         button2 = InlineKeyboardButtonSerializer(InlineButton(text=f'1', callback_data=f'/attribute_value {attribute} 1 {reply}')).data
         button3 = InlineKeyboardButtonSerializer(InlineButton(text=f'2', callback_data=f'/attribute_value {attribute} 2 {reply}')).data
@@ -168,7 +168,7 @@ class ReplyMarkup():
         elif name == 'addreview':
             SendMessage("1045490278", 'kwargs').send()
             # SendMessage("1045490278", kwargs['attribute']).send()
-            keyboard = self.get_review_attributes_buttons(kwargs['attribute'], kwargs['reply'])
+            keyboard = self.get_review_attributes_buttons(**kwargs)
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
