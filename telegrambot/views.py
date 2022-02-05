@@ -436,7 +436,7 @@ class Update():
             model = apps.get_model('reviewables', self.tg_account.reply_1.capitalize())
             reviewable, created = model.objects.get_or_create(screen_name=self.tg_account.reply_3)
             about = True if self.tg_account.reply_2 == 'customer' else False
-            review = Review.objects.create(body=self.tg_account.reply_3, about_customer=about, owner=self.tg_account.account, reviewable=reviewable)
+            review = Review.objects.create(body=self.tg_account.reply_4, about_customer=about, owner=self.tg_account.account, reviewable=reviewable)
             text =  render_to_string('review.html', {'likeable': review})
             # reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
             response = SendMessage(chat_id, text, None, message.message_id).edit_text()
