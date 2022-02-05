@@ -20,7 +20,7 @@ from .models import *
 from reviews.models import AttributeTitle, Review
 
 
-COMMANDS_LIST = ('reviews', 'review', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments', 'addreview', 'attribute_value')
+COMMANDS_LIST = ('reviews', 'review', 'user_info', 'start', 'login', 'me', 'like', 'dislike', 'comments', 'addreview', 'attribute_value','confirm_addreview')
 
 def get_tg_account(user):
     tg_account, created = TelegramAccount.objects.get_or_create(tg_id=user['id'])
