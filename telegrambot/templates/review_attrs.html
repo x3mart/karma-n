@@ -1,3 +1,3 @@
 {% for attribute in attributes %} {{ attribute.title }} - {{ attribute.value }}
 {% endfor %}
-<b>Оцените {{ next_title }}</b>
+{% if next_title %}<b>Оцените {{ next_title }}</b>{% endif %}

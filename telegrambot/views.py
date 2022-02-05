@@ -167,6 +167,10 @@ class ReplyMarkup():
                 keyboard.append(button)
         elif name == 'addreview':
             keyboard = self.get_review_attributes_buttons(**kwargs)
+        elif name == 'confirm_addreview':
+            button1 = InlineButton(text='Отправить', callback_data=f'/confirm_addreview')
+            button2 = InlineButton(text='Отменить', callback_data=f'/cancel_addreview')
+            keyboard = [[button1], [button2]]
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -419,11 +423,23 @@ class Update():
                 attributes.append({'value': value, 'title': attribute.title})
             print(attributes)
             attr = int(args[2]) - 1
-            next = get_attributes(self.tg_account.reply_2)[int(args[2])]
-            text =  render_to_string('review_attrs.html', {'attributes': attributes, 'next_title': next.title})
-            kwargs={'attribute': next.id, 'reply': int(args[2]) + 1}
-            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, **kwargs)
+            if int(args[2]) < 4:
+                next = get_attributes(self.tg_account.reply_2)[int(args[2])]
+                text =  render_to_string('review_attrs.html', {'attributes': attributes, 'next_title': next.title})
+                kwargs={'attribute': next.id, 'reply': int(args[2]) + 1}
+                reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, **kwargs)
+            else:
+                text =  render_to_string('review_attrs.html', {'attributes': attributes})
+                reply_markup = ReplyMarkup().get_markup('confirm_addreview', self.tg_account)
             response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
+        elif command == 'confirm_addreview':
+            model = apps.get_model('reviewables', self.tg_account.reply_1.capitalize())
+            reviewable, created = model.objects.get_or_create(screen_name=self.tg_account.reply_3)
+            about = True if self.tg_account.reply_2 == 'customer' else False
+            review = Review.objects.create(body=self.tg_account.reply_3, about_customer=about, owner=self.tg_account.account, reviewable=reviewable)
+            text =  render_to_string('review.html', {'likeable': review})
+            # reply_markup = ReplyMarkup().get_markup(command, tg_account=self.tg_account, **kwargs)
+            response = SendMessage(chat_id, text, None, message.message_id).edit_text()
         else:
             response = None
         return response
