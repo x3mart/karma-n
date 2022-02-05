@@ -283,7 +283,7 @@ class Update():
         attributes = []
         for attribute in attrs:
             id, value = attribute
-            attribute = get_attributes(self.tg_account.reply_2).get(pk=int(id))
+            attribute = AttributeTitle.objects.get(pk=int(id))
             attributes.append({'value': value, 'title': attribute.title, 'title_id': attribute.id})
         return attributes
     
@@ -536,19 +536,19 @@ class Update():
 @permission_classes((permissions.AllowAny,))
 def tg_update_handler(request):
     # response = SendMessage(chat_id=1045490278, text='update').send()
-    try:
-        update = Update(request.data)
-        if hasattr(update,'message'):
-            # response = SendMessage(chat_id=1045490278, text='message').send()
-            update.message_dispatcher()
-        elif hasattr(update,'callback_query'):
-            update.callback_dispatcher()
+    # try:
+    update = Update(request.data)
+    if hasattr(update,'message'):
+        # response = SendMessage(chat_id=1045490278, text='message').send()
+        update.message_dispatcher()
+    elif hasattr(update,'callback_query'):
+        update.callback_dispatcher()
         # method = "sendMessage"
         # send_message = SendMessage(chat_id=1045490278, text=f'{request.data}')
         # data = SendMessageSerializer(send_message).data
         # requests.post(TG_URL + method, data)
-    except:
-        pass
+    # except:
+        # pass
     return Response({}, status=200)
 
     

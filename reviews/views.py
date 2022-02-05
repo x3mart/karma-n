@@ -53,7 +53,7 @@ def get_review_rating(review):
 def create_attributes(review, attributes):
         objs = []
         for attribute in attributes:
-            objs.append(Attribute(review=review, title_id=attribute['title'], value=float(attribute['value'])))
+            objs.append(Attribute(review=review, title_id=attribute['title_id'], value=float(attribute['value'])))
         Attribute.objects.bulk_create(objs)
 
 def get_reviews(user_id):
@@ -110,7 +110,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karma-n.ru/">Смотреть</a></div>')
 
     def get_template_attributes(self, template):
-        attributes = Attribute.objects.filter(review_template=template).values('title', 'value')
+        attributes = Attribute.objects.filter(review_template=template).values('title_id', 'value')
         return attributes
     
     def get_template(self, template):
