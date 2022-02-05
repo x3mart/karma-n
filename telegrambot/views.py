@@ -167,8 +167,8 @@ class ReplyMarkup():
                 keyboard.append(button)
         elif name == 'addreview':
             SendMessage("1045490278", 'kwargs').send()
-            SendMessage("1045490278", kwargs['attribute']).send()
-            keyboard = self.get_review_attributes_buttons(kwargs['attribute'])
+            # SendMessage("1045490278", kwargs['attribute']).send()
+            keyboard = self.get_review_attributes_buttons('1')
         else:
             button1 = InlineButton(text='Авторизоваться', callback_data=f'/login')
             button2 = InlineButton(text='Зарегистрироваться', url='https://novosti247.ru')
@@ -454,7 +454,7 @@ class Update():
             text = f'Оцените {attribute.title}'
             kwargs={'attribute': attribute.id}
             response = SendMessage(chat_id, kwargs['attribute']).send()
-            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, kwargs)
+            reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account)
             response = SendMessage(chat_id, text, reply_markup).send()
         else:
             response = self.command_dispatcher('message', command, args) if command else None 
