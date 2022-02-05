@@ -423,7 +423,7 @@ class Update():
             text =  render_to_string('review_attrs.html', {'attributes': attributes, 'next_title': next.title})
             kwargs={'attribute': next.id, 'reply': int(args[2]) + 1}
             reply_markup = ReplyMarkup().get_markup('addreview', self.tg_account, **kwargs)
-            response = SendMessage(chat_id, text, reply_markup).send()
+            response = SendMessage(chat_id, text, reply_markup, message.message_id).edit_text()
         else:
             response = None
         return response
