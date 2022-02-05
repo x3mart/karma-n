@@ -402,21 +402,22 @@ class Update():
         elif command == 'attribute_value':
             print('wow')
             if args[2] == '1':
-                self.tg_account.reply_5 = f'{get_attributes(self.tg_account.reply_2)[0]} {args[1]}'
+                self.tg_account.reply_5 = f'{get_attributes(self.tg_account.reply_2)[0].id} {args[1]}'
                 self.tg_account.save()
             else:
                 attribute = get_attributes(self.tg_account.reply_2)[int(args[2])-1]
                 self.tg_account.reply_5 = self.tg_account.reply_5 + f',{attribute.id} {args[1]}'
                 self.tg_account.save()
-                attrs = self.tg_account.reply_5
-                attrs = attrs.split(',')
-                attrs = list(map(lambda attr: tuple(attr.split(' ')), attrs))
-                attributes = []
-                for attribute in attrs:
-                    id, value = attribute
-                    title = get_attributes(self.tg_account.reply_2).get(pk=int(id)).title
-                    attributes.append({'value': value, 'title': title})
-                print(attributes)
+            attrs = self.tg_account.reply_5
+            attrs = attrs.split(',')
+            attrs = list(map(lambda attr: tuple(attr.split(' ')), attrs))
+            attributes = []
+            for attribute in attrs:
+                id, value = attribute
+                print(id)
+                attribute = get_attributes(self.tg_account.reply_2).get(pk=int(id))
+                attributes.append({'value': value, 'title': attribute.title})
+            print(attributes)
             attr = int(args[2]) - 1
             next = get_attributes(self.tg_account.reply_2)[int(args[2])]
             text =  render_to_string('review_attrs.html', {'attributes': attributes, 'next_title': next.title})
