@@ -2,6 +2,7 @@ from djoser.views import UserViewSet
 from djoser.conf import settings
 from django.db.models import Prefetch
 from rest_framework.decorators import action
+from services.models import Service
 from utils.images import image_processing
 from rest_framework.response import Response
 from accounts.serializers import AccountSerializer, AvatarSerializer
@@ -25,9 +26,31 @@ class AccountViewSet(UserViewSet):
             return AvatarSerializer
         return super().get_serializer_class()
     
-    def perform_destroy(self, instance):
-        instance.reviewables.clear()
-        return super().perform_destroy(instance)
+    def perform_update(self, serializer):
+        services = self.request.data.get('services')
+        if services:
+            services = [Service.objects.get_or_create(title=service['title'], category_id=service['category'])[0] for service in services]
+
+        return super().perform_update(serializer)
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        services = request.data.get('services')
+        if services:
+            services = [Service.objects.get_or_create(title=service['title'], category_id=service['category'])[0] for service in services]
+        else:
+            services = []
+        instance.services.set(services)
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
     
     @action(methods=['patch'], detail=True)
     def avatar(self, request, *args, **kwargs):
