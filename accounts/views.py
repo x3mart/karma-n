@@ -53,7 +53,7 @@ class AccountViewSet(UserViewSet):
         if reviewables:
             reviewables_set.append([apps.get_model('reviewables', reviewable['resourcetype'].capitalize()).objects.get_or_create(screen_name=reviewable['screen_name'])[0].id for reviewable in reviewables if reviewable['resourcetype'] != 'phone'])
             reviewables_set.append([Phone.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']))[0].id for reviewable in reviewables if reviewable['resourcetype'] == 'phone'])
-        Reviewable.objects.filter(pk__in=reviewables_set).update(owner=instance)
+            Reviewable.objects.filter(pk__in=reviewables_set).update(owner=instance)
             
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
