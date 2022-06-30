@@ -51,8 +51,8 @@ class AccountViewSet(UserViewSet):
         reviewables = request.data.get('reviewables')
         reviewables_set=[]
         if reviewables:
-            reviewables_set.append([apps.get_model('reviewables', reviewable['resourcetype'].capitalize()).objects.get_or_create(screen_name=reviewable['screen_name'])[0].id for reviewable in reviewables if reviewable['resourcetype'] != 'phone'])
-            reviewables_set.append([Phone.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']))[0].id for reviewable in reviewables if reviewable['resourcetype'] == 'phone'])
+            reviewables_set += [apps.get_model('reviewables', reviewable['resourcetype'].capitalize()).objects.get_or_create(screen_name=reviewable['screen_name'])[0].id for reviewable in reviewables if reviewable['resourcetype'] != 'phone']
+            reviewables_set += [Phone.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']))[0].id for reviewable in reviewables if reviewable['resourcetype'] == 'phone']
             print(reviewables_set)
         if len(reviewables_set):
             Reviewable.objects.filter(pk__in=reviewables_set).update(owner_id=instance.id)
