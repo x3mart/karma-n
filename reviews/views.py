@@ -1,4 +1,3 @@
-from karman.settings import SMS_SECRET
 from notifications.models import Message
 from karman.permissions import KarmanPermission, ReviewPermission, CommentPermission
 from reviewables.models import Vk, Instagram, Phone, Reviewable
@@ -94,17 +93,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
     ordering = ('-created_at', '-count_likes')
 
     def send_sms(self, reviewable):
-        phone_number = clean_phone(reviewable.screen_name)
-        url = 'https://sms.ru/sms/send/'
-        sms_data = {
-            'api_id': SMS_SECRET,
-            'to':phone_number,
-            'msg':f'На Ваш номер телефона {reviewable.screen_name} был оставлен отзыв на сайте KarmaN. https://karma-n.ru/',
-            'json':1
-            }
-        sms_reponse = requests.get(url, params=sms_data)
-        sms = sms_reponse.json()
-        return sms
+        # phone_number = clean_phone(reviewable.screen_name)
+        # url = 'https://sms.ru/sms/send/'
+        # sms_data = {
+        #     'api_id': SMS_SECRET,
+        #     'to':phone_number,
+        #     'msg':f'На Ваш номер телефона {reviewable.screen_name} был оставлен отзыв на сайте KarmaN. https://karma-n.ru/',
+        #     'json':1
+        #     }
+        # sms_reponse = requests.get(url, params=sms_data)
+        # sms = sms_reponse.json()
+        # return sms
+        pass
     
     def create_message(self, reviewable):
         Message.objects.create(owner=reviewable.owner, title='Новый отзыв', body=f'<div>Новый отзыв на ваш {str(reviewable.polymorphic_ctype).replace("reviewables |", "")}: {reviewable.screen_name}. <a href="https://karma-n.ru/">Смотреть</a></div>')
@@ -142,7 +142,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
             data['about_customer'] = template.about_customer     
         review = Review.objects.create(owner=request.user, reviewable=reviewable, **data)
         if not reviewable.owner and ctype.capitalize() == 'Phone':
-            self.send_sms(reviewable)
+            # self.send_sms(reviewable)
+            pass
         elif reviewable.owner:
             self.create_message(reviewable)
         if template:

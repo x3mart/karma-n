@@ -11,7 +11,7 @@ from django.apps import apps
 from .models import Check
 from django.contrib.contenttypes.models import ContentType
 from .serializers import GetCodeSerializer, CheckCodeSerializer
-from karman.settings import SMS_SECRET, VK_SECRET, VK_TOKEN
+from karman.settings import SMSAERO, VK_SECRET, VK_TOKEN
 import numpy as np
 from utils.reviewables import clean_phone
 from reviewables.models import Vk, Phone, Instagram, Reviewable
@@ -61,20 +61,18 @@ def get_code(request):
         error_message = send_code_possibility(check, created)
         if error_message:
             return Response(error_message, status=400)
-        url = 'https://sms.ru/sms/send'
-        sms_data = {
-            'api_id': SMS_SECRET,
-            'to':screen_name,
-            'msg':f'Ваш код подтверждения телефона на сайте Karma-N {code}',
-            'json':1
+        url = f'https://x3mart@gmail.com:{SMSAERO}@gate.smsaero.ru/v2/flashcall/send'
+        call_data = {
+            'phone':screen_name,
+            'code':f'{code}'
             }
         try:
-            sms_reponse = requests.get(url, params=sms_data)
-            sms = sms_reponse.json()
+            call_reponse = requests.get(url, params=call_data)
+            call = call_reponse.json()
         except:
             return Response({'error':'Ошибка связи. Отправьте запрос еще раз'}, status=400)
-        if sms['status_code'] != 100:
-            return Response({'error':sms['status']}, sms['status_code'])
+        if not call['success']:
+            return Response({'error':call['message']}, call['data'])
     elif screen_name and type == 'vk':
         url = 'https://api.vk.com/method/utils.resolveScreenName'
         vk_data = {
@@ -171,4 +169,6 @@ def vk_handler(request):
     secret = request.data.get('secret', None)
     if secret == VK_SECRET:
         return Response({},status=200)
+    if request.data.get('group_id') == 209432771:
+        return Response('f85e17c9',status=200)
     return HttpResponseBadRequest()
