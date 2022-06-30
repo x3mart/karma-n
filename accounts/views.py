@@ -2,11 +2,12 @@ from djoser.views import UserViewSet
 from djoser.conf import settings
 from django.db.models import Prefetch
 from rest_framework.decorators import action
-from reviewables.models import Reviewable
+from reviewables.models import Phone, Reviewable
 from services.models import Service
 from utils.images import image_processing
 from utils.reviewables import clean_phone
 from rest_framework.response import Response
+from django.apps import apps
 from accounts.serializers import AccountSerializer, AvatarSerializer
 from reviews.models import UserCustomerAttributeAvgValue, UserExecutorAttributeAvgValue
 
@@ -50,8 +51,8 @@ class AccountViewSet(UserViewSet):
         reviewables = request.data.get('reviewables')
         reviewables_set=[]
         if reviewables:
-            reviewables_set.append([Reviewable.objects.get_or_create(screen_name=reviewable['screen_name'], resourcetype=reviewable['resourcetype'])[0] for reviewable in reviewables if reviewable['resourcetype'] != 'Phone'])
-            reviewables_set.append([Reviewable.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']), resourcetype=reviewable['resourcetype'])[0] for reviewable in reviewables if reviewable['resourcetype'] == 'Phone'])
+            reviewables_set.append([apps.get_model('reviewables', reviewable['resourcetype'].capitalize()).objects.get_or_create(screen_name=reviewable['screen_name'])[0] for reviewable in reviewables if reviewable['resourcetype'] != 'phone'])
+            reviewables_set.append([Phone.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']))[0] for reviewable in reviewables if reviewable['resourcetype'] == 'phone'])
         instance.reviewables.set(reviewables_set)
             
         if getattr(instance, '_prefetched_objects_cache', None):
