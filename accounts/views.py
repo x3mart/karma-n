@@ -30,7 +30,7 @@ class AccountViewSet(UserViewSet):
         return super().perform_destroy(instance)
     
     @action(methods=['patch'], detail=True)
-    def avatar(self, request, pk=None):
+    def avatar(self, request, *args, **kwargs):
         user = self.get_object()
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
