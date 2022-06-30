@@ -168,7 +168,7 @@ def check_code(request):
 def vk_handler(request):
     secret = request.data.get('secret', None)
     if secret == VK_SECRET:
-        return Response({},status=200)
+        return Response('f85e17c9',status=200)
     if request.data.get('group_id') == 209432771:
         return Response('f85e17c9',status=200)
     return HttpResponseBadRequest()
