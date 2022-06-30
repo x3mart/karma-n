@@ -48,7 +48,7 @@ class AccountSerializer(UserSerializer):
 
 class CurentAcountSerializer(AccountSerializer):
     services = ServiceSerializer(many=True, read_only=True)
-    reviewables = ReviewablePolymorphicSerializer(many=True)
+    reviewables = ReviewablePolymorphicSerializer(many=True, read_only=True)
     users_customer_attributes_avg = UserCustomerAttributeAvgSerializer(many=True, read_only=True)
     users_executor_attributes_avg = UserExecutorAttributeAvgSerializer(many=True, read_only=True)
     class Meta:
