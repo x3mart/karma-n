@@ -1,4 +1,4 @@
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.throttling import UserRateThrottle
@@ -168,7 +168,7 @@ def check_code(request):
 def vk_handler(request):
     secret = request.data.get('secret', None)
     if secret == VK_SECRET:
-        return Response('f85e17c9',status=200, content_type='text/plain')
+        return HttpResponse('f85e17c9',status=200, content_type='text/plain')
     if request.data.get('group_id') == 209432771:
-        return Response('f85e17c9',status=200)
+        return HttpResponse('f85e17c9',status=200, content_type='text/plain')
     return HttpResponseBadRequest()
