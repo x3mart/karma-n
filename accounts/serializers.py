@@ -55,3 +55,7 @@ class CurentAcountSerializer(AccountSerializer):
         model = Account
         exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions']
         extra_kwargs = {'password': {'write_only': True}, }
+
+
+class AvatarSerializer(serializers.Serializer):
+    avatar = serializers.ImageField()

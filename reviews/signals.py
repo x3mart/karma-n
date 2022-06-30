@@ -43,8 +43,8 @@ def review_post_save(instance, created, **kwargs):
 @receiver(post_save, sender=Comment)
 def comment_post_save(instance, created, **kwargs):
     if created:
-        review = instance.commented_review
-        review.count_comments = Comment.objects.filter(commented_review_id=review.id).count()
+        review = Review.objects.filter(pk=instance.commented_review.id)
+        review.update(count_comments = Comment.objects.filter(commented_review_id=review.id).count())
         review.save()
 
     

@@ -72,6 +72,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     about = models.TextField(null=True, blank=True,)
     services = models.ManyToManyField('services.Service', verbose_name='Услуги', related_name='accounts')
 
+
     objects = AccountManager()
 
     USERNAME_FIELD = 'email'
