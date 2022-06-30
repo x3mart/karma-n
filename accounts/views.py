@@ -29,7 +29,7 @@ class AccountViewSet(UserViewSet):
         instance.reviewables.clear()
         return super().perform_destroy(instance)
     
-    @action(methods=['path'], detail=True)
+    @action(methods=['patch'], detail=True)
     def avatar(self, request, pk=None):
         user = self.get_object()
         serializer = self.get_serializer(data=request.data)
