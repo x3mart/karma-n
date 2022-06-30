@@ -2,8 +2,10 @@ from djoser.views import UserViewSet
 from djoser.conf import settings
 from django.db.models import Prefetch
 from rest_framework.decorators import action
+from reviewables.models import Reviewable
 from services.models import Service
 from utils.images import image_processing
+from utils.reviewables import clean_phone
 from rest_framework.response import Response
 from accounts.serializers import AccountSerializer, AvatarSerializer
 from reviews.models import UserCustomerAttributeAvgValue, UserExecutorAttributeAvgValue
@@ -45,6 +47,12 @@ class AccountViewSet(UserViewSet):
         else:
             services = []
         instance.services.set(services)
+        reviewables = request.data.get('reviewables')
+        reviewables_set=[]
+        if reviewables:
+            reviewables_set.append([Reviewable.objects.get_or_create(screen_name=reviewable['screen_name'], resourcetype=reviewable['resourcetype'])[0] for reviewable in reviewables if reviewable['resourcetype'] != 'phone'])
+            reviewables_set.append([Reviewable.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']), resourcetype=reviewable['resourcetype'])[0] for reviewable in reviewables if reviewable['resourcetype'] == 'phone'])
+            
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
