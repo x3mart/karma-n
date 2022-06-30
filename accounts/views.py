@@ -38,7 +38,7 @@ class AccountViewSet(UserViewSet):
         user.avatar = data['avatar']
         user.save()
         image_processing(user.avatar, 300, 300)
-        return Response(AccountSerializer(user, context={'request':request}), status=200)
+        return Response(AccountSerializer(user, context={'request':request}).data, status=200)
         
 
     
