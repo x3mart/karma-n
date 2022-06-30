@@ -32,12 +32,13 @@ class AccountViewSet(UserViewSet):
     @action(methods=['patch'], detail=True)
     def avatar(self, request, *args, **kwargs):
         user = self.get_object()
+        current_image = user.avatar
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             data = serializer.validated_data
         user.avatar = data['avatar']
         user.save()
-        image_processing(user.avatar, 300, 300)
+        image_processing(user.avatar, current_image, 300, 300)
         return Response(AccountSerializer(user, context={'request':request}).data, status=200)
         
 

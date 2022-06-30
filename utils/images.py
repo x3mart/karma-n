@@ -102,5 +102,5 @@ def image_processing(img, current_img=None, crop_width=None, crop_height=None, t
             crop_image(img.path, crop_width, crop_height)
         if crop_width and crop_height and aspectratio:
             resize_with_aspectratio(img.path, crop_width, crop_height)
-        # if current_img and current_img != img:
-        #     delete_image(current_img)
+        if current_img and current_img != img:
+            delete_image(current_img)
