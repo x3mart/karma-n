@@ -51,15 +51,12 @@ class AccountViewSet(UserViewSet):
         reviewables = request.data.get('reviewables')
         reviewables_set=[]
         if reviewables:
-            reviewables_set += [apps.get_model('reviewables', reviewable['resourcetype'].capitalize()).objects.get_or_create(screen_name=reviewable['screen_name'])[0].id for reviewable in reviewables if reviewable['resourcetype'] != 'phone']
-            reviewables_set += [Phone.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']))[0].id for reviewable in reviewables if reviewable['resourcetype'] == 'phone']
-            print(reviewables_set)
+            reviewables_set += [apps.get_model('reviewables', reviewable['resourcetype'].capitalize()).objects.get_or_create(screen_name=reviewable['screen_name'])[0].id for reviewable in reviewables if reviewable['resourcetype'].capitalize() != 'Phone']
+            reviewables_set += [Phone.objects.get_or_create(screen_name=clean_phone(reviewable['screen_name']))[0].id for reviewable in reviewables if reviewable['resourcetype'].capitalize() == 'Phone']
         if len(reviewables_set):
             Reviewable.objects.filter(pk__in=reviewables_set).update(owner_id=instance.id)
             
         if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
